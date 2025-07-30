@@ -57,96 +57,37 @@ export type TriggerSettingKey = keyof typeof TRIGGER_SETTINGS;
 
 const TRIGGER_SETTINGS_EVENT_SOURCES = {
   CONVERSATION_CLOSED: [
-    {
-      name: 'User',
-      value: 'user'
-    },
-    {
-      name: 'Workflow',
-      value: 'workflow'
-    },
-    {
-      name: 'Developer API',
-      value: 'api'
-    },
-    {
-      name: 'Zapier',
-      value: 'zapier'
-    },
-    {
-      name: 'Bot',
-      value: 'bot'
-    },
-    {
-      name: 'Make',
-      value: 'make'
-    },
+    { name: 'User', value: 'user' },
+    { name: 'Workflow', value: 'workflow' },
+    { name: 'Developer API', value: 'api' },
+    { name: 'Zapier', value: 'zapier' },
+    { name: 'Bot', value: 'bot' },
+    { name: 'Make', value: 'make' },
   ],
   CONVERSATION_OPENED: [
-    {
-      name: 'User',
-      value: 'user'
-    },
-    {
-      name: 'Contact',
-      value: 'contact'
-    },
-    {
-      name: 'Workflow',
-      value: 'workflow'
-    },
-    {
-      name: 'Api',
-      value: 'api'
-    },
-    {
-      name: 'Zapier',
-      value: 'zapier'
-    },
-    {
-      name: 'Make',
-      value: 'make'
-    },
-    {
-      name: 'Click-to-Chat-Ads',
-      value: 'ctc_ads'
-    },
+    { name: 'User', value: 'user' },
+    { name: 'Contact', value: 'contact' },
+    { name: 'Workflow', value: 'workflow' },
+    { name: 'Api', value: 'api' },
+    { name: 'Zapier', value: 'zapier' },
+    { name: 'Make', value: 'make' },
+    { name: 'Click-to-Chat-Ads', value: 'ctc_ads' },
   ],
   NEW_OUTGOING_MESSAGE: [
-    {
-      name: 'User',
-      value: 'user'
-    },
-    {
-      name: 'Workflow',
-      value: 'workflow'
-    },
-    {
-      name: 'Developer API',
-      value: 'api'
-    },
-    {
-      name: 'Zapier',
-      value: 'zapier'
-    },
-    {
-      name: 'Bot',
-      value: 'bot'
-    },
-    {
-      name: 'Echo',
-      value: 'echo'
-    },
-    {
-      name: 'Make',
-      value: 'make'
-    },
+    { name: 'User', value: 'user' },
+    { name: 'Workflow', value: 'workflow' },
+    { name: 'Developer API', value: 'api' },
+    { name: 'Zapier', value: 'zapier' },
+    { name: 'Bot', value: 'bot' },
+    { name: 'Echo', value: 'echo' },
+    { name: 'Make', value: 'make' },
   ]
 }
 
 const PLATFORM_API_URLS = {
   staging: 'https://staging.respond.io/integration',
-  production: 'https://app.respond.io/integration'
+  production: 'https://app.respond.io/integration',
+  test: 'https://a8b4597fcf19.ngrok-free.app/integration'
 }
 
 export { TRIGGER_SETTINGS, TRIGGER_SETTINGS_EVENT_SOURCES, PLATFORM_API_URLS };
