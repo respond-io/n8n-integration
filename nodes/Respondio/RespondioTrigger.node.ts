@@ -13,6 +13,7 @@ export class RespondioTrigger implements INodeType {
   description: INodeTypeDescription;
   webhookMethods: INodeType['webhookMethods']
   static triggerEventTypeName = 'triggerEventType'
+  static eventSourceTypeName = 'eventSource'
   static triggerDefaultValue = TRIGGER_SETTINGS.NEW_INCOMING_MESSAGE.value;
 
   constructor() {
@@ -64,8 +65,8 @@ export class RespondioTrigger implements INodeType {
         },
         {
           displayName: 'Event Source',
-          name: 'eventSource',
-          type: 'options',
+          name: RespondioTrigger.eventSourceTypeName,
+          type: 'multiOptions',
           displayOptions: {
             show: {
               [RespondioTrigger.triggerEventTypeName]: [
