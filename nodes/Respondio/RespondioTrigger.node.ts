@@ -7,6 +7,7 @@ import {
   NodeConnectionType,
   ILoadOptionsFunctions,
   NodeOperationError,
+  IWorkflowMetadata,
 } from 'n8n-workflow';
 import { PLATFORM_API_URLS, TRIGGER_SETTINGS, TRIGGER_SETTINGS_EVENT_SOURCES } from './constants';
 
@@ -92,6 +93,8 @@ export class RespondioTrigger implements INodeType {
           const credentials = await this.getCredentials('respondIoApi');
           const webhookUrl = this.getNodeWebhookUrl('default');
           const currentNode = this.getNode();
+          const workflow = this.getWorkflow();
+
 
           const eventType = this.getNodeParameter(
             RespondioTrigger.triggerEventTypeName,
@@ -101,9 +104,10 @@ export class RespondioTrigger implements INodeType {
 
           const executionEnv = credentials?.environment as 'production' | 'staging' || 'staging';
           const platformUrl = PLATFORM_API_URLS[executionEnv]
-          const bundle: { sources?: string[] } = {}
+          const bundle: { sources?: string[]; workflowDetails?: IWorkflowMetadata } = {}
 
           if (eventSources?.length) bundle.sources = eventSources
+          if (workflow) bundle.workflowDetails = workflow
 
           try {
             const response = await this.helpers.request({
@@ -139,13 +143,20 @@ export class RespondioTrigger implements INodeType {
           const executionEnv = credentials?.environment as 'production' | 'staging' || 'staging';
           const platformUrl = PLATFORM_API_URLS[executionEnv]
 
-          await this.helpers.request({
-            method: 'DELETE',
-            url: `${platformUrl}/n8n/unsubscribe/${webhookId}`,
-            headers: {
-              Authorization: `Bearer ${credentials.apiKey}`,
-            },
-          });
+          try {
+            const response = await this.helpers.request({
+              method: 'DELETE',
+              url: `${platformUrl}/n8n/unsubscribe/${webhookId}`,
+              headers: {
+                Authorization: `Bearer ${credentials.apiKey}`,
+              },
+            });
+
+            this.logger.info(`Delete response: ${JSON.stringify(response)}`);
+          } catch (error) {
+            this.logger.info(`Error: ${JSON.stringify(error)}`);
+            throw new NodeOperationError(this.getNode(), `Failed to create webhook subscription: ${error.message}`);
+          }
 
           return true;
         },
@@ -154,7 +165,7 @@ export class RespondioTrigger implements INodeType {
           // return false everytime since the delete happens on:
           // 1. workflow executed -> webhookMethods.create -> workflow stop -> webhookMethods.delete
           // 2. workflow activated -> webhookMethods.create -> workflow deactivated -> webhookMethods.delete
-          return false
+          return false;
         },
       },
     };
