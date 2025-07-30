@@ -6,6 +6,7 @@ import {
   IWebhookResponseData,
   NodeConnectionType,
   ILoadOptionsFunctions,
+  NodeOperationError,
 } from 'n8n-workflow';
 import { PLATFORM_API_URLS, TRIGGER_SETTINGS, TRIGGER_SETTINGS_EVENT_SOURCES } from './constants';
 
@@ -96,46 +97,51 @@ export class RespondioTrigger implements INodeType {
             RespondioTrigger.triggerEventTypeName,
             RespondioTrigger.triggerDefaultValue,
           ) as string;
-          this.logger.info(`eventType: ${JSON.stringify(eventType)}`)
+          const eventSources = this.getNodeParameter(RespondioTrigger.eventSourceTypeName, []) as string[];
+
           const executionEnv = credentials?.environment as 'production' | 'staging' || 'staging';
           const platformUrl = PLATFORM_API_URLS[executionEnv]
-          this.logger.info(`platformUrl: ${JSON.stringify(platformUrl)}`)
+          const bundle: { sources?: string[] } = {}
 
-          const response = await this.helpers.request({
-            method: 'POST',
-            url: 'https://webhook.site/28126219-0c38-46d7-ac76-742169397987',
-            // url: `${platformUrl}/n8n/subscribe`,
-            headers: {
-              Authorization: `Bearer ${credentials.apiKey}`,
-            },
-            body: {
-              // const { type, url, hookId, bundle: { inputData } } = this.req.body;
-              // url: webhookUrl,
-              // event: eventType,
-              type: eventType,
-              url: webhookUrl,
-              hookId: currentNode.webhookId,
-              bundle: {},
-            },
-            json: true,
-          });
+          if (eventSources?.length) bundle.sources = eventSources
 
-          // Store webhook ID for later cleanup
-          this.getWorkflowStaticData('global').respondioWebhookId = response.id;
+          try {
+            const response = await this.helpers.request({
+              method: 'POST',
+              url: `${platformUrl}/n8n/subscribe`,
+              headers: {
+                Authorization: `Bearer ${credentials.apiKey}`,
+              },
+              body: {
+                type: eventType,
+                url: webhookUrl,
+                hookId: currentNode.webhookId,
+                bundle,
+              },
+              json: true,
+            });
+            this.logger.info(`Response: ${JSON.stringify(response)}`);
+          } catch (error) {
+            this.logger.info(`Error: ${JSON.stringify(error)}`);
+            throw new NodeOperationError(this.getNode(), `Failed to create webhook subscription: ${error.message}`);
+          }
 
           return true;
         },
 
         async delete(this: IHookFunctions): Promise<boolean> {
           const credentials = await this.getCredentials('respondIoApi');
-          const staticData = this.getWorkflowStaticData('global');
-          const webhookId = staticData.respondioWebhookId;
+          const currentNode = this.getNode();
+          const webhookId = currentNode.webhookId;
 
           if (!webhookId) return true;
 
+          const executionEnv = credentials?.environment as 'production' | 'staging' || 'staging';
+          const platformUrl = PLATFORM_API_URLS[executionEnv]
+
           await this.helpers.request({
             method: 'DELETE',
-            url: `https://api.respond.io/webhooks/${webhookId}`,
+            url: `${platformUrl}/n8n/unsubscribe/${webhookId}`,
             headers: {
               Authorization: `Bearer ${credentials.apiKey}`,
             },
