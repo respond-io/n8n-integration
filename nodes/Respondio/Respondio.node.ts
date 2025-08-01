@@ -30,18 +30,47 @@ function buildDynamicProperties(resourceTypeName: string, resourceTypeDefault: s
     required: true,
   });
 
+  // comment out first
+  // for (const [resource, actions] of Object.entries(ACTION_SETTINGS)) {
+  //   for (const action of Object.values(actions)) {
+  //     if (action.params) {
+  //       for (const param of action.params) {
+  //         properties.push({
+  //           ...param,
+  //           displayOptions: {
+  //             show: {
+  //               resource: [resource],
+  //               action: [action.value],
+  //             },
+  //           },
+  //         });
+  //       }
+  //     }
+  //   }
+  // }
+
   for (const [resource, actions] of Object.entries(ACTION_SETTINGS)) {
     for (const action of Object.values(actions)) {
       if (action.params) {
         for (const param of action.params) {
-          properties.push({
-            ...param,
-            displayOptions: {
+          const mergedDisplayOptions = param.displayOptions
+            ? {
               show: {
-                resource: [resource],
+                ...param.displayOptions.show,
+                [resourceTypeName]: [resource],
                 action: [action.value],
               },
-            },
+            }
+            : {
+              show: {
+                [resourceTypeName]: [resource],
+                action: [action.value],
+              },
+            };
+
+          properties.push({
+            ...param,
+            displayOptions: mergedDisplayOptions,
           });
         }
       }

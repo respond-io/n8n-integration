@@ -109,7 +109,51 @@ const ACTION_SETTINGS = {
       // value: 'addComment',
       value: 'ADD_COMMENT',
       description: 'Adds a comment to a conversation',
-      params: [{}]
+      params: [
+        {
+          displayName: 'Identifier Type',
+          name: 'identifierType',
+          type: 'options',
+          options: [
+            { name: 'ID', value: 'id' },
+            { name: 'Email', value: 'email' },
+            { name: 'Phone', value: 'phone' },
+          ],
+          required: true,
+          description: 'How would you like to identify the contact?'
+        },
+        {
+          displayName: 'Contact ID',
+          name: 'contactId',
+          type: 'number',
+          required: true,
+          description: 'Numeric ID of the contact',
+          displayOptions: {
+            show: {
+              identifierType: ['id'],
+            },
+          },
+        },
+        {
+          displayName: 'Contact Identifier',
+          name: 'contactIdentifier',
+          type: 'string',
+          required: true,
+          description: 'Email or phone of the contact',
+          displayOptions: {
+            show: {
+              identifierType: ['email', 'phone'],
+            },
+          },
+        },
+        {
+          displayName: 'Comment',
+          name: 'comment',
+          type: 'string',
+          required: true,
+          description: 'Wrap mentioned user ids in $userId$, for example: $1$'
+        }
+      ]
     }
   },
   CONTACTS: {
