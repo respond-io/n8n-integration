@@ -338,7 +338,8 @@ const ACTION_SETTINGS = {
           name: 'search',
           type: 'string',
           required: false,
-          description: 'Search term for filtering Contacts'
+          description: 'Search term for filtering Contacts',
+          default: ''
         },
         {
           displayName: 'Limit',
@@ -346,6 +347,7 @@ const ACTION_SETTINGS = {
           type: 'number',
           required: false,
           description: 'Maximum number of Contacts to return',
+          default: 10
         }
       ]
     },
@@ -397,7 +399,14 @@ const ACTION_SETTINGS = {
       // value: 'getAllCustomFields',
       value: 'GET_ALL_CUSTOM_FIELDS',
       description: 'Return all the Custom Fields of a Workspace',
-      params: [{}]
+      params: [{
+        displayName: 'Limit',
+        name: 'limit',
+        type: 'number',
+        required: false,
+        description: 'Maximum number of Contacts to return',
+        default: 10
+      }]
     },
     FIND_CUSTOM_FIELD: {
       name: 'Find a Custom Field',
@@ -407,9 +416,10 @@ const ACTION_SETTINGS = {
       params: [{
         displayName: 'Custom Field ID',
         name: 'customFieldId',
-        type: 'string',
+        type: 'number',
         required: true,
         description: 'Custom Field ID',
+        default: undefined,
       }]
     },
     CREATE_CUSTOM_FIELD: {
@@ -417,7 +427,64 @@ const ACTION_SETTINGS = {
       // value: 'createCustomField',
       value: 'CREATE_CUSTOM_FIELD',
       description: 'Creates a Custom Field',
-      params: [{}]
+      params: [
+        {
+          displayName: 'Name',
+          name: 'name',
+          type: 'string',
+          required: true,
+          description: 'Name of the Custom Field',
+          default: '',
+        },
+        {
+          displayName: 'Description',
+          name: 'description',
+          type: 'string',
+          required: false,
+          description: 'Description of the Custom Field',
+          default: '',
+        },
+        {
+          displayName: 'Slug',
+          name: 'slug',
+          type: 'string',
+          required: false,
+          description: 'The unique identifier for API and integrations. Field ID cannot be edited once added. Only letters, numbers, and underscores are allowed for this field.',
+          default: '',
+        },
+        {
+          displayName: 'Type',
+          name: 'dataType',
+          type: 'options',
+          options: [
+            { name: 'Text', value: 'text' },
+            { name: 'List', value: 'list' },
+            { name: 'Checkbox', value: 'checkbox' },
+            { name: 'Email', value: 'email' },
+            { name: 'Number', value: 'number' },
+            { name: 'URL', value: 'url' },
+            { name: 'Date', value: 'date' },
+            { name: 'Time', value: 'time' },
+          ],
+          required: true,
+          description: 'Type of the Custom Field',
+          default: '',
+        },
+        {
+          displayName: 'Options',
+          name: 'allowedValues',
+          type: 'string',
+          typeOptions: { multipleValues: true },
+          required: false,
+          description: 'List Values',
+          default: [],
+          displayOptions: {
+            show: {
+              dataType: ['list'],
+            },
+          },
+        }
+      ]
     }
   },
   CONVERSATIONS: {
@@ -426,7 +493,60 @@ const ACTION_SETTINGS = {
       // value: 'updateContactAssignee',
       value: 'ASSIGN_OR_UNASSIGNED_CONVERSATION',
       description: 'Updates the assignee of a conversation',
-      params: [{}]
+      params: [
+        ...generateContactIdentifierInputFields([
+          IContactIdentifiers.id,
+          IContactIdentifiers.email,
+          IContactIdentifiers.phone,
+        ]),
+        {
+          displayName: 'Assignment Type',
+          name: 'assignmentType',
+          type: 'options',
+          options: [
+            { name: 'Unassign the Contact', value: 'none' },
+            { name: 'Assign by User ID', value: 'userId' },
+            { name: 'Assign by User Email', value: 'userEmail' },
+          ],
+          required: true,
+          description: 'Type of the Custom Field',
+          default: '',
+        },
+        {
+          displayName: 'Select User ID',
+          name: 'assigneeUserId',
+          type: 'options',
+          required: true,
+          description: 'The ID of the user to assign the conversation to. This ID can be found under Settings > "Users"',
+          typeOptions: {
+            loadOptionsMethod: 'getSpaceUsers',
+            loadOptionsDependsOn: ['assignmentType']
+          },
+          default: '',
+          displayOptions: {
+            show: {
+              assignmentType: ['userId'],
+            },
+          },
+        },
+        {
+          displayName: 'Select User Email',
+          name: 'assigneeUserEmail',
+          type: 'string',
+          required: true,
+          description: 'The email of the user to assign the conversation to. This email can be found under Settings > "Users"',
+          typeOptions: {
+            loadOptionsMethod: 'getSpaceUsers',
+            loadOptionsDependsOn: ['assignmentType']
+          },
+          default: '',
+          displayOptions: {
+            show: {
+              assignmentType: ['userEmail'],
+            },
+          },
+        }
+      ]
     },
     OPEN_OR_CLOSE_CONVERSATION: {
       name: 'Open or close a Conversation',
