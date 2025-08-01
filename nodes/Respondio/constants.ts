@@ -1,7 +1,5 @@
 import { INodeProperties, INodePropertyOptions } from "n8n-workflow";
-import { generateContactIdentifierInputFields, IContactIdentifiers } from "./utils";
-import languagesJSON from './utils/languages.json'
-import countriesJSON from './utils/countries.json'
+import { generateContactIdentifierInputFields, generateContactInputFields, IContactIdentifiers } from "./utils";
 
 const TRIGGER_SETTINGS = {
   CONTACT_ASSIGNEE_UPDATED: {
@@ -362,56 +360,7 @@ const ACTION_SETTINGS = {
           IContactIdentifiers.email,
           IContactIdentifiers.phone,
         ]),
-        {
-          displayName: 'Contact\'s First Name',
-          required: false,
-          name: 'firstName',
-          type: 'string',
-          description: 'First name of the contact',
-        },
-        {
-          displayName: 'Contact\'s Last Name',
-          required: false,
-          name: 'lastName',
-          type: 'string',
-          description: 'Last name of the contact',
-        },
-        {
-          displayName: 'Contact\'s Email Address',
-          required: false,
-          name: 'email',
-          type: 'string',
-          description: 'Email address of the contact',
-        },
-        {
-          displayName: 'Contact\'s Preferred Language',
-          required: false,
-          name: 'language',
-          type: 'options',
-          options: languagesJSON.map((language) => ({
-            name: language.English,
-            value: language.alpha2,
-          })),
-          description: 'Preferred language of the contact',
-        },
-        {
-          displayName: 'Contact\'s Profile Picture URL',
-          required: false,
-          name: 'profilePic',
-          type: 'string',
-          description: 'Profile picture URL of the contact',
-        },
-        {
-          displayName: 'Contact\'s Country',
-          required: false,
-          name: 'countryCode',
-          type: 'options',
-          options: countriesJSON.map((country) => ({
-            name: country.Name,
-            value: country.Code,
-          })),
-          description: 'Email address of the contact',
-        },
+        ...generateContactInputFields(false),
       ]
     },
     CREATE_OR_UPDATE_CONTACT: {
@@ -419,14 +368,27 @@ const ACTION_SETTINGS = {
       // value: 'createOrUpdateContact',
       value: 'CREATE_OR_UPDATE_CONTACT',
       description: 'Creates or updates a Contact. Leave the contact field empty if you want to store an empty value or remain the existing value. It is highly recommended to add a delay before executing a new action after creating a new contact, as processing time is required',
-      params: [{}]
+      params: [
+        ...generateContactIdentifierInputFields([
+          IContactIdentifiers.id,
+          IContactIdentifiers.email,
+          IContactIdentifiers.phone,
+        ]),
+        ...generateContactInputFields(false),
+      ]
     },
     CREATE_CONTACT: {
       name: 'Create a Contact',
       // value: 'createContact',
       value: 'CREATE_CONTACT',
       description: 'Creates a Contact. Leave the contact field empty if you want to store an empty value or remain the existing value. It is highly recommended to add a delay before executing a new action after creating a new contact, as processing time is required',
-      params: [{}]
+      params: [
+        ...generateContactIdentifierInputFields([
+          IContactIdentifiers.email,
+          IContactIdentifiers.phone,
+        ]),
+        ...generateContactInputFields(true),
+      ]
     }
   },
   CONTACT_FIELDS: {
