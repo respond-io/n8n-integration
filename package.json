@@ -33,7 +33,7 @@
   "n8n": {
     "n8nNodesApiVersion": 1,
     "credentials": [
-      "dist/credentials/Respondio.credentials.js"
+      "dist/credentials/RespondIoApi.credentials.js"
     ],
     "nodes": [
       "dist/nodes/Respondio/Respondio.node.js",
