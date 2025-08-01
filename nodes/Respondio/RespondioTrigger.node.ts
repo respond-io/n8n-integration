@@ -72,9 +72,9 @@ export class RespondioTrigger implements INodeType {
           displayOptions: {
             show: {
               [RespondioTrigger.triggerEventTypeName]: [
-                TRIGGER_SETTINGS.CONVERSATION_CLOSED.value, ,
-                TRIGGER_SETTINGS.CONVERSATION_OPENED.value, ,
-                TRIGGER_SETTINGS.NEW_OUTGOING_MESSAGE.value, ,
+                TRIGGER_SETTINGS.CONVERSATION_CLOSED.value,
+                TRIGGER_SETTINGS.CONVERSATION_OPENED.value,
+                TRIGGER_SETTINGS.NEW_OUTGOING_MESSAGE.value,
               ],
             }
           },
