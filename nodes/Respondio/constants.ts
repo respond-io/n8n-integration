@@ -162,28 +162,169 @@ const ACTION_SETTINGS = {
       // value: 'addSpaceTag',
       value: 'ADD_SPACE_TAG',
       description: 'Adds Tag(s) for a Contact',
-      params: [{}]
+      params: [
+        {
+          displayName: 'Name',
+          name: 'name',
+          type: 'string',
+          required: true,
+          description: 'Name of space tag'
+        },
+        {
+          displayName: 'Description',
+          name: 'description',
+          type: 'string',
+          required: false,
+          description: 'Description of space tag'
+        },
+        {
+          displayName: 'Color Code',
+          name: 'colorCode',
+          type: 'options',
+          options: [
+            { name: 'Gray', value: 'tag-grey' },
+            { name: 'Red', value: 'tag-red' },
+            { name: 'Orange', value: 'tag-orange' },
+            { name: 'Yellow', value: 'tag-yellow' },
+            { name: 'Green', value: 'tag-green' },
+            { name: 'Blue', value: 'tag-blue' },
+            { name: 'Indigo', value: 'tag-indigo' },
+            { name: 'Purple', value: 'tag-purpole' },
+          ],
+          required: false,
+          description: 'Color code of space tag'
+        },
+        {
+          displayName: 'Emoji',
+          name: 'emoji',
+          type: 'string',
+          required: false,
+          description: 'Emoji for space tag',
+        },
+      ]
     },
     DELETE_SPACE_TAG: {
       name: 'Delete a Space Tag',
       // value: 'deleteSpaceTag',
       value: 'DELETE_SPACE_TAG',
       description: 'Deletes space tag',
-      params: [{}]
+      params: [
+        {
+          displayName: 'Name',
+          name: 'name',
+          type: 'string',
+          required: true,
+          description: 'Name of space tag to delete',
+        },
+      ]
     },
     UPDATE_SPACE_TAG: {
       name: 'Update a Space Tag',
       // value: 'updateSpaceTag',
       value: 'UPDATE_SPACE_TAG',
       description: 'Updates a Space Tag',
-      params: [{}]
+      params: [
+        {
+          displayName: 'Current Name',
+          name: 'currentName',
+          type: 'string',
+          required: true,
+          description: 'Current Name of space tag'
+        },
+        {
+          displayName: 'Name',
+          name: 'name',
+          type: 'string',
+          required: true,
+          description: 'Name of space tag'
+        },
+        {
+          displayName: 'Description',
+          name: 'description',
+          type: 'string',
+          required: false,
+          description: 'Description of space tag'
+        },
+        {
+          displayName: 'Color Code',
+          name: 'colorCode',
+          type: 'options',
+          options: [
+            { name: 'Gray', value: 'tag-grey' },
+            { name: 'Red', value: 'tag-red' },
+            { name: 'Orange', value: 'tag-orange' },
+            { name: 'Yellow', value: 'tag-yellow' },
+            { name: 'Green', value: 'tag-green' },
+            { name: 'Blue', value: 'tag-blue' },
+            { name: 'Indigo', value: 'tag-indigo' },
+            { name: 'Purple', value: 'tag-purpole' },
+          ],
+          required: false,
+          description: 'Color code of space tag'
+        },
+        {
+          displayName: 'Emoji',
+          name: 'emoji',
+          type: 'string',
+          required: false,
+          description: 'Emoji for space tag',
+        },
+      ]
     },
     REMOVE_TAGS: {
       name: 'Remove many Tags',
       // value: 'removeTags',
       value: 'REMOVE_TAGS',
       description: 'Removes Tag(s) for a Contact',
-      params: [{}]
+      params: [
+        {
+          displayName: 'Identifier Type',
+          name: 'identifierType',
+          type: 'options',
+          options: [
+            { name: 'ID', value: 'id' },
+            { name: 'Email', value: 'email' },
+            { name: 'Phone', value: 'phone' },
+          ],
+          required: true,
+          description: 'How would you like to identify the contact?'
+        },
+        {
+          displayName: 'Contact ID',
+          name: 'contactId',
+          type: 'number',
+          required: true,
+          description: 'Numeric ID of the contact',
+          displayOptions: {
+            show: {
+              identifierType: ['id'],
+            },
+          },
+        },
+        {
+          displayName: 'Contact Identifier',
+          name: 'contactIdentifier',
+          type: 'string',
+          required: true,
+          description: 'Email or phone of the contact',
+          displayOptions: {
+            show: {
+              identifierType: ['email', 'phone'],
+            },
+          },
+        },
+        {
+          displayName: 'Select a Tag to Delete',
+          name: 'tagId',
+          type: 'options',
+          typeOptions: {
+            loadOptionsMethod: 'getTagsForContact',
+            loadOptionsDependsOn: ['identifierType', 'contactId', 'contactIdentifier'],
+          },
+          required: true,
+          description: 'Choose the tag to delete from this contact',
+        },
+      ]
     },
     DELETE_CONTACT: {
       name: 'Delete a Contact',
