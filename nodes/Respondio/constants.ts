@@ -1,4 +1,7 @@
-import { INodePropertyOptions } from "n8n-workflow";
+import { INodeProperties, INodePropertyOptions } from "n8n-workflow";
+import { generateContactIdentifierInputFields, IContactIdentifiers } from "./utils";
+import languagesJSON from './utils/languages.json'
+import countriesJSON from './utils/countries.json'
 
 const TRIGGER_SETTINGS = {
   CONTACT_ASSIGNEE_UPDATED: {
@@ -110,42 +113,11 @@ const ACTION_SETTINGS = {
       value: 'ADD_COMMENT',
       description: 'Adds a comment to a conversation',
       params: [
-        {
-          displayName: 'Identifier Type',
-          name: 'identifierType',
-          type: 'options',
-          options: [
-            { name: 'ID', value: 'id' },
-            { name: 'Email', value: 'email' },
-            { name: 'Phone', value: 'phone' },
-          ],
-          required: true,
-          description: 'How would you like to identify the contact?'
-        },
-        {
-          displayName: 'Contact ID',
-          name: 'contactId',
-          type: 'number',
-          required: true,
-          description: 'Numeric ID of the contact',
-          displayOptions: {
-            show: {
-              identifierType: ['id'],
-            },
-          },
-        },
-        {
-          displayName: 'Contact Identifier',
-          name: 'contactIdentifier',
-          type: 'string',
-          required: true,
-          description: 'Email or phone of the contact',
-          displayOptions: {
-            show: {
-              identifierType: ['email', 'phone'],
-            },
-          },
-        },
+        ...generateContactIdentifierInputFields([
+          IContactIdentifiers.id,
+          IContactIdentifiers.email,
+          IContactIdentifiers.phone,
+        ]),
         {
           displayName: 'Comment',
           name: 'comment',
@@ -277,42 +249,11 @@ const ACTION_SETTINGS = {
       value: 'REMOVE_TAGS',
       description: 'Removes Tag(s) for a Contact',
       params: [
-        {
-          displayName: 'Identifier Type',
-          name: 'identifierType',
-          type: 'options',
-          options: [
-            { name: 'ID', value: 'id' },
-            { name: 'Email', value: 'email' },
-            { name: 'Phone', value: 'phone' },
-          ],
-          required: true,
-          description: 'How would you like to identify the contact?'
-        },
-        {
-          displayName: 'Contact ID',
-          name: 'contactId',
-          type: 'number',
-          required: true,
-          description: 'Numeric ID of the contact',
-          displayOptions: {
-            show: {
-              identifierType: ['id'],
-            },
-          },
-        },
-        {
-          displayName: 'Contact Identifier',
-          name: 'contactIdentifier',
-          type: 'string',
-          required: true,
-          description: 'Email or phone of the contact',
-          displayOptions: {
-            show: {
-              identifierType: ['email', 'phone'],
-            },
-          },
-        },
+        ...generateContactIdentifierInputFields([
+          IContactIdentifiers.id,
+          IContactIdentifiers.email,
+          IContactIdentifiers.phone,
+        ]),
         {
           displayName: 'Select a Tag to Delete',
           name: 'tagId',
@@ -331,35 +272,62 @@ const ACTION_SETTINGS = {
       // value: 'deleteContact',
       value: 'DELETE_CONTACT',
       description: 'Deletes a Contact',
-      params: [{}]
-    },
-    MERGE_CONTACT: {
-      name: 'Merge a Contact',
-      // value: 'mergeContact',
-      value: 'MERGE_CONTACT',
-      description: 'Merges two Contacts',
-      params: [{}]
+      params: [
+        ...generateContactIdentifierInputFields([
+          IContactIdentifiers.id,
+          IContactIdentifiers.email,
+          IContactIdentifiers.phone,
+        ]),
+      ]
     },
     FIND_CONTACT_CHANNELS: {
       name: 'Find many Contact Channels',
       // value: 'getContactChannels',
       value: 'FIND_CONTACT_CHANNELS',
       description: 'Find connected Channels of a Contact',
-      params: [{}]
+      params: [
+        ...generateContactIdentifierInputFields([
+          IContactIdentifiers.id,
+          IContactIdentifiers.email,
+          IContactIdentifiers.phone,
+        ]),
+      ]
     },
     FIND_CONTACT: {
       name: 'Find a Contact',
       // value: 'getContact',
       value: 'FIND_CONTACT',
       description: 'Finds a specific Contact by identifier',
-      params: [{}]
+      params: [
+        ...generateContactIdentifierInputFields([
+          IContactIdentifiers.id,
+          IContactIdentifiers.email,
+          IContactIdentifiers.phone,
+        ]),
+      ]
     },
     ADD_TAGS: {
       name: 'Add many Tags',
       // value: 'addTags',
       value: 'ADD_TAGS',
       description: 'Adds Tag(s) for a Contact',
-      params: [{}]
+      params: [
+        ...generateContactIdentifierInputFields([
+          IContactIdentifiers.id,
+          IContactIdentifiers.email,
+          IContactIdentifiers.phone,
+        ]),
+        {
+          displayName: 'Tags',
+          name: 'tags',
+          type: 'string',
+          typeOptions: { multipleValues: true },
+          default: [],
+          placeholder: 'TagName',
+          description: 'List of tags as strings',
+          required: true
+        }
+      ]
     },
     GET_MANY_CONTACTS: {
       name: 'Get many Contacts',
@@ -375,58 +343,76 @@ const ACTION_SETTINGS = {
           description: 'Search term for filtering Contacts'
         },
         {
-          displayName: 'Category',
-          name: 'category',
-          type: 'string',
+          displayName: 'Limit',
+          name: 'limit',
+          type: 'number',
           required: false,
-          description: 'Category of the contact field to filter on',
-        },
-        {
-          displayName: 'Field',
-          name: 'field',
-          type: 'string',
-          required: false,
-          description: 'Specific contact field to match',
-        },
-        {
-          displayName: 'Operator',
-          name: 'operator',
-          type: 'options',
-          options: [
-            { name: 'Equals', value: 'eq' },
-            { name: 'Not Equals', value: 'neq' },
-            { name: 'Contains', value: 'contains' },
-            { name: 'Does Not Contain', value: 'ncontains' },
-          ],
-          required: false,
-          description: 'Comparison operator to use for filtering',
-        },
-        {
-          displayName: 'Value',
-          name: 'value',
-          type: 'string',
-          required: false,
-          description: 'Value to compare against',
-        },
-        {
-          displayName: 'Condition Operator',
-          name: 'conditionOperator',
-          type: 'options',
-          options: [
-            { name: 'AND', value: 'and' },
-            { name: 'OR', value: 'or' },
-          ],
-          required: false,
-          description: 'Logical operator to combine multiple conditions',
-        },
+          description: 'Maximum number of Contacts to return',
+        }
       ]
     },
     UPDATE_CONTACT: {
       name: 'Update a Contact',
       // value: 'updateContact',
       value: 'UPDATE_CONTACT',
-      description: 'pdates Contact Field(s) of a Contact. Leave the contact field empty if you want to remain the existing value.',
-      params: [{}]
+      description: 'Updates Contact Field(s) of a Contact. Leave the contact field empty if you want to remain the existing value.',
+      params: [
+        ...generateContactIdentifierInputFields([
+          IContactIdentifiers.id,
+          IContactIdentifiers.email,
+          IContactIdentifiers.phone,
+        ]),
+        {
+          displayName: 'Contact\'s First Name',
+          required: false,
+          name: 'firstName',
+          type: 'string',
+          description: 'First name of the contact',
+        },
+        {
+          displayName: 'Contact\'s Last Name',
+          required: false,
+          name: 'lastName',
+          type: 'string',
+          description: 'Last name of the contact',
+        },
+        {
+          displayName: 'Contact\'s Email Address',
+          required: false,
+          name: 'email',
+          type: 'string',
+          description: 'Email address of the contact',
+        },
+        {
+          displayName: 'Contact\'s Preferred Language',
+          required: false,
+          name: 'language',
+          type: 'options',
+          options: languagesJSON.map((language) => ({
+            name: language.English,
+            value: language.alpha2,
+          })),
+          description: 'Preferred language of the contact',
+        },
+        {
+          displayName: 'Contact\'s Profile Picture URL',
+          required: false,
+          name: 'profilePic',
+          type: 'string',
+          description: 'Profile picture URL of the contact',
+        },
+        {
+          displayName: 'Contact\'s Country',
+          required: false,
+          name: 'countryCode',
+          type: 'options',
+          options: countriesJSON.map((country) => ({
+            name: country.Name,
+            value: country.Code,
+          })),
+          description: 'Email address of the contact',
+        },
+      ]
     },
     CREATE_OR_UPDATE_CONTACT: {
       name: 'Create or Update a Contact',
@@ -542,7 +528,7 @@ const ACTION_SETTINGS = {
       params: [{}]
     }
   }
-} as const satisfies Record<string, Record<string, INodePropertyOptions & { params: Array<Record<string, Object>> }>>;
+} as const satisfies Record<string, Record<string, INodePropertyOptions & { params: Array<INodeProperties> | Array<Object> }>>;
 
 const PLATFORM_API_URLS = {
   staging: 'https://staging.respond.io/integration',
