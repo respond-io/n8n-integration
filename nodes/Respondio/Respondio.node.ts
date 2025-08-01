@@ -1,6 +1,51 @@
-import { IExecuteFunctions, ILoadOptionsFunctions, INodeExecutionData, INodeProperties, INodePropertyOptions, type INodeType, type INodeTypeDescription, NodeConnectionType, NodeExecutionWithMetadata } from 'n8n-workflow';
+import {
+  IExecuteFunctions,
+  ILoadOptionsFunctions,
+  INodeExecutionData,
+  INodeProperties,
+  INodePropertyOptions,
+  type INodeType,
+  type INodeTypeDescription,
+  NodeConnectionType,
+  NodeExecutionWithMetadata,
+} from 'n8n-workflow';
 
-import { ACTION_SETTINGS } from './constants';
+import { ACTION_SETTINGS, PLATFORM_API_URLS } from './constants';
+
+const abortControllers: Record<string, AbortController> = {};
+
+type getContactResponse = {
+  id: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  phone: string | null;
+  email: string | null;
+  language: string | null;
+  profilePic: string;
+  locale: string | null;
+  countryCode: string | null;
+  status: 'open' | 'closed' | 'done' | 'snoozed' | 'unsnoozed' | null;
+  isBlocked: boolean;
+  custom_fields: Array<{ name: string; value: string | null }>;
+  tags: Array<{ id: string; name: string }>;
+  assignee: {
+    id: string | null;
+    firstName: string | null;
+    lastName: string | null;
+    email: string | null;
+  } | null;
+  lifecycle: string | null;
+  created_at: number | null;
+}
+
+function toGenericAbortSignal(signal: AbortSignal) {
+  return {
+    aborted: signal.aborted,
+    onabort: signal.onabort,
+    addEventListener: signal.addEventListener.bind(signal),
+    removeEventListener: signal.removeEventListener.bind(signal),
+  };
+}
 
 function buildDynamicProperties(resourceTypeName: string, resourceTypeDefault: string): INodeProperties[] {
   const properties: INodeProperties[] = [];
@@ -34,14 +79,24 @@ function buildDynamicProperties(resourceTypeName: string, resourceTypeDefault: s
     for (const action of Object.values(actions)) {
       if (action.params) {
         for (const param of action.params) {
-          properties.push({
-            ...param,
-            displayOptions: {
+          const mergedDisplayOptions = param.displayOptions
+            ? {
               show: {
-                resource: [resource],
+                ...param.displayOptions.show,
+                [resourceTypeName]: [resource],
                 action: [action.value],
               },
-            },
+            }
+            : {
+              show: {
+                [resourceTypeName]: [resource],
+                action: [action.value],
+              },
+            };
+
+          properties.push({
+            ...param,
+            displayOptions: mergedDisplayOptions,
           });
         }
       }
@@ -95,6 +150,55 @@ export class Respondio implements INodeType {
           value: action.value,
           description: action.description,
         }));
+      },
+      async getTagsForContact(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+        const nodeId = this.getNode().id;
+        // Abort previous request for this node
+        if (abortControllers[nodeId]) {
+          abortControllers[nodeId].abort();
+        }
+
+        const abortController = new AbortController();
+        abortControllers[nodeId] = abortController;
+
+        const credentials = await this.getCredentials('respondIoApi');
+        const identifierType = this.getNodeParameter('identifierType', 0) as string;
+        const contactId = this.getNodeParameter('contactId', 0) as string;
+        const contactIdentifier = this.getNodeParameter('contactIdentifier', 0) as string;
+
+        const identifierValue = identifierType === 'id' ? contactId : contactIdentifier;
+
+        // Skip if no identifier provided yet
+        if (!identifierValue) return [];
+
+        const executionEnv = credentials?.environment as 'production' | 'staging' || 'staging';
+        const platformUrl = PLATFORM_API_URLS[executionEnv]
+
+        try {
+          const response: getContactResponse = await this.helpers.httpRequest({
+            method: 'GET',
+            url: `${platformUrl}/n8n/contact/${identifierType}:${identifierValue.toString().trim()}`,
+            headers: {
+              Authorization: `Bearer ${credentials.apiKey}`,
+            },
+            json: true,
+            abortSignal: toGenericAbortSignal(abortController.signal),
+          });
+
+          this.logger.info(`Response from API: [${nodeId}] ${JSON.stringify(response)}`);
+          return response.tags.map((tag: any) => ({
+            name: tag.name,
+            value: tag.id,
+          }));
+        } catch (error: any) {
+          if (error.name === 'AbortError') {
+            this.logger.info('Previous request aborted due to new input.');
+            return [];
+          }
+
+          this.logger.error(`Failed to load tags: ${error.message || error}`);
+          return [];
+        }
       },
     },
   };
