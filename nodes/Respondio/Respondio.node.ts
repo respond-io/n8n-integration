@@ -9,6 +9,7 @@ import {
   NodeConnectionType,
   NodeExecutionWithMetadata,
 } from 'n8n-workflow';
+import { setTimeout as waitFor } from 'timers/promises';
 
 import { ACTION_SETTINGS, PLATFORM_API_URLS } from './constants';
 
@@ -36,6 +37,25 @@ type getContactResponse = {
   } | null;
   lifecycle: string | null;
   created_at: number | null;
+}
+
+type SpaceUser = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: 'agent' | 'admin' | 'owner';
+  team: string | null;
+  restrictions: string[];
+}
+
+// @ts-ignore
+type GetSpaceUsersResponse = {
+  items: SpaceUser[];
+  pagination: {
+    next?: string;
+    previous?: string;
+  };
 }
 
 function toGenericAbortSignal(signal: AbortSignal) {
@@ -143,7 +163,7 @@ export class Respondio implements INodeType {
 
         // Make sure resource exists
         const actionsForResource = ACTION_SETTINGS[resource] ?? {};
-        this.logger.info(`actionsForResource: ${JSON.stringify(actionsForResource)}`);
+        // this.logger.info(`actionsForResource: ${JSON.stringify(actionsForResource)}`);
 
         return Object.values(actionsForResource).map(action => ({
           name: action.name,
@@ -200,6 +220,46 @@ export class Respondio implements INodeType {
           return [];
         }
       },
+      async getSpaceUsers(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+        const credentials = await this.getCredentials('respondIoApi');
+
+        const executionEnv = credentials?.environment as 'production' | 'staging' || 'staging';
+        const platformUrl = PLATFORM_API_URLS[executionEnv]
+
+        // n8n does not support paginated fetch, so we have to fetch everything all at once...
+        let cursor: string | null = null;
+        const allSpaceUsers = [] as INodePropertyOptions[];
+        do {
+          // make it 10 for now
+          let limit = 10;
+          const urlObject = new URL(`${platformUrl}/n8n/space/users`);
+          urlObject.searchParams.set('limit', limit.toString());
+          if (cursor) urlObject.searchParams.set('cursor', cursor);
+
+          const response: GetSpaceUsersResponse = await this.helpers.request({
+            url: urlObject.toString(),
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${credentials.apiKey}`,
+            },
+            json: true
+          })
+
+          allSpaceUsers.push(
+            ...response.items.map((user) => ({
+              name: `${user.firstName} ${user.lastName} (${user.email})`,
+              value: user.id,
+            }))
+          );
+
+          cursor = response?.pagination?.next
+            ? new URL(response.pagination.next).searchParams.get('cursorId')
+            : null;
+          await waitFor(500);
+        } while (cursor);
+        this.logger.info(`Total space users fetched: ${allSpaceUsers.length}`);
+        return allSpaceUsers;
+      }
     },
   };
 
