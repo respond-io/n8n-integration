@@ -1,5 +1,5 @@
 import { INodeProperties, INodePropertyOptions } from "n8n-workflow";
-import { generateContactIdentifierInputFields, generateContactInputFields, IContactIdentifiers } from "./utils";
+import { generateContactIdentifierInputFields, generateContactInputFields, IContactIdentifiers } from "../utils";
 
 const TRIGGER_SETTINGS = {
   CONTACT_ASSIGNEE_UPDATED: {
@@ -89,7 +89,6 @@ const ACTION_SETTINGS = {
   CHANNELS: {
     GET_ALL_CHANNELS: {
       name: 'Get all Channels',
-      // value: 'getAllChannels',
       value: 'GET_ALL_CHANNELS',
       description: 'Return all the channels of a Workspace',
       params: [{}]
@@ -98,7 +97,6 @@ const ACTION_SETTINGS = {
   CLOSING_NOTES: {
     GET_ALL_CLOSING_NOTES: {
       name: 'Get all Closing Notes',
-      // value: 'getAllClosingNotes',
       value: 'GET_ALL_CLOSING_NOTES',
       description: 'Return all the Closing Notes of a Workspace',
       params: [{}]
@@ -107,7 +105,6 @@ const ACTION_SETTINGS = {
   COMMENTS: {
     ADD_COMMENT: {
       name: 'Add a Comment',
-      // value: 'addComment',
       value: 'ADD_COMMENT',
       description: 'Adds a comment to a conversation',
       params: [
@@ -129,7 +126,6 @@ const ACTION_SETTINGS = {
   CONTACTS: {
     ADD_SPACE_TAG: {
       name: 'Add a Space Tag',
-      // value: 'addSpaceTag',
       value: 'ADD_SPACE_TAG',
       description: 'Adds Tag(s) for a Contact',
       params: [
@@ -175,7 +171,6 @@ const ACTION_SETTINGS = {
     },
     DELETE_SPACE_TAG: {
       name: 'Delete a Space Tag',
-      // value: 'deleteSpaceTag',
       value: 'DELETE_SPACE_TAG',
       description: 'Deletes space tag',
       params: [
@@ -190,7 +185,6 @@ const ACTION_SETTINGS = {
     },
     UPDATE_SPACE_TAG: {
       name: 'Update a Space Tag',
-      // value: 'updateSpaceTag',
       value: 'UPDATE_SPACE_TAG',
       description: 'Updates a Space Tag',
       params: [
@@ -243,7 +237,6 @@ const ACTION_SETTINGS = {
     },
     REMOVE_TAGS: {
       name: 'Remove many Tags',
-      // value: 'removeTags',
       value: 'REMOVE_TAGS',
       description: 'Removes Tag(s) for a Contact',
       params: [
@@ -267,7 +260,6 @@ const ACTION_SETTINGS = {
     },
     DELETE_CONTACT: {
       name: 'Delete a Contact',
-      // value: 'deleteContact',
       value: 'DELETE_CONTACT',
       description: 'Deletes a Contact',
       params: [
@@ -280,7 +272,6 @@ const ACTION_SETTINGS = {
     },
     FIND_CONTACT_CHANNELS: {
       name: 'Find many Contact Channels',
-      // value: 'getContactChannels',
       value: 'FIND_CONTACT_CHANNELS',
       description: 'Find connected Channels of a Contact',
       params: [
@@ -293,7 +284,6 @@ const ACTION_SETTINGS = {
     },
     FIND_CONTACT: {
       name: 'Find a Contact',
-      // value: 'getContact',
       value: 'FIND_CONTACT',
       description: 'Finds a specific Contact by identifier',
       params: [
@@ -306,7 +296,6 @@ const ACTION_SETTINGS = {
     },
     ADD_TAGS: {
       name: 'Add many Tags',
-      // value: 'addTags',
       value: 'ADD_TAGS',
       description: 'Adds Tag(s) for a Contact',
       params: [
@@ -329,7 +318,6 @@ const ACTION_SETTINGS = {
     },
     GET_MANY_CONTACTS: {
       name: 'Get many Contacts',
-      // value: 'getManyContacts',
       value: 'GET_MANY_CONTACTS',
       description: 'Return multiple Contacts that matches with the search condition',
       params: [
@@ -353,7 +341,6 @@ const ACTION_SETTINGS = {
     },
     UPDATE_CONTACT: {
       name: 'Update a Contact',
-      // value: 'updateContact',
       value: 'UPDATE_CONTACT',
       description: 'Updates Contact Field(s) of a Contact. Leave the contact field empty if you want to remain the existing value.',
       params: [
@@ -367,7 +354,6 @@ const ACTION_SETTINGS = {
     },
     CREATE_OR_UPDATE_CONTACT: {
       name: 'Create or Update a Contact',
-      // value: 'createOrUpdateContact',
       value: 'CREATE_OR_UPDATE_CONTACT',
       description: 'Creates or updates a Contact. Leave the contact field empty if you want to store an empty value or remain the existing value. It is highly recommended to add a delay before executing a new action after creating a new contact, as processing time is required',
       params: [
@@ -381,7 +367,6 @@ const ACTION_SETTINGS = {
     },
     CREATE_CONTACT: {
       name: 'Create a Contact',
-      // value: 'createContact',
       value: 'CREATE_CONTACT',
       description: 'Creates a Contact. Leave the contact field empty if you want to store an empty value or remain the existing value. It is highly recommended to add a delay before executing a new action after creating a new contact, as processing time is required',
       params: [
@@ -396,7 +381,6 @@ const ACTION_SETTINGS = {
   CONTACT_FIELDS: {
     GET_ALL_CUSTOM_FIELDS: {
       name: 'Get all Custom Fields',
-      // value: 'getAllCustomFields',
       value: 'GET_ALL_CUSTOM_FIELDS',
       description: 'Return all the Custom Fields of a Workspace',
       params: [{
@@ -410,7 +394,6 @@ const ACTION_SETTINGS = {
     },
     FIND_CUSTOM_FIELD: {
       name: 'Find a Custom Field',
-      // value: 'getCustomField',
       value: 'FIND_CUSTOM_FIELD',
       description: 'Finds a specific Contact Field',
       params: [{
@@ -424,7 +407,6 @@ const ACTION_SETTINGS = {
     },
     CREATE_CUSTOM_FIELD: {
       name: 'Create a Custom Field',
-      // value: 'createCustomField',
       value: 'CREATE_CUSTOM_FIELD',
       description: 'Creates a Custom Field',
       params: [
@@ -490,7 +472,6 @@ const ACTION_SETTINGS = {
   CONVERSATIONS: {
     ASSIGN_OR_UNASSIGNED_CONVERSATION: {
       name: 'Assign or unassign a Conversation',
-      // value: 'updateContactAssignee',
       value: 'ASSIGN_OR_UNASSIGNED_CONVERSATION',
       description: 'Updates the assignee of a conversation',
       params: [
@@ -550,7 +531,6 @@ const ACTION_SETTINGS = {
     },
     OPEN_OR_CLOSE_CONVERSATION: {
       name: 'Open or close a Conversation',
-      // value: 'updateContactConversationStatus',
       value: 'OPEN_OR_CLOSE_CONVERSATION',
       description: 'Updates the status of a conversation',
       params: [
@@ -606,7 +586,6 @@ const ACTION_SETTINGS = {
   LIFECYCLE: {
     REMOVE_CONTACT_LIFECYCLE: {
       name: 'Remove a Contact Lifecycle',
-      // value: 'unassignContactLifecycle',
       value: 'REMOVE_CONTACT_LIFECYCLE',
       description: 'Unassign contact lifecycle stage',
       params: generateContactIdentifierInputFields([
@@ -617,7 +596,6 @@ const ACTION_SETTINGS = {
     },
     UPDATE_CONTACT_LIFECYCLE: {
       name: 'Update a Contact Lifecycle',
-      // value: 'updateContactLifecycle',
       value: 'UPDATE_CONTACT_LIFECYCLE',
       description: 'Update contact lifecycle stage',
       params: [
@@ -640,7 +618,6 @@ const ACTION_SETTINGS = {
   MESSAGES: {
     FIND_MESSAGE: {
       name: 'Find a Message',
-      // value: 'getContactMessage',
       value: 'FIND_MESSAGE',
       description: 'Finds a specific message by identifier',
       params: [
@@ -662,7 +639,6 @@ const ACTION_SETTINGS = {
     // do this last
     SEND_MESSAGE: {
       name: 'Send a Message',
-      // value: 'sendMessage',
       value: 'SEND_MESSAGE',
       description: 'Sends a message to a contact',
       params: [
@@ -672,7 +648,6 @@ const ACTION_SETTINGS = {
   USER: {
     FIND_USER: {
       name: 'Find a User',
-      // value: 'getUser',
       value: 'FIND_USER',
       description: 'Finds a specific user by identifier',
       params: [{
@@ -685,7 +660,6 @@ const ACTION_SETTINGS = {
     },
     GET_ALL_USERS: {
       name: 'Get all Users',
-      // value: 'getAllUsers',
       value: 'GET_ALL_USERS',
       description: 'Return all the users of a Workspace',
       params: [{
