@@ -1,7 +1,5 @@
 import { INodeProperties, INodePropertyOptions } from "n8n-workflow";
 
-import { generateContactIdentifierInputFields, generateContactInputFields, IContactIdentifiers } from "../utils";
-
 import channelActions from './actions/channels'
 import closingNotesActions from './actions/closing_notes'
 import commentsActions from './actions/comments'
