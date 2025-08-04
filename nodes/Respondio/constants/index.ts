@@ -86,9 +86,38 @@ const TRIGGER_SETTINGS_EVENT_SOURCES = {
   ]
 }
 
+enum ACTION_NAMES {
+  GET_ALL_CHANNELS = 'GET_ALL_CHANNELS',
+  GET_ALL_CLOSING_NOTES = 'GET_ALL_CLOSING_NOTES',
+  ADD_COMMENT = 'ADD_COMMENT',
+  ADD_SPACE_TAG = 'ADD_SPACE_TAG',
+  DELETE_SPACE_TAG = 'DELETE_SPACE_TAG',
+  UPDATE_SPACE_TAG = 'UPDATE_SPACE_TAG',
+  REMOVE_TAGS = 'REMOVE_TAGS',
+  DELETE_CONTACT = 'DELETE_CONTACT',
+  FIND_CONTACT_CHANNELS = 'FIND_CONTACT_CHANNELS',
+  FIND_CONTACT = 'FIND_CONTACT',
+  ADD_TAGS = 'ADD_TAGS',
+  GET_MANY_CONTACTS = 'GET_MANY_CONTACTS',
+  UPDATE_CONTACT = 'UPDATE_CONTACT',
+  CREATE_OR_UPDATE_CONTACT = 'CREATE_OR_UPDATE_CONTACT',
+  CREATE_CONTACT = 'CREATE_CONTACT',
+  GET_ALL_CUSTOM_FIELDS = 'GET_ALL_CUSTOM_FIELDS',
+  FIND_CUSTOM_FIELD = 'FIND_CUSTOM_FIELD',
+  CREATE_CUSTOM_FIELD = 'CREATE_CUSTOM_FIELD',
+  ASSIGN_OR_UNASSIGNED_CONVERSATION = 'ASSIGN_OR_UNASSIGNED_CONVERSATION',
+  OPEN_OR_CLOSE_CONVERSATION = 'OPEN_OR_CLOSE_CONVERSATION',
+  REMOVE_CONTACT_LIFECYCLE = 'REMOVE_CONTACT_LIFECYCLE',
+  UPDATE_CONTACT_LIFECYCLE = 'UPDATE_CONTACT_LIFECYCLE',
+  FIND_MESSAGE = 'FIND_MESSAGE',
+  SEND_MESSAGE = 'SEND_MESSAGE',
+  FIND_USER = 'FIND_USER',
+  GET_ALL_USERS = 'GET_ALL_USERS',
+}
+
 const ACTION_SETTINGS = {
   CHANNELS: {
-    GET_ALL_CHANNELS: {
+    [ACTION_NAMES.GET_ALL_CHANNELS]: {
       name: 'Get all Channels',
       value: 'GET_ALL_CHANNELS',
       description: 'Return all the channels of a Workspace',
@@ -96,7 +125,7 @@ const ACTION_SETTINGS = {
     }
   },
   CLOSING_NOTES: {
-    GET_ALL_CLOSING_NOTES: {
+    [ACTION_NAMES.GET_ALL_CLOSING_NOTES]: {
       name: 'Get all Closing Notes',
       value: 'GET_ALL_CLOSING_NOTES',
       description: 'Return all the Closing Notes of a Workspace',
@@ -104,7 +133,7 @@ const ACTION_SETTINGS = {
     }
   },
   COMMENTS: {
-    ADD_COMMENT: {
+    [ACTION_NAMES.ADD_COMMENT]: {
       name: 'Add a Comment',
       value: 'ADD_COMMENT',
       description: 'Adds a comment to a conversation',
@@ -125,7 +154,7 @@ const ACTION_SETTINGS = {
     }
   },
   CONTACTS: {
-    ADD_SPACE_TAG: {
+    [ACTION_NAMES.ADD_SPACE_TAG]: {
       name: 'Add a Space Tag',
       value: 'ADD_SPACE_TAG',
       description: 'Adds Tag(s) for a Contact',
@@ -170,7 +199,7 @@ const ACTION_SETTINGS = {
         },
       ]
     },
-    DELETE_SPACE_TAG: {
+    [ACTION_NAMES.DELETE_SPACE_TAG]: {
       name: 'Delete a Space Tag',
       value: 'DELETE_SPACE_TAG',
       description: 'Deletes space tag',
@@ -184,7 +213,7 @@ const ACTION_SETTINGS = {
         },
       ]
     },
-    UPDATE_SPACE_TAG: {
+    [ACTION_NAMES.UPDATE_SPACE_TAG]: {
       name: 'Update a Space Tag',
       value: 'UPDATE_SPACE_TAG',
       description: 'Updates a Space Tag',
@@ -236,7 +265,7 @@ const ACTION_SETTINGS = {
         },
       ]
     },
-    REMOVE_TAGS: {
+    [ACTION_NAMES.REMOVE_TAGS]: {
       name: 'Remove many Tags',
       value: 'REMOVE_TAGS',
       description: 'Removes Tag(s) for a Contact',
@@ -259,7 +288,7 @@ const ACTION_SETTINGS = {
         },
       ]
     },
-    DELETE_CONTACT: {
+    [ACTION_NAMES.DELETE_CONTACT]: {
       name: 'Delete a Contact',
       value: 'DELETE_CONTACT',
       description: 'Deletes a Contact',
@@ -271,7 +300,7 @@ const ACTION_SETTINGS = {
         ]),
       ]
     },
-    FIND_CONTACT_CHANNELS: {
+    [ACTION_NAMES.FIND_CONTACT_CHANNELS]: {
       name: 'Find many Contact Channels',
       value: 'FIND_CONTACT_CHANNELS',
       description: 'Find connected Channels of a Contact',
@@ -283,7 +312,7 @@ const ACTION_SETTINGS = {
         ]),
       ]
     },
-    FIND_CONTACT: {
+    [ACTION_NAMES.FIND_CONTACT]: {
       name: 'Find a Contact',
       value: 'FIND_CONTACT',
       description: 'Finds a specific Contact by identifier',
@@ -295,7 +324,7 @@ const ACTION_SETTINGS = {
         ]),
       ]
     },
-    ADD_TAGS: {
+    [ACTION_NAMES.ADD_TAGS]: {
       name: 'Add many Tags',
       value: 'ADD_TAGS',
       description: 'Adds Tag(s) for a Contact',
@@ -317,7 +346,7 @@ const ACTION_SETTINGS = {
         }
       ]
     },
-    GET_MANY_CONTACTS: {
+    [ACTION_NAMES.GET_MANY_CONTACTS]: {
       name: 'Get many Contacts',
       value: 'GET_MANY_CONTACTS',
       description: 'Return multiple Contacts that matches with the search condition',
@@ -340,7 +369,7 @@ const ACTION_SETTINGS = {
         }
       ]
     },
-    UPDATE_CONTACT: {
+    [ACTION_NAMES.UPDATE_CONTACT]: {
       name: 'Update a Contact',
       value: 'UPDATE_CONTACT',
       description: 'Updates Contact Field(s) of a Contact. Leave the contact field empty if you want to remain the existing value.',
@@ -353,7 +382,7 @@ const ACTION_SETTINGS = {
         ...generateContactInputFields(false),
       ]
     },
-    CREATE_OR_UPDATE_CONTACT: {
+    [ACTION_NAMES.CREATE_OR_UPDATE_CONTACT]: {
       name: 'Create or Update a Contact',
       value: 'CREATE_OR_UPDATE_CONTACT',
       description: 'Creates or updates a Contact. Leave the contact field empty if you want to store an empty value or remain the existing value. It is highly recommended to add a delay before executing a new action after creating a new contact, as processing time is required',
@@ -366,7 +395,7 @@ const ACTION_SETTINGS = {
         ...generateContactInputFields(false),
       ]
     },
-    CREATE_CONTACT: {
+    [ACTION_NAMES.CREATE_CONTACT]: {
       name: 'Create a Contact',
       value: 'CREATE_CONTACT',
       description: 'Creates a Contact. Leave the contact field empty if you want to store an empty value or remain the existing value. It is highly recommended to add a delay before executing a new action after creating a new contact, as processing time is required',
@@ -380,7 +409,7 @@ const ACTION_SETTINGS = {
     }
   },
   CONTACT_FIELDS: {
-    GET_ALL_CUSTOM_FIELDS: {
+    [ACTION_NAMES.GET_ALL_CUSTOM_FIELDS]: {
       name: 'Get all Custom Fields',
       value: 'GET_ALL_CUSTOM_FIELDS',
       description: 'Return all the Custom Fields of a Workspace',
@@ -393,7 +422,7 @@ const ACTION_SETTINGS = {
         default: 10
       }]
     },
-    FIND_CUSTOM_FIELD: {
+    [ACTION_NAMES.FIND_CUSTOM_FIELD]: {
       name: 'Find a Custom Field',
       value: 'FIND_CUSTOM_FIELD',
       description: 'Finds a specific Contact Field',
@@ -406,7 +435,7 @@ const ACTION_SETTINGS = {
         default: undefined,
       }]
     },
-    CREATE_CUSTOM_FIELD: {
+    [ACTION_NAMES.CREATE_CUSTOM_FIELD]: {
       name: 'Create a Custom Field',
       value: 'CREATE_CUSTOM_FIELD',
       description: 'Creates a Custom Field',
@@ -471,7 +500,7 @@ const ACTION_SETTINGS = {
     }
   },
   CONVERSATIONS: {
-    ASSIGN_OR_UNASSIGNED_CONVERSATION: {
+    [ACTION_NAMES.ASSIGN_OR_UNASSIGNED_CONVERSATION]: {
       name: 'Assign or unassign a Conversation',
       value: 'ASSIGN_OR_UNASSIGNED_CONVERSATION',
       description: 'Updates the assignee of a conversation',
@@ -530,7 +559,7 @@ const ACTION_SETTINGS = {
         }
       ]
     },
-    OPEN_OR_CLOSE_CONVERSATION: {
+    [ACTION_NAMES.OPEN_OR_CLOSE_CONVERSATION]: {
       name: 'Open or close a Conversation',
       value: 'OPEN_OR_CLOSE_CONVERSATION',
       description: 'Updates the status of a conversation',
@@ -585,7 +614,7 @@ const ACTION_SETTINGS = {
     }
   },
   LIFECYCLE: {
-    REMOVE_CONTACT_LIFECYCLE: {
+    [ACTION_NAMES.REMOVE_CONTACT_LIFECYCLE]: {
       name: 'Remove a Contact Lifecycle',
       value: 'REMOVE_CONTACT_LIFECYCLE',
       description: 'Unassign contact lifecycle stage',
@@ -595,7 +624,7 @@ const ACTION_SETTINGS = {
         IContactIdentifiers.phone,
       ])
     },
-    UPDATE_CONTACT_LIFECYCLE: {
+    [ACTION_NAMES.UPDATE_CONTACT_LIFECYCLE]: {
       name: 'Update a Contact Lifecycle',
       value: 'UPDATE_CONTACT_LIFECYCLE',
       description: 'Update contact lifecycle stage',
@@ -617,7 +646,7 @@ const ACTION_SETTINGS = {
     },
   },
   MESSAGES: {
-    FIND_MESSAGE: {
+    [ACTION_NAMES.FIND_MESSAGE]: {
       name: 'Find a Message',
       value: 'FIND_MESSAGE',
       description: 'Finds a specific message by identifier',
@@ -637,10 +666,10 @@ const ACTION_SETTINGS = {
         }
       ]
     },
-    SEND_MESSAGE: send_message,
+    [ACTION_NAMES.SEND_MESSAGE]: send_message,
   },
   USER: {
-    FIND_USER: {
+    [ACTION_NAMES.FIND_USER]: {
       name: 'Find a User',
       value: 'FIND_USER',
       description: 'Finds a specific user by identifier',
@@ -652,7 +681,7 @@ const ACTION_SETTINGS = {
         description: 'The ID of the user to find. This ID can be found under Settings > "Users"',
       }]
     },
-    GET_ALL_USERS: {
+    [ACTION_NAMES.GET_ALL_USERS]: {
       name: 'Get all Users',
       value: 'GET_ALL_USERS',
       description: 'Return all the users of a Workspace',
@@ -669,9 +698,9 @@ const ACTION_SETTINGS = {
 } as const satisfies Record<string, Record<string, INodePropertyOptions & { params: Array<INodeProperties> | Array<Object> }>>;
 
 const PLATFORM_API_URLS = {
-  staging: 'https://staging.respond.io/integration',
-  production: 'https://app.respond.io/integration',
-  test: 'https://a8b4597fcf19.ngrok-free.app/integration'
+  staging: 'https://staging.respond.io',
+  production: 'https://app.respond.io',
+  test: 'https://a8b4597fcf19.ngrok-free.app'
 }
 
-export { TRIGGER_SETTINGS, TRIGGER_SETTINGS_EVENT_SOURCES, PLATFORM_API_URLS, ACTION_SETTINGS };
+export { TRIGGER_SETTINGS, TRIGGER_SETTINGS_EVENT_SOURCES, PLATFORM_API_URLS, ACTION_SETTINGS, ACTION_NAMES };

@@ -11,110 +11,17 @@ import {
 } from 'n8n-workflow';
 import { setTimeout as waitFor } from 'timers/promises';
 
-import { ACTION_SETTINGS, PLATFORM_API_URLS } from './constants';
+import { ACTION_NAMES, ACTION_SETTINGS, PLATFORM_API_URLS } from './constants';
+import {
+  GetClosingNotesResponse,
+  getContactResponse,
+  GetSpaceChannelsResponse,
+  GetSpaceUsersResponse,
+  GetWhatsAppTemplatesResponse,
+  WhatsAppTemplate,
+} from './types';
 
 const abortControllers: Record<string, AbortController> = {};
-
-type getContactResponse = {
-  id: string | null;
-  firstName: string | null;
-  lastName: string | null;
-  phone: string | null;
-  email: string | null;
-  language: string | null;
-  profilePic: string;
-  locale: string | null;
-  countryCode: string | null;
-  status: 'open' | 'closed' | 'done' | 'snoozed' | 'unsnoozed' | null;
-  isBlocked: boolean;
-  custom_fields: Array<{ name: string; value: string | null }>;
-  tags: Array<{ id: string; name: string }>;
-  assignee: {
-    id: string | null;
-    firstName: string | null;
-    lastName: string | null;
-    email: string | null;
-  } | null;
-  lifecycle: string | null;
-  created_at: number | null;
-}
-
-type SpaceUser = {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: 'agent' | 'admin' | 'owner';
-  team: string | null;
-  restrictions: string[];
-}
-
-// @ts-ignore
-type GetSpaceUsersResponse = {
-  items: SpaceUser[];
-  pagination: {
-    next?: string;
-    previous?: string;
-  };
-}
-
-type ClosingNote = {
-  timestamp: number;
-  category: string;
-  content: string;
-  description: string | null;
-}
-
-type GetClosingNotesResponse = {
-  items: Array<ClosingNote>;
-  pagination: {
-    next?: string;
-    previous?: string;
-  };
-}
-
-type Channel = {
-  id: string;
-  name: string;
-  source: string;
-  created_at: number;
-}
-
-type GetSpaceChannelsResponse = {
-  items: Array<Channel>;
-  pagination: {
-    next?: string;
-    previous?: string;
-  };
-}
-
-type WhatsAppTemplate = {
-  id: number;
-  name: string;
-  components: string; // JSON string of components
-  bundle: string;
-  channelId: string;
-  botId: string;
-  created_at: string;
-  updated_at: string;
-  languageCode: string;
-  namespace: string;
-  category: string;
-  status: 'approved' | 'rejected';
-  statusDetail: string;
-  templateId: string;
-  label: string;
-  qualityScore: string;
-}
-
-type GetWhatsAppTemplatesResponse = {
-  items: Array<WhatsAppTemplate>;
-  pagination: {
-    next?: string;
-    previous?: string;
-  };
-}
-
 
 const getWhatsappTemplates = async (context: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> => {
   const credentials = await context.getCredentials('respondIoApi');
@@ -128,7 +35,7 @@ const getWhatsappTemplates = async (context: ILoadOptionsFunctions): Promise<INo
   do {
     // make it 10 for now
     let limit = 10;
-    const urlObject = new URL(`${platformUrl}/space/channel`);
+    const urlObject = new URL(`${platformUrl}/developer-api/space/channel`);
     urlObject.searchParams.set('limit', limit.toString());
     if (cursor) urlObject.searchParams.set('cursorId', cursor);
 
@@ -302,7 +209,7 @@ export class Respondio implements INodeType {
         try {
           const response: getContactResponse = await this.helpers.httpRequest({
             method: 'GET',
-            url: `${platformUrl}/n8n/contact/${identifierType}:${identifierValue.toString().trim()}`,
+            url: `${platformUrl}/developer-api/contact/${identifierType}:${identifierValue.toString().trim()}`,
             headers: {
               Authorization: `Bearer ${credentials.apiKey}`,
             },
@@ -337,7 +244,7 @@ export class Respondio implements INodeType {
         do {
           // make it 10 for now
           let limit = 10;
-          const urlObject = new URL(`${platformUrl}/n8n/space/users`);
+          const urlObject = new URL(`${platformUrl}/developer-api/space/users`);
           urlObject.searchParams.set('limit', limit.toString());
           if (cursor) urlObject.searchParams.set('cursorId', cursor);
 
@@ -376,7 +283,7 @@ export class Respondio implements INodeType {
         do {
           // make it 10 for now
           let limit = 10;
-          const urlObject = new URL(`${platformUrl}/space/closing_notes`);
+          const urlObject = new URL(`${platformUrl}/developer-api/space/closing_notes`);
           urlObject.searchParams.set('limit', limit.toString());
           if (cursor) urlObject.searchParams.set('cursorId', cursor);
 
@@ -416,7 +323,7 @@ export class Respondio implements INodeType {
         do {
           // make it 10 for now
           let limit = 10;
-          const urlObject = new URL(`${platformUrl}/space/channel`);
+          const urlObject = new URL(`${platformUrl}/developer-api/space/channel`);
           urlObject.searchParams.set('limit', limit.toString());
           if (cursor) urlObject.searchParams.set('cursorId', cursor);
 
@@ -445,8 +352,8 @@ export class Respondio implements INodeType {
         this.logger.info(`Total space channels fetched: ${allSpaceChannels.length}`);
         return allSpaceChannels;
       },
-      async getWhatsappTemplates(context: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-        return getWhatsappTemplates(context);
+      async getWhatsappTemplates(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+        return getWhatsappTemplates(this);
       },
       async getWhatsappTemplateLanguageCodes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
         const globalData = this.getWorkflowStaticData('global')
@@ -479,9 +386,93 @@ export class Respondio implements INodeType {
 
   // async async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][] | NodeExecutionWithMetadata[][] | null> {
   async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][] | NodeExecutionWithMetadata[][] | null> {
-    this.logger.info('Testing')
-    const temp = buildDynamicProperties(Respondio.resourceTypeName, Respondio.resourceTypeDefault);
-    this.logger.info(JSON.stringify(temp, null, 2));
+    const inputData = this.getInputData()
+    this.logger.info(JSON.stringify(inputData, null, 2));
+
+    const operation = this.getNodeParameter(Respondio.resourceTypeName, 0) as string;
+    this.logger.info(`Operation: ${operation}`);
+    const action = this.getNodeParameter('action', 0) as string;
+
+    switch (action) {
+      case ACTION_NAMES.GET_ALL_CHANNELS:
+        this.logger.info('Fetching all channels');
+        break;
+      case ACTION_NAMES.GET_ALL_CLOSING_NOTES:
+        this.logger.info('Fetching all closing notes');
+        break;
+      case ACTION_NAMES.ADD_COMMENT:
+        this.logger.info('ADDING comment');
+        break;
+      case ACTION_NAMES.ADD_SPACE_TAG:
+        this.logger.info('ADD SPACE TAG');
+        break;
+      case ACTION_NAMES.DELETE_SPACE_TAG:
+        this.logger.info('Deleting space tag');
+        break;
+      case ACTION_NAMES.UPDATE_SPACE_TAG:
+        this.logger.info('Updating space tag');
+        break;
+      case ACTION_NAMES.REMOVE_TAGS:
+        this.logger.info('Removing tags');
+        break;
+      case ACTION_NAMES.DELETE_CONTACT:
+        this.logger.info('Deleting contact');
+        break;
+      case ACTION_NAMES.FIND_CONTACT_CHANNELS:
+        this.logger.info('Fetching all channels for contact');
+        break;
+      case ACTION_NAMES.FIND_CONTACT:
+        this.logger.info('Fetching contact by identifier');
+        break;
+      case ACTION_NAMES.ADD_TAGS:
+        this.logger.info('Adding tags to contact');
+        break;
+      case ACTION_NAMES.GET_MANY_CONTACTS:
+        this.logger.info('Fetching many contacts');
+        break;
+      case ACTION_NAMES.UPDATE_CONTACT:
+        this.logger.info('Updating contact');
+        break;
+      case ACTION_NAMES.CREATE_OR_UPDATE_CONTACT:
+        this.logger.info('Creating or updating contact');
+        break;
+      case ACTION_NAMES.CREATE_CONTACT:
+        this.logger.info('Creating contact');
+        break;
+      case ACTION_NAMES.GET_ALL_CUSTOM_FIELDS:
+        this.logger.info('Fetching all custom fields');
+        break;
+      case ACTION_NAMES.FIND_CUSTOM_FIELD:
+        this.logger.info('Fetching custom field by name');
+        break;
+      case ACTION_NAMES.CREATE_CUSTOM_FIELD:
+        this.logger.info('Creating custom field');
+        break;
+      case ACTION_NAMES.ASSIGN_OR_UNASSIGNED_CONVERSATION:
+        this.logger.info('Assigning or unassigning conversation');
+        break;
+      case ACTION_NAMES.OPEN_OR_CLOSE_CONVERSATION:
+        this.logger.info('Opening or closing conversation');
+        break;
+      case ACTION_NAMES.REMOVE_CONTACT_LIFECYCLE:
+        this.logger.info('Removing contact lifecycle');
+        break;
+      case ACTION_NAMES.UPDATE_CONTACT_LIFECYCLE:
+        this.logger.info('Updating contact lifecycle');
+        break;
+      case ACTION_NAMES.FIND_MESSAGE:
+        this.logger.info('Fetching message by identifier');
+        break;
+      case ACTION_NAMES.SEND_MESSAGE:
+        this.logger.info('Sending message');
+        break;
+      case ACTION_NAMES.FIND_USER:
+        this.logger.info('Fetching user by identifier');
+        break;
+      case ACTION_NAMES.GET_ALL_USERS:
+        this.logger.info('Fetching all users');
+        break;
+    }
 
     return null
   }
