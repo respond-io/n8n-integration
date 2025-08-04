@@ -23,7 +23,7 @@ export default {
       name: 'limit',
       type: 'number',
       required: false,
-      description: 'Maximum number of Contacts to return',
+      description: 'Maximum number of Users to return',
       default: 10
     }] as unknown as INodeProperties[]
   }
