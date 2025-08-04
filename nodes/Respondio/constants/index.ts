@@ -1,5 +1,6 @@
 import { INodeProperties, INodePropertyOptions } from "n8n-workflow";
 import { generateContactIdentifierInputFields, generateContactInputFields, IContactIdentifiers } from "../utils";
+import send_message from "./send_message";
 
 const TRIGGER_SETTINGS = {
   CONTACT_ASSIGNEE_UPDATED: {
@@ -641,8 +642,8 @@ const ACTION_SETTINGS = {
       name: 'Send a Message',
       value: 'SEND_MESSAGE',
       description: 'Sends a message to a contact',
-      params: [
-      ]
+      // @ts-expect-error
+      params: send_message
     },
   },
   USER: {

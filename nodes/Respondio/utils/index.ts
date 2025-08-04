@@ -40,7 +40,7 @@ export const generateContactIdentifierInputFields = (
           identifierType: [IContactIdentifiers.id],
         },
       },
-      default: undefined,
+      default: '',
     },
     {
       displayName: 'Contact Identifier',
