@@ -1,12 +1,11 @@
-import { INodeProperties } from "n8n-workflow";
-
-import { generateContactIdentifierInputFields, IContactIdentifiers } from "../../utils";
+import { generateContactIdentifierInputFields, IContactIdentifiers } from "../../../utils";
 import email from './email';
 import attachments from './attachments';
 import custom_payload from './custom_payload';
 import quick_reply from './quick_reply';
 import whatsapp_template from './whatsapp_template';
 import text_message from './text_message';
+import { ACTION_NAMES } from "../..";
 
 const INPUT_IDENTIFIER = '$input$';
 const HIDDEN_INPUT_IDENTIFIER = '$hidden$';
@@ -195,73 +194,88 @@ const payloadFormatter = (
   }
 }
 
-interface ActionNode {
-  name: string;
-  value: string;
-  description: string;
-  params: INodeProperties[];
-}
-
 export default {
-  name: 'Send a Message',
-  value: 'SEND_MESSAGE',
-  description: 'Sends a message to a contact',
-  params: [
-    ...generateContactIdentifierInputFields([
-      IContactIdentifiers.id,
-      IContactIdentifiers.email,
-      IContactIdentifiers.phone,
-    ]),
-    {
-      displayName: 'Channel Type',
-      name: 'channelType',
-      type: 'options',
-      options: [
-        { name: 'Specific Channel', value: 'specificChannel' },
-        { name: 'Last Interacted Channel', value: 'lastInteractedChannel' },
-      ],
-      required: true,
-      description: 'Select the channel type to send the message',
-      default: 'specificChannel'
-    },
-    {
-      displayName: 'Channel ID',
-      name: 'channelId',
-      type: 'number',
-      typeOptions: {
-        loadOptionsMethod: 'getSpaceChannels',
-        loadOptionsDependsOn: ['channelType']
+  [ACTION_NAMES.FIND_MESSAGE]: {
+    name: 'Find a Message',
+    value: 'FIND_MESSAGE',
+    description: 'Finds a specific message by identifier',
+    params: [
+      ...generateContactIdentifierInputFields([
+        IContactIdentifiers.id,
+        IContactIdentifiers.email,
+        IContactIdentifiers.phone,
+      ]),
+      {
+        displayName: 'Message ID',
+        name: 'messageId',
+        type: 'number',
+        required: true,
+        description: 'Numeric ID of the message',
+        default: 0,
+      }
+    ]
+  },
+  [ACTION_NAMES.SEND_MESSAGE]: {
+    name: 'Send a Message',
+    value: 'SEND_MESSAGE',
+    description: 'Sends a message to a contact',
+    params: [
+      ...generateContactIdentifierInputFields([
+        IContactIdentifiers.id,
+        IContactIdentifiers.email,
+        IContactIdentifiers.phone,
+      ]),
+      {
+        displayName: 'Channel Type',
+        name: 'channelType',
+        type: 'options',
+        options: [
+          { name: 'Specific Channel', value: 'specificChannel' },
+          { name: 'Last Interacted Channel', value: 'lastInteractedChannel' },
+        ],
+        required: true,
+        description: 'Select the channel type to send the message',
+        default: 'specificChannel'
       },
-      required: true,
-      description: 'Choose your channel from the list of connected channels',
-      displayOptions: {
-        show: {
-          channelType: ['specificChannel'],
+      {
+        displayName: 'Channel ID',
+        name: 'channelId',
+        type: 'number',
+        typeOptions: {
+          loadOptionsMethod: 'getSpaceChannels',
+          loadOptionsDependsOn: ['channelType']
         },
+        required: true,
+        description: 'Choose your channel from the list of connected channels',
+        displayOptions: {
+          show: {
+            channelType: ['specificChannel'],
+          },
+        },
+        default: 0,
       },
-      default: 0,
-    },
-    {
-      displayName: 'Message Type',
-      name: 'messageType',
-      type: 'options',
-      options: [
-        { name: 'Text', value: 'text' },
-        { name: 'Attachments', value: 'attachments' },
-        { name: 'Quick Reply', value: 'quick_reply' },
-        { name: 'Custom Payload', value: 'custom_payload' },
-        { name: 'WhatsApp Template', value: 'whatsapp_template' },
-        { name: 'Email', value: 'email' },
-      ],
-      required: true,
-      description: 'Select the channel type to send the message',
-      default: 'text'
-    },
-    ...email.generateFields(),
-    ...attachments.generateFields(),
-    ...custom_payload.generateFields(),
-    ...quick_reply.generateFields(),
-    ...whatsapp_template.generateFields(),
-    ...text_message.generateFields(),
-  ]
-} as const satisfies ActionNode;
+      {
+        displayName: 'Message Type',
+        name: 'messageType',
+        type: 'options',
+        options: [
+          { name: 'Text', value: 'text' },
+          { name: 'Attachments', value: 'attachments' },
+          { name: 'Quick Reply', value: 'quick_reply' },
+          { name: 'Custom Payload', value: 'custom_payload' },
+          { name: 'WhatsApp Template', value: 'whatsapp_template' },
+          { name: 'Email', value: 'email' },
+        ],
+        required: true,
+        description: 'Select the channel type to send the message',
+        default: 'text'
+      },
+      ...email.generateFields(),
+      ...attachments.generateFields(),
+      ...custom_payload.generateFields(),
+      ...quick_reply.generateFields(),
+      ...whatsapp_template.generateFields(),
+      ...text_message.generateFields(),
+    ]
+  },
+};
