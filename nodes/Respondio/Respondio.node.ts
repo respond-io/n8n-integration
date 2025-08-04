@@ -58,6 +58,21 @@ type GetSpaceUsersResponse = {
   };
 }
 
+type ClosingNote = {
+  timestamp: number;
+  category: string;
+  content: string;
+  description: string | null;
+}
+
+type GetClosingNotesResponse = {
+  items: Array<ClosingNote>;
+  pagination: {
+    next?: string;
+    previous?: string;
+  };
+}
+
 function toGenericAbortSignal(signal: AbortSignal) {
   return {
     aborted: signal.aborted,
@@ -259,6 +274,46 @@ export class Respondio implements INodeType {
         } while (cursor);
         this.logger.info(`Total space users fetched: ${allSpaceUsers.length}`);
         return allSpaceUsers;
+      },
+      async getClosingNotes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+        const credentials = await this.getCredentials('respondIoApi');
+        const executionEnv = credentials?.environment as 'production' | 'staging' || 'staging';
+        const platformUrl = PLATFORM_API_URLS[executionEnv]
+
+        // n8n does not support paginated fetch, so we have to fetch everything all at once...
+        let cursor: string | null = null;
+        const allClosingNotes = [] as INodePropertyOptions[];
+        do {
+          // make it 10 for now
+          let limit = 10;
+          const urlObject = new URL(`${platformUrl}/space/closing_notes`);
+          urlObject.searchParams.set('limit', limit.toString());
+          if (cursor) urlObject.searchParams.set('cursor', cursor);
+
+          const response: GetClosingNotesResponse = await this.helpers.request({
+            url: urlObject.toString(),
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${credentials.apiKey}`,
+            },
+            json: true
+          })
+
+          allClosingNotes.push(
+            ...response.items.map((item) => ({
+              name: item.category,
+              value: item.category,
+              description: item.description || item.content,
+            }))
+          );
+
+          cursor = response?.pagination?.next
+            ? new URL(response.pagination.next).searchParams.get('cursorId')
+            : null;
+          await waitFor(500);
+        } while (cursor);
+        this.logger.info(`Total space users fetched: ${allClosingNotes.length}`);
+        return allClosingNotes;
       }
     },
   };

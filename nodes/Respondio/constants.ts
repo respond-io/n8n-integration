@@ -553,7 +553,54 @@ const ACTION_SETTINGS = {
       // value: 'updateContactConversationStatus',
       value: 'OPEN_OR_CLOSE_CONVERSATION',
       description: 'Updates the status of a conversation',
-      params: [{}]
+      params: [
+        ...generateContactIdentifierInputFields([
+          IContactIdentifiers.id,
+          IContactIdentifiers.email,
+          IContactIdentifiers.phone,
+        ]),
+        {
+          displayName: 'Conversation Status',
+          name: 'status',
+          type: 'options',
+          required: true,
+          description: 'Status of the conversation',
+          options: [
+            { name: 'Open', value: 'open' },
+            { name: 'Close', value: 'close' },
+          ],
+        },
+        {
+          displayName: 'Select Conversation Category',
+          name: 'category',
+          type: 'string',
+          required: true,
+          description: 'The category of the conversation.',
+          typeOptions: {
+            loadOptionsMethod: 'getClosingNotes',
+            loadOptionsDependsOn: ['status']
+          },
+          default: '',
+          displayOptions: {
+            show: {
+              status: ['close'],
+            },
+          },
+        },
+        {
+          displayName: 'Summary',
+          name: 'summary',
+          type: 'string',
+          required: false,
+          description: 'Summary of the conversation',
+          default: '',
+          displayOptions: {
+            show: {
+              status: ['close'],
+            },
+          },
+        }
+      ]
     }
   },
   LIFECYCLE: {
