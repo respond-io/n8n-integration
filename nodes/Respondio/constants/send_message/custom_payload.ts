@@ -3,11 +3,11 @@ import { INodeProperties } from "n8n-workflow";
 export default {
   generateFields: (): INodeProperties[] => [
     {
-      displayName: 'Custom Payload Description',
-      required: true,
+      displayName: 'Custom Payload Description - Refer to the channel documentation for the required payload structure. Must be a valid JSON object',
+      required: false,
       name: 'customPayloadDescription',
       type: 'notice',
-      description: 'Refer to the channel documentation for the required payload structure. Must be a valid JSON object',
+      noDataExpression: true,
       default: '',
       displayOptions: {
         show: {

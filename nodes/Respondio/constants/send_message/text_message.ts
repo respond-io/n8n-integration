@@ -17,7 +17,7 @@ export default {
     },
     {
       displayName: 'Message Tag',
-      name: 'messageType',
+      name: 'messageTag',
       type: 'options',
       required: true,
       options: [

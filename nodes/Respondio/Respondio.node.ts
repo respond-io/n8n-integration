@@ -73,6 +73,96 @@ type GetClosingNotesResponse = {
   };
 }
 
+type Channel = {
+  id: string;
+  name: string;
+  source: string;
+  created_at: number;
+}
+
+type GetSpaceChannelsResponse = {
+  items: Array<Channel>;
+  pagination: {
+    next?: string;
+    previous?: string;
+  };
+}
+
+type WhatsAppTemplate = {
+  id: number;
+  name: string;
+  components: string; // JSON string of components
+  bundle: string;
+  channelId: string;
+  botId: string;
+  created_at: string;
+  updated_at: string;
+  languageCode: string;
+  namespace: string;
+  category: string;
+  status: 'approved' | 'rejected';
+  statusDetail: string;
+  templateId: string;
+  label: string;
+  qualityScore: string;
+}
+
+type GetWhatsAppTemplatesResponse = {
+  items: Array<WhatsAppTemplate>;
+  pagination: {
+    next?: string;
+    previous?: string;
+  };
+}
+
+
+const getWhatsappTemplates = async (context: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> => {
+  const credentials = await context.getCredentials('respondIoApi');
+  const executionEnv = credentials?.environment as 'production' | 'staging' || 'staging';
+  const platformUrl = PLATFORM_API_URLS[executionEnv]
+
+  // n8n does not support paginated fetch, so we have to fetch everything all at once...
+  let cursor: string | null = null;
+  const allWhatsappTemplates = [] as INodePropertyOptions[];
+  const rawWhatsappTemplates = []
+  do {
+    // make it 10 for now
+    let limit = 10;
+    const urlObject = new URL(`${platformUrl}/space/channel`);
+    urlObject.searchParams.set('limit', limit.toString());
+    if (cursor) urlObject.searchParams.set('cursorId', cursor);
+
+    const response: GetWhatsAppTemplatesResponse = await context.helpers.request({
+      url: urlObject.toString(),
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${credentials.apiKey}`,
+      },
+      json: true
+    })
+
+    allWhatsappTemplates.push(
+      ...response.items.map((item) => ({
+        name: `${item.name} (${item.languageCode})`,
+        value: item.id,
+        description: `Namespace: ${item.namespace}, Category: ${item.category}, Status: ${item.status}`,
+      }))
+    );
+    rawWhatsappTemplates.push(...response.items)
+
+    cursor = response?.pagination?.next
+      ? new URL(response.pagination.next).searchParams.get('cursorId')
+      : null;
+    await waitFor(500);
+  } while (cursor);
+  context.logger.info(`Total space channels fetched: ${allWhatsappTemplates.length}`);
+
+  // store the raw templates in global static data for subsequent usage
+  const globalData = context.getWorkflowStaticData('global')
+  globalData.whatsappTemplates = JSON.stringify(rawWhatsappTemplates);
+  return allWhatsappTemplates;
+}
+
 function toGenericAbortSignal(signal: AbortSignal) {
   return {
     aborted: signal.aborted,
@@ -249,7 +339,7 @@ export class Respondio implements INodeType {
           let limit = 10;
           const urlObject = new URL(`${platformUrl}/n8n/space/users`);
           urlObject.searchParams.set('limit', limit.toString());
-          if (cursor) urlObject.searchParams.set('cursor', cursor);
+          if (cursor) urlObject.searchParams.set('cursorId', cursor);
 
           const response: GetSpaceUsersResponse = await this.helpers.request({
             url: urlObject.toString(),
@@ -288,7 +378,7 @@ export class Respondio implements INodeType {
           let limit = 10;
           const urlObject = new URL(`${platformUrl}/space/closing_notes`);
           urlObject.searchParams.set('limit', limit.toString());
-          if (cursor) urlObject.searchParams.set('cursor', cursor);
+          if (cursor) urlObject.searchParams.set('cursorId', cursor);
 
           const response: GetClosingNotesResponse = await this.helpers.request({
             url: urlObject.toString(),
@@ -312,8 +402,77 @@ export class Respondio implements INodeType {
             : null;
           await waitFor(500);
         } while (cursor);
-        this.logger.info(`Total space users fetched: ${allClosingNotes.length}`);
+        this.logger.info(`Total closing notes fetched: ${allClosingNotes.length}`);
         return allClosingNotes;
+      },
+      async getSpaceChannels(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+        const credentials = await this.getCredentials('respondIoApi');
+        const executionEnv = credentials?.environment as 'production' | 'staging' || 'staging';
+        const platformUrl = PLATFORM_API_URLS[executionEnv]
+
+        // n8n does not support paginated fetch, so we have to fetch everything all at once...
+        let cursor: string | null = null;
+        const allSpaceChannels = [] as INodePropertyOptions[];
+        do {
+          // make it 10 for now
+          let limit = 10;
+          const urlObject = new URL(`${platformUrl}/space/channel`);
+          urlObject.searchParams.set('limit', limit.toString());
+          if (cursor) urlObject.searchParams.set('cursorId', cursor);
+
+          const response: GetSpaceChannelsResponse = await this.helpers.request({
+            url: urlObject.toString(),
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${credentials.apiKey}`,
+            },
+            json: true
+          })
+
+          allSpaceChannels.push(
+            ...response.items.map((item) => ({
+              name: item.name,
+              value: item.id,
+              description: `${item.name} - ${item.source}`
+            }))
+          );
+
+          cursor = response?.pagination?.next
+            ? new URL(response.pagination.next).searchParams.get('cursorId')
+            : null;
+          await waitFor(500);
+        } while (cursor);
+        this.logger.info(`Total space channels fetched: ${allSpaceChannels.length}`);
+        return allSpaceChannels;
+      },
+      async getWhatsappTemplates(context: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+        return getWhatsappTemplates(context);
+      },
+      async getWhatsappTemplateLanguageCodes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+        const globalData = this.getWorkflowStaticData('global')
+
+        if (!globalData.whatsappTemplates) {
+          await getWhatsappTemplates(this);
+          const globalData = this.getWorkflowStaticData('global')
+          const whatsappTemplates = globalData.whatsappTemplates ?
+            JSON.parse(globalData.whatsappTemplates as string) as Array<WhatsAppTemplate> :
+            [];
+          if (whatsappTemplates?.length) {
+            return whatsappTemplates.map((template: WhatsAppTemplate) => ({
+              name: template.languageCode,
+              value: template.languageCode,
+            }));
+          }
+        }
+
+        const whatsappTemplates = globalData.whatsappTemplates ?
+          JSON.parse(globalData.whatsappTemplates as string) as Array<WhatsAppTemplate> :
+          [];
+
+        return whatsappTemplates.map((template: WhatsAppTemplate) => ({
+          name: template.languageCode,
+          value: template.languageCode,
+        }))
       }
     },
   };

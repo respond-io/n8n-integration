@@ -34,7 +34,7 @@ export default {
     typeOptions: { multipleValues: true },
     required: false,
     description: 'Enter your Email CC',
-    default: '',
+    default: [],
     displayOptions: {
       show: {
         messageType: ['email'],
@@ -48,7 +48,7 @@ export default {
     typeOptions: { multipleValues: true },
     required: false,
     description: 'Enter your Email BCC',
-    default: '',
+    default: [],
     displayOptions: {
       show: {
         messageType: ['email'],

@@ -637,14 +637,7 @@ const ACTION_SETTINGS = {
         }
       ]
     },
-    // do this last
-    SEND_MESSAGE: {
-      name: 'Send a Message',
-      value: 'SEND_MESSAGE',
-      description: 'Sends a message to a contact',
-      // @ts-expect-error
-      params: send_message
-    },
+    SEND_MESSAGE: send_message,
   },
   USER: {
     FIND_USER: {

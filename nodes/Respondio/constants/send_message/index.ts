@@ -106,6 +106,7 @@ type BaseRequestBody = {
   | Record<string, any>;
 };
 
+// @ts-ignore
 const payloadFormatter = (
   channelType: string,
   channelId: number,
@@ -194,8 +195,6 @@ const payloadFormatter = (
   }
 }
 
-payloadFormatter('qwe', 0, 'qwe', 'qwe', 'qwe', 'qwe', 'qwe', 'qwe', 'qwe', 'qwe', 'qwe', 'qwe', 'qwe', 'qwe', ['qwe'], 'qwe', 'qwe', 'qwe', {})
-
 interface ActionNode {
   name: string;
   value: string;
@@ -256,7 +255,7 @@ export default {
       ],
       required: true,
       description: 'Select the channel type to send the message',
-      default: 'specificChannel'
+      default: 'text'
     },
     ...email.generateFields(),
     ...attachments.generateFields(),
