@@ -1,3 +1,4 @@
+import { INodeProperties } from "n8n-workflow";
 import { ACTION_NAMES } from "../..";
 
 export default {
@@ -14,6 +15,6 @@ export default {
         description: 'Maximum number of Contacts to return',
         default: 10
       }
-    ]
+    ] as unknown as INodeProperties[]
   }
 }

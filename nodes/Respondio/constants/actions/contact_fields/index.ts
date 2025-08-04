@@ -1,3 +1,4 @@
+import { INodeProperties } from "n8n-workflow";
 import { ACTION_NAMES } from "../..";
 
 export default {
@@ -12,7 +13,7 @@ export default {
       required: false,
       description: 'Maximum number of Contacts to return',
       default: 10
-    }]
+    }] as unknown as INodeProperties[]
   },
   [ACTION_NAMES.FIND_CUSTOM_FIELD]: {
     name: 'Find a Custom Field',
@@ -25,7 +26,7 @@ export default {
       required: true,
       description: 'Custom Field ID',
       default: undefined,
-    }]
+    }] as unknown as INodeProperties[]
   },
   [ACTION_NAMES.CREATE_CUSTOM_FIELD]: {
     name: 'Create a Custom Field',
@@ -88,6 +89,6 @@ export default {
           },
         },
       }
-    ]
+    ] as unknown as INodeProperties[]
   }
 }

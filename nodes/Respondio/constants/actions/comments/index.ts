@@ -1,3 +1,4 @@
+import { INodeProperties } from "n8n-workflow";
 import { ACTION_NAMES } from "../..";
 import { generateContactIdentifierInputFields, IContactIdentifiers } from "../../../utils";
 
@@ -19,6 +20,6 @@ export default {
         required: true,
         description: 'Wrap mentioned user ids in $userId$, for example: $1$'
       }
-    ]
+    ] as unknown as INodeProperties[]
   }
 }

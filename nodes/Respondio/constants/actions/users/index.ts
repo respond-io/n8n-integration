@@ -1,3 +1,4 @@
+import { INodeProperties } from "n8n-workflow";
 import { ACTION_NAMES } from "../..";
 
 export default {
@@ -11,7 +12,7 @@ export default {
       type: 'string',
       required: true,
       description: 'The ID of the user to find. This ID can be found under Settings > "Users"',
-    }]
+    }] as unknown as INodeProperties[]
   },
   [ACTION_NAMES.GET_ALL_USERS]: {
     name: 'Get all Users',
@@ -24,6 +25,6 @@ export default {
       required: false,
       description: 'Maximum number of Contacts to return',
       default: 10
-    }]
+    }] as unknown as INodeProperties[]
   }
 }

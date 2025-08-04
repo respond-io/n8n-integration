@@ -1,3 +1,4 @@
+import { INodeProperties } from "n8n-workflow";
 import { ACTION_NAMES } from "../..";
 import { generateContactIdentifierInputFields, IContactIdentifiers } from "../../../utils";
 
@@ -59,7 +60,7 @@ export default {
           },
         },
       }
-    ]
+    ] as unknown as INodeProperties[]
   },
   [ACTION_NAMES.OPEN_OR_CLOSE_CONVERSATION]: {
     name: 'Open or close a Conversation',
@@ -112,6 +113,6 @@ export default {
           },
         },
       }
-    ]
+    ] as unknown as INodeProperties[]
   }
 }

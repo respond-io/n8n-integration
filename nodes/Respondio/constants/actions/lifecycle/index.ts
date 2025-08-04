@@ -1,3 +1,4 @@
+import { INodeProperties } from "n8n-workflow";
 import { ACTION_NAMES } from "../..";
 import { generateContactIdentifierInputFields, IContactIdentifiers } from "../../../utils";
 
@@ -10,7 +11,7 @@ export default {
       IContactIdentifiers.id,
       IContactIdentifiers.email,
       IContactIdentifiers.phone,
-    ])
+    ]) as unknown as INodeProperties[]
   },
   [ACTION_NAMES.UPDATE_CONTACT_LIFECYCLE]: {
     name: 'Update a Contact Lifecycle',
@@ -30,6 +31,6 @@ export default {
         description: 'Name of the lifecycle stage',
         default: ''
       },
-    ]
+    ] as unknown as INodeProperties[]
   },
 }

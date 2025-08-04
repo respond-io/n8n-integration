@@ -164,7 +164,16 @@ const ACTION_SETTINGS = {
     [ACTION_NAMES.FIND_USER]: usersActions.FIND_USER,
     [ACTION_NAMES.GET_ALL_USERS]: usersActions.GET_ALL_USERS,
   }
-} as const satisfies Record<string, Record<string, INodePropertyOptions & { params: Array<INodeProperties> | Array<Object> }>>;
+} as const satisfies Record<
+  string,
+  Record<
+    string,
+    INodePropertyOptions & {
+      params: INodeProperties[];
+    }
+  >
+>;
+
 
 const PLATFORM_API_URLS = {
   staging: 'https://staging.respond.io',

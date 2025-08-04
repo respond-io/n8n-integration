@@ -1,3 +1,4 @@
+import { INodeProperties } from "n8n-workflow";
 import { ACTION_NAMES } from "../..";
 import { generateContactIdentifierInputFields, generateContactInputFields, IContactIdentifiers } from "../../../utils";
 
@@ -45,7 +46,7 @@ export default {
         required: false,
         description: 'Emoji for space tag',
       },
-    ]
+    ] as unknown as INodeProperties[]
   },
   [ACTION_NAMES.DELETE_SPACE_TAG]: {
     name: 'Delete a Space Tag',
@@ -59,7 +60,7 @@ export default {
         required: true,
         description: 'Name of space tag to delete',
       },
-    ]
+    ] as unknown as INodeProperties[]
   },
   [ACTION_NAMES.UPDATE_SPACE_TAG]: {
     name: 'Update a Space Tag',
@@ -111,7 +112,7 @@ export default {
         required: false,
         description: 'Emoji for space tag',
       },
-    ]
+    ] as unknown as INodeProperties[]
   },
   [ACTION_NAMES.REMOVE_TAGS]: {
     name: 'Remove many Tags',
@@ -134,7 +135,7 @@ export default {
         required: true,
         description: 'Choose the tag to delete from this contact',
       },
-    ]
+    ] as unknown as INodeProperties[]
   },
   [ACTION_NAMES.DELETE_CONTACT]: {
     name: 'Delete a Contact',
@@ -146,7 +147,7 @@ export default {
         IContactIdentifiers.email,
         IContactIdentifiers.phone,
       ]),
-    ]
+    ] as unknown as INodeProperties[]
   },
   [ACTION_NAMES.FIND_CONTACT_CHANNELS]: {
     name: 'Find many Contact Channels',
@@ -158,7 +159,7 @@ export default {
         IContactIdentifiers.email,
         IContactIdentifiers.phone,
       ]),
-    ]
+    ] as unknown as INodeProperties[]
   },
   [ACTION_NAMES.FIND_CONTACT]: {
     name: 'Find a Contact',
@@ -170,7 +171,7 @@ export default {
         IContactIdentifiers.email,
         IContactIdentifiers.phone,
       ]),
-    ]
+    ] as unknown as INodeProperties[]
   },
   [ACTION_NAMES.ADD_TAGS]: {
     name: 'Add many Tags',
@@ -192,7 +193,7 @@ export default {
         description: 'List of tags as strings',
         required: true
       }
-    ]
+    ] as unknown as INodeProperties[]
   },
   [ACTION_NAMES.GET_MANY_CONTACTS]: {
     name: 'Get many Contacts',
@@ -215,7 +216,7 @@ export default {
         description: 'Maximum number of Contacts to return',
         default: 10
       }
-    ]
+    ] as unknown as INodeProperties[]
   },
   [ACTION_NAMES.UPDATE_CONTACT]: {
     name: 'Update a Contact',
@@ -228,7 +229,7 @@ export default {
         IContactIdentifiers.phone,
       ]),
       ...generateContactInputFields(false),
-    ]
+    ] as unknown as INodeProperties[]
   },
   [ACTION_NAMES.CREATE_OR_UPDATE_CONTACT]: {
     name: 'Create or Update a Contact',
@@ -241,7 +242,7 @@ export default {
         IContactIdentifiers.phone,
       ]),
       ...generateContactInputFields(false),
-    ]
+    ] as unknown as INodeProperties[]
   },
   [ACTION_NAMES.CREATE_CONTACT]: {
     name: 'Create a Contact',
@@ -253,6 +254,6 @@ export default {
         IContactIdentifiers.phone,
       ]),
       ...generateContactInputFields(true),
-    ]
+    ] as unknown as INodeProperties[]
   }
 }

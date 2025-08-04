@@ -1,3 +1,5 @@
+import { INodeProperties } from "n8n-workflow";
+
 import { generateContactIdentifierInputFields, IContactIdentifiers } from "../../../utils";
 import email from './email';
 import attachments from './attachments';
@@ -213,7 +215,7 @@ export default {
         description: 'Numeric ID of the message',
         default: 0,
       }
-    ]
+    ] as unknown as INodeProperties[]
   },
   [ACTION_NAMES.SEND_MESSAGE]: {
     name: 'Send a Message',
@@ -276,6 +278,6 @@ export default {
       ...quick_reply.generateFields(),
       ...whatsapp_template.generateFields(),
       ...text_message.generateFields(),
-    ]
+    ] as unknown as INodeProperties[]
   },
 };
