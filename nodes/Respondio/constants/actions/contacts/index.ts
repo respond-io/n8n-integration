@@ -1,6 +1,6 @@
 import { INodeProperties } from "n8n-workflow";
-import { ACTION_NAMES } from "../..";
 import { generateContactIdentifierInputFields, generateContactInputFields, IContactIdentifiers } from "../../../utils";
+import { ACTION_NAMES } from "../action_names";
 
 export default {
   [ACTION_NAMES.ADD_SPACE_TAG]: {

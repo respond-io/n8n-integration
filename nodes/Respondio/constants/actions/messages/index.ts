@@ -7,7 +7,7 @@ import custom_payload from './custom_payload';
 import quick_reply from './quick_reply';
 import whatsapp_template from './whatsapp_template';
 import text_message from './text_message';
-import { ACTION_NAMES } from "../..";
+import { ACTION_NAMES } from "../action_names";
 
 const INPUT_IDENTIFIER = '$input$';
 const HIDDEN_INPUT_IDENTIFIER = '$hidden$';

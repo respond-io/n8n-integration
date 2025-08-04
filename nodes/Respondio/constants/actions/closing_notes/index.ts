@@ -1,5 +1,5 @@
 import { INodeProperties } from "n8n-workflow";
-import { ACTION_NAMES } from "../..";
+import { ACTION_NAMES } from "../action_names";
 
 export default {
   [ACTION_NAMES.GET_ALL_CLOSING_NOTES]: {

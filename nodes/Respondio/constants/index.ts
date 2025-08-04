@@ -1,6 +1,6 @@
 import { INodeProperties, INodePropertyOptions } from "n8n-workflow";
 
-import { ACTION_NAMES } from "./actions";
+import { ACTION_NAMES } from "./actions/action_names";
 import channelActions from './actions/channels'
 import closingNotesActions from './actions/closing_notes'
 import commentsActions from './actions/comments'

@@ -1,6 +1,6 @@
 import { INodeProperties } from "n8n-workflow";
-import { ACTION_NAMES } from "../..";
 import { generateContactIdentifierInputFields, IContactIdentifiers } from "../../../utils";
+import { ACTION_NAMES } from "../action_names";
 
 export default {
   [ACTION_NAMES.ASSIGN_OR_UNASSIGNED_CONVERSATION]: {
