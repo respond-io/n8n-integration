@@ -27,3 +27,4 @@ export enum ACTION_NAMES {
   GET_ALL_USERS = 'GET_ALL_USERS',
 }
 
+export default ACTION_NAMES

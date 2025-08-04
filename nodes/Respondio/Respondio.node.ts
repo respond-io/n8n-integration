@@ -11,7 +11,8 @@ import {
 } from 'n8n-workflow';
 import { setTimeout as waitFor } from 'timers/promises';
 
-import { ACTION_NAMES, ACTION_SETTINGS, PLATFORM_API_URLS } from './constants';
+import ACTION_NAMES from './constants/actions/action_names'
+import { ACTION_SETTINGS, PLATFORM_API_URLS } from './constants';
 import {
   GetClosingNotesResponse,
   getContactResponse,

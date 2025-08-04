@@ -1,5 +1,5 @@
 import { INodeProperties } from "n8n-workflow";
-import { ACTION_NAMES } from "../action_names";
+import ACTION_NAMES from "../action_names";
 
 export default {
   [ACTION_NAMES.FIND_USER]: {
