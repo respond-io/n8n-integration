@@ -1,4 +1,5 @@
 import { INodeProperties } from "n8n-workflow";
+
 import { generateContactIdentifierInputFields, IContactIdentifiers } from "../../utils";
 import email from './email';
 import attachments from './attachments';
@@ -7,11 +8,33 @@ import quick_reply from './quick_reply';
 import whatsapp_template from './whatsapp_template';
 import text_message from './text_message';
 
-const { unflatten } = require('flat')
-
 const INPUT_IDENTIFIER = '$input$';
 const HIDDEN_INPUT_IDENTIFIER = '$hidden$';
 const CATTALOG_PRODUCTS_KEY = 'catalog_products'
+
+function unflatten(data: Record<string, any>, separator = '.'): Record<string, any> {
+  const result: Record<string, any> = {};
+
+  for (const flatKey in data) {
+    const value = data[flatKey];
+    const keys = flatKey.split(separator);
+
+    let current = result;
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (i === keys.length - 1) {
+        current[key] = value;
+      } else {
+        if (!current[key] || typeof current[key] !== 'object') {
+          current[key] = {};
+        }
+        current = current[key];
+      }
+    }
+  }
+
+  return result;
+}
 
 const getWhatsappTemplateMessage = (
   inputData: Record<string, any>,
@@ -20,7 +43,7 @@ const getWhatsappTemplateMessage = (
   messageType: string,
   templateComponentsFields: string
 ) => {
-  let templateComponentsFieldsParsed = null
+  let templateComponentsFieldsParsed: Record<string, any> | null = null
 
   try {
     templateComponentsFieldsParsed = JSON.parse(templateComponentsFields)
@@ -65,7 +88,9 @@ const getWhatsappTemplateMessage = (
     template: {
       name: templateName,
       languageCode: templateLanguageCode,
-      ...(templateComponentsFieldsParsed && ({ ...unflatten(templateComponentsFieldsParsed) }))
+      ...(templateComponentsFieldsParsed
+        ? unflatten(templateComponentsFieldsParsed) as Record<string, any>
+        : {}),
     }
   }
 }
