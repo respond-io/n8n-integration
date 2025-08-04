@@ -609,14 +609,32 @@ const ACTION_SETTINGS = {
       // value: 'unassignContactLifecycle',
       value: 'REMOVE_CONTACT_LIFECYCLE',
       description: 'Unassign contact lifecycle stage',
-      params: [{}]
+      params: generateContactIdentifierInputFields([
+        IContactIdentifiers.id,
+        IContactIdentifiers.email,
+        IContactIdentifiers.phone,
+      ])
     },
     UPDATE_CONTACT_LIFECYCLE: {
       name: 'Update a Contact Lifecycle',
       // value: 'updateContactLifecycle',
       value: 'UPDATE_CONTACT_LIFECYCLE',
       description: 'Update contact lifecycle stage',
-      params: [{}]
+      params: [
+        ...generateContactIdentifierInputFields([
+          IContactIdentifiers.id,
+          IContactIdentifiers.email,
+          IContactIdentifiers.phone,
+        ]),
+        {
+          displayName: 'Lifecycle Stage Name',
+          name: 'name',
+          type: 'string',
+          required: true,
+          description: 'Name of the lifecycle stage',
+          default: ''
+        },
+      ]
     },
   },
   MESSAGES: {
@@ -625,14 +643,30 @@ const ACTION_SETTINGS = {
       // value: 'getContactMessage',
       value: 'FIND_MESSAGE',
       description: 'Finds a specific message by identifier',
-      params: [{}]
+      params: [
+        ...generateContactIdentifierInputFields([
+          IContactIdentifiers.id,
+          IContactIdentifiers.email,
+          IContactIdentifiers.phone,
+        ]),
+        {
+          displayName: 'Message ID',
+          name: 'messageId',
+          type: 'number',
+          required: true,
+          description: 'Numeric ID of the message',
+          default: 0,
+        }
+      ]
     },
+    // do this last
     SEND_MESSAGE: {
       name: 'Send a Message',
       // value: 'sendMessage',
       value: 'SEND_MESSAGE',
       description: 'Sends a message to a contact',
-      params: [{}]
+      params: [
+      ]
     },
   },
   USER: {
@@ -654,7 +688,14 @@ const ACTION_SETTINGS = {
       // value: 'getAllUsers',
       value: 'GET_ALL_USERS',
       description: 'Return all the users of a Workspace',
-      params: [{}]
+      params: [{
+        displayName: 'Limit',
+        name: 'limit',
+        type: 'number',
+        required: false,
+        description: 'Maximum number of Contacts to return',
+        default: 10
+      }]
     }
   }
 } as const satisfies Record<string, Record<string, INodePropertyOptions & { params: Array<INodeProperties> | Array<Object> }>>;
