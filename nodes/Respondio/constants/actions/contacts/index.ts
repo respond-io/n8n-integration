@@ -125,15 +125,16 @@ export default {
         IContactIdentifiers.phone,
       ]),
       {
-        displayName: 'Select a Tag to Delete',
+        displayName: 'Select tag(s) to delete',
         name: 'tagId',
-        type: 'options',
+        type: 'multiOptions',
         typeOptions: {
           loadOptionsMethod: 'getTagsForContact',
           loadOptionsDependsOn: ['identifierType', 'contactId', 'contactIdentifier'],
         },
         required: true,
-        description: 'Choose the tag to delete from this contact',
+        description: 'Choose the tag(s) to delete from this contact',
+        multiple: true
       },
     ] as unknown as INodeProperties[]
   },
