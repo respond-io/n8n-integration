@@ -11,16 +11,16 @@ import {
 } from 'n8n-workflow';
 
 import ACTION_NAMES from './constants/actions/action_names'
-import { ACTION_SETTINGS, PLATFORM_API_URLS } from './constants';
+import { ACTION_SETTINGS } from './constants';
 import {
   Channel,
   ClosingNote,
-  getContactResponse,
+  GetContactResponse,
   SpaceUser,
   WhatsAppTemplate,
 } from './types';
 import handlers from './handlers';
-import { fetchPaginatedOptions } from './utils';
+import { callDeveloperApi, constructIdentifier, fetchPaginatedOptions } from './utils';
 
 const abortControllers: Record<string, AbortController> = {};
 
@@ -169,34 +169,20 @@ export class Respondio implements INodeType {
         const abortController = new AbortController();
         abortControllers[nodeId] = abortController;
 
-        const credentials = await this.getCredentials('respondIoApi');
-        const identifierType = this.getNodeParameter('identifierType', 0) as string;
-        const contactId = this.getNodeParameter('contactId', 0) as string;
-        const contactIdentifier = this.getNodeParameter('contactIdentifier', 0) as string;
-
-        const identifierValue = identifierType === 'id' ? contactId : contactIdentifier;
-
-        // Skip if no identifier provided yet
-        if (!identifierValue) return [];
-
-        const executionEnv = credentials?.environment as 'production' | 'staging' || 'staging';
-        const platformUrl = PLATFORM_API_URLS[executionEnv]
+        const identifier = constructIdentifier(this);
 
         try {
-          const response: getContactResponse = await this.helpers.httpRequest({
+          const response = await callDeveloperApi<GetContactResponse>(this, {
             method: 'GET',
-            url: `${platformUrl}/contact/${identifierType}:${identifierValue.toString().trim()}`,
-            headers: {
-              Authorization: `Bearer ${credentials.apiKey}`,
-            },
-            json: true,
+            path: `/contact/${identifier}`,
             abortSignal: toGenericAbortSignal(abortController.signal),
-          });
+            useHttpRequestHelper: true
+          })
 
           this.logger.info(`Response from API: [${nodeId}] ${JSON.stringify(response)}`);
           return response.tags.map((tag: any) => ({
-            name: tag.name,
-            value: tag.id,
+            name: tag,
+            value: tag,
           }));
         } catch (error: any) {
           if (error.name === 'AbortError') {

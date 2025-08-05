@@ -61,7 +61,7 @@ export const generateContactIdentifierInputFields = (
   ]
 }
 
-export const constructIdentifier = (executionContext: IExecuteFunctions) => {
+export const constructIdentifier = (executionContext: IExecuteFunctions | ILoadOptionsFunctions) => {
   const identifierType = executionContext.getNodeParameter('identifierType', 0, 10) as IContactIdentifiers;
   const contactId = executionContext.getNodeParameter('contactId', 0, 0) as string;
   const contactIdentifier = executionContext.getNodeParameter('contactIdentifier', 0, 'email') as string;
@@ -289,18 +289,22 @@ export async function fetchPaginatedOptions<TItem, TResult>(
   return { transformed, raw };
 }
 
-export async function callDeveloperApi(
-  executionContext: IExecuteFunctions,
+export async function callDeveloperApi<T>(
+  executionContext: IExecuteFunctions | ILoadOptionsFunctions,
   {
     method,
     path,
     body,
+    abortSignal,
+    useHttpRequestHelper = false,
   }: {
     method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
     path: string;
     body?: any;
+    abortSignal?: any;
+    useHttpRequestHelper?: boolean;
   }
-): Promise<any> {
+): Promise<T> {
   const credentials = await executionContext.getCredentials('respondIoApi');
   const env = (credentials?.environment as 'production' | 'staging') || 'staging';
   const platformUrl = PLATFORM_API_URLS[env];
@@ -309,13 +313,14 @@ export async function callDeveloperApi(
 
   const options = {
     url: `${platformUrl}${path}`,
-    headers: {
-      Authorization: `Bearer ${credentials.apiKey}`,
-    },
+    headers: { Authorization: `Bearer ${credentials.apiKey}` },
     method,
     body,
     json: true,
+    abortSignal
   };
 
-  return executionContext.helpers.request(options);
+  return useHttpRequestHelper ?
+    executionContext.helpers.httpRequest(options) :
+    executionContext.helpers.request(options);
 }

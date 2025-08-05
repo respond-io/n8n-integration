@@ -1,4 +1,4 @@
-export type getContactResponse = {
+export type GetContactResponse = {
   id: string | null;
   firstName: string | null;
   lastName: string | null;
@@ -11,7 +11,7 @@ export type getContactResponse = {
   status: 'open' | 'closed' | 'done' | 'snoozed' | 'unsnoozed' | null;
   isBlocked: boolean;
   custom_fields: Array<{ name: string; value: string | null }>;
-  tags: Array<{ id: string; name: string }>;
+  tags: Array<string>;
   assignee: {
     id: string | null;
     firstName: string | null;
