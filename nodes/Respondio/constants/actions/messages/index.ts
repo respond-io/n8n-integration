@@ -242,7 +242,7 @@ export default {
       {
         displayName: 'Channel ID',
         name: 'channelId',
-        type: 'number',
+        type: 'options',
         typeOptions: {
           loadOptionsMethod: 'getSpaceChannels',
           loadOptionsDependsOn: ['channelType']

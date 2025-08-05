@@ -9,61 +9,37 @@ import {
   NodeConnectionType,
   NodeExecutionWithMetadata,
 } from 'n8n-workflow';
-import { setTimeout as waitFor } from 'timers/promises';
 
 import ACTION_NAMES from './constants/actions/action_names'
 import { ACTION_SETTINGS, PLATFORM_API_URLS } from './constants';
 import {
-  GetClosingNotesResponse,
+  Channel,
+  ClosingNote,
   getContactResponse,
-  GetSpaceChannelsResponse,
-  GetSpaceUsersResponse,
-  GetWhatsAppTemplatesResponse,
+  SpaceUser,
   WhatsAppTemplate,
 } from './types';
+import handlers from './handlers';
+import { fetchPaginatedOptions } from './utils';
 
 const abortControllers: Record<string, AbortController> = {};
 
 const getWhatsappTemplates = async (context: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> => {
-  const credentials = await context.getCredentials('respondIoApi');
-  const executionEnv = credentials?.environment as 'production' | 'staging' || 'staging';
-  const platformUrl = PLATFORM_API_URLS[executionEnv]
-
-  // n8n does not support paginated fetch, so we have to fetch everything all at once...
-  let cursor: string | null = null;
-  const allWhatsappTemplates = [] as INodePropertyOptions[];
-  const rawWhatsappTemplates = []
-  do {
-    // make it 10 for now
-    let limit = 10;
-    const urlObject = new URL(`${platformUrl}/developer-api/space/channel`);
-    urlObject.searchParams.set('limit', limit.toString());
-    if (cursor) urlObject.searchParams.set('cursorId', cursor);
-
-    const response: GetWhatsAppTemplatesResponse = await context.helpers.request({
-      url: urlObject.toString(),
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${credentials.apiKey}`,
-      },
-      json: true
-    })
-
-    allWhatsappTemplates.push(
-      ...response.items.map((item) => ({
-        name: `${item.name} (${item.languageCode})`,
-        value: item.id,
-        description: `Namespace: ${item.namespace}, Category: ${item.category}, Status: ${item.status}`,
-      }))
-    );
-    rawWhatsappTemplates.push(...response.items)
-
-    cursor = response?.pagination?.next
-      ? new URL(response.pagination.next).searchParams.get('cursorId')
-      : null;
-    await waitFor(500);
-  } while (cursor);
-  context.logger.info(`Total space channels fetched: ${allWhatsappTemplates.length}`);
+  const {
+    transformed: allWhatsappTemplates,
+    raw: rawWhatsappTemplates,
+  } = await fetchPaginatedOptions<WhatsAppTemplate, INodePropertyOptions>(
+    context,
+    'respondIoApi',
+    '/v2/space/channel',
+    (item) => ({
+      name: `${item.name} (${item.languageCode})`,
+      value: item.id,
+      description: `Namespace: ${item.namespace}, Category: ${item.category}, Status: ${item.status}`,
+    }),
+    { limit: 20, logLabel: '[Space Channel]', includeRaw: true }
+  )
+  context.logger.info(`Total whatsapp templates fetched: ${allWhatsappTemplates.length}`);
 
   // store the raw templates in global static data for subsequent usage
   const globalData = context.getWorkflowStaticData('global')
@@ -210,7 +186,7 @@ export class Respondio implements INodeType {
         try {
           const response: getContactResponse = await this.helpers.httpRequest({
             method: 'GET',
-            url: `${platformUrl}/developer-api/contact/${identifierType}:${identifierValue.toString().trim()}`,
+            url: `${platformUrl}/v2/contact/${identifierType}:${identifierValue.toString().trim()}`,
             headers: {
               Authorization: `Bearer ${credentials.apiKey}`,
             },
@@ -234,126 +210,51 @@ export class Respondio implements INodeType {
         }
       },
       async getSpaceUsers(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-        const credentials = await this.getCredentials('respondIoApi');
-
-        const executionEnv = credentials?.environment as 'production' | 'staging' || 'staging';
-        const platformUrl = PLATFORM_API_URLS[executionEnv]
-
-        // n8n does not support paginated fetch, so we have to fetch everything all at once...
-        let cursor: string | null = null;
-        const allSpaceUsers = [] as INodePropertyOptions[];
-        do {
-          // make it 10 for now
-          let limit = 10;
-          const urlObject = new URL(`${platformUrl}/developer-api/space/users`);
-          urlObject.searchParams.set('limit', limit.toString());
-          if (cursor) urlObject.searchParams.set('cursorId', cursor);
-
-          const response: GetSpaceUsersResponse = await this.helpers.request({
-            url: urlObject.toString(),
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${credentials.apiKey}`,
-            },
-            json: true
-          })
-
-          allSpaceUsers.push(
-            ...response.items.map((user) => ({
-              name: `${user.firstName} ${user.lastName} (${user.email})`,
-              value: user.id,
-            }))
-          );
-
-          cursor = response?.pagination?.next
-            ? new URL(response.pagination.next).searchParams.get('cursorId')
-            : null;
-          await waitFor(500);
-        } while (cursor);
-        this.logger.info(`Total space users fetched: ${allSpaceUsers.length}`);
-        return allSpaceUsers;
+        const { transformed: result } = await fetchPaginatedOptions<SpaceUser, INodePropertyOptions>(
+          this,
+          'respondIoApi',
+          '/v2/space/user',
+          (item) => ({
+            name: `${item.firstName} ${item.lastName} (${item.email})`,
+            value: item.id,
+          }),
+          { limit: 20, logLabel: '[Space Users]' }
+        )
+        this.logger.info(`Total space users fetched: ${result.length}`);
+        return result;
       },
       async getClosingNotes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-        const credentials = await this.getCredentials('respondIoApi');
-        const executionEnv = credentials?.environment as 'production' | 'staging' || 'staging';
-        const platformUrl = PLATFORM_API_URLS[executionEnv]
-
-        // n8n does not support paginated fetch, so we have to fetch everything all at once...
-        let cursor: string | null = null;
-        const allClosingNotes = [] as INodePropertyOptions[];
-        do {
-          // make it 10 for now
-          let limit = 10;
-          const urlObject = new URL(`${platformUrl}/developer-api/space/closing_notes`);
-          urlObject.searchParams.set('limit', limit.toString());
-          if (cursor) urlObject.searchParams.set('cursorId', cursor);
-
-          const response: GetClosingNotesResponse = await this.helpers.request({
-            url: urlObject.toString(),
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${credentials.apiKey}`,
-            },
-            json: true
-          })
-
-          allClosingNotes.push(
-            ...response.items.map((item) => ({
-              name: item.category,
-              value: item.category,
-              description: item.description || item.content,
-            }))
-          );
-
-          cursor = response?.pagination?.next
-            ? new URL(response.pagination.next).searchParams.get('cursorId')
-            : null;
-          await waitFor(500);
-        } while (cursor);
+        const { transformed: allClosingNotes } = await fetchPaginatedOptions<ClosingNote, INodePropertyOptions>(
+          this,
+          'respondIoApi',
+          '/v2/space/closing_notes',
+          (item) => ({
+            name: item.category,
+            value: item.category,
+            description: item.description || item.content,
+          }),
+          { limit: 20, logLabel: '[Closing Notes]' }
+        )
         this.logger.info(`Total closing notes fetched: ${allClosingNotes.length}`);
         return allClosingNotes;
       },
       async getSpaceChannels(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-        const credentials = await this.getCredentials('respondIoApi');
-        const executionEnv = credentials?.environment as 'production' | 'staging' || 'staging';
-        const platformUrl = PLATFORM_API_URLS[executionEnv]
-
-        // n8n does not support paginated fetch, so we have to fetch everything all at once...
-        let cursor: string | null = null;
-        const allSpaceChannels = [] as INodePropertyOptions[];
-        do {
-          // make it 10 for now
-          let limit = 10;
-          const urlObject = new URL(`${platformUrl}/developer-api/space/channel`);
-          urlObject.searchParams.set('limit', limit.toString());
-          if (cursor) urlObject.searchParams.set('cursorId', cursor);
-
-          const response: GetSpaceChannelsResponse = await this.helpers.request({
-            url: urlObject.toString(),
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${credentials.apiKey}`,
-            },
-            json: true
-          })
-
-          allSpaceChannels.push(
-            ...response.items.map((item) => ({
-              name: item.name,
-              value: item.id,
-              description: `${item.name} - ${item.source}`
-            }))
-          );
-
-          cursor = response?.pagination?.next
-            ? new URL(response.pagination.next).searchParams.get('cursorId')
-            : null;
-          await waitFor(500);
-        } while (cursor);
+        const { transformed: allSpaceChannels } = await fetchPaginatedOptions<Channel, INodePropertyOptions>(
+          this,
+          'respondIoApi',
+          '/v2/space/channel',
+          (item) => ({
+            name: item.name,
+            value: item.id,
+            description: `${item.name} - ${item.source}`,
+          }),
+          { limit: 20, logLabel: '[Space Channel]' }
+        )
         this.logger.info(`Total space channels fetched: ${allSpaceChannels.length}`);
         return allSpaceChannels;
       },
       async getWhatsappTemplates(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+        this.logger.info('Fetching WhatsApp templates');
         return getWhatsappTemplates(this);
       },
       async getWhatsappTemplateLanguageCodes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
@@ -393,6 +294,10 @@ export class Respondio implements INodeType {
     const operation = this.getNodeParameter(Respondio.resourceTypeName, 0) as string;
     this.logger.info(`Operation: ${operation}`);
     const action = this.getNodeParameter('action', 0) as string;
+
+    const handler = handlers[operation as keyof typeof handlers];
+
+    if (!handler) throw new Error('Operation not supported')
 
     switch (action) {
       case ACTION_NAMES.GET_ALL_CHANNELS:

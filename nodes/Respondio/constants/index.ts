@@ -10,6 +10,7 @@ import conversationsActions from './actions/conversations'
 import lifecycleActions from './actions/lifecycle'
 import messagesActions from './actions/messages'
 import usersActions from './actions/users';
+import OPERATION_NAMES from "./actions/operation_names";
 
 const TRIGGER_SETTINGS = {
   CONTACT_ASSIGNEE_UPDATED: {
@@ -96,10 +97,10 @@ const TRIGGER_SETTINGS_EVENT_SOURCES = {
 }
 
 const ACTION_SETTINGS = {
-  CHANNELS: { [ACTION_NAMES.GET_ALL_CHANNELS]: channelActions.GET_ALL_CHANNELS },
-  CLOSING_NOTES: { [ACTION_NAMES.GET_ALL_CLOSING_NOTES]: closingNotesActions.GET_ALL_CLOSING_NOTES },
-  COMMENTS: { [ACTION_NAMES.ADD_COMMENT]: commentsActions.ADD_COMMENT },
-  CONTACTS: {
+  [OPERATION_NAMES.CHANNELS]: { [ACTION_NAMES.GET_ALL_CHANNELS]: channelActions.GET_ALL_CHANNELS },
+  [OPERATION_NAMES.CLOSING_NOTES]: { [ACTION_NAMES.GET_ALL_CLOSING_NOTES]: closingNotesActions.GET_ALL_CLOSING_NOTES },
+  [OPERATION_NAMES.COMMENTS]: { [ACTION_NAMES.ADD_COMMENT]: commentsActions.ADD_COMMENT },
+  [OPERATION_NAMES.CONTACTS]: {
     [ACTION_NAMES.ADD_SPACE_TAG]: contactActions.ADD_SPACE_TAG,
     [ACTION_NAMES.DELETE_SPACE_TAG]: contactActions.DELETE_SPACE_TAG,
     [ACTION_NAMES.UPDATE_SPACE_TAG]: contactActions.UPDATE_SPACE_TAG,
@@ -113,24 +114,24 @@ const ACTION_SETTINGS = {
     [ACTION_NAMES.CREATE_OR_UPDATE_CONTACT]: contactActions.CREATE_OR_UPDATE_CONTACT,
     [ACTION_NAMES.CREATE_CONTACT]: contactActions.CREATE_CONTACT,
   },
-  CONTACT_FIELDS: {
+  [OPERATION_NAMES.CONTACT_FIELDS]: {
     [ACTION_NAMES.GET_ALL_CUSTOM_FIELDS]: contactFieldActions.GET_ALL_CUSTOM_FIELDS,
     [ACTION_NAMES.FIND_CUSTOM_FIELD]: contactFieldActions.FIND_CUSTOM_FIELD,
     [ACTION_NAMES.CREATE_CUSTOM_FIELD]: contactFieldActions.CREATE_CUSTOM_FIELD,
   },
-  CONVERSATIONS: {
+  [OPERATION_NAMES.CONVERSATIONS]: {
     [ACTION_NAMES.ASSIGN_OR_UNASSIGNED_CONVERSATION]: conversationsActions.ASSIGN_OR_UNASSIGNED_CONVERSATION,
     [ACTION_NAMES.OPEN_OR_CLOSE_CONVERSATION]: conversationsActions.OPEN_OR_CLOSE_CONVERSATION,
   },
-  LIFECYCLE: {
+  [OPERATION_NAMES.LIFECYCLE]: {
     [ACTION_NAMES.REMOVE_CONTACT_LIFECYCLE]: lifecycleActions.REMOVE_CONTACT_LIFECYCLE,
     [ACTION_NAMES.UPDATE_CONTACT_LIFECYCLE]: lifecycleActions.UPDATE_CONTACT_LIFECYCLE,
   },
-  MESSAGES: {
+  [OPERATION_NAMES.MESSAGES]: {
     [ACTION_NAMES.FIND_MESSAGE]: messagesActions.FIND_MESSAGE,
     [ACTION_NAMES.SEND_MESSAGE]: messagesActions.SEND_MESSAGE
   },
-  USER: {
+  [OPERATION_NAMES.USER]: {
     [ACTION_NAMES.FIND_USER]: usersActions.FIND_USER,
     [ACTION_NAMES.GET_ALL_USERS]: usersActions.GET_ALL_USERS,
   }
@@ -146,7 +147,7 @@ const ACTION_SETTINGS = {
 
 
 const PLATFORM_API_URLS = {
-  staging: 'https://staging.respond.io',
+  staging: 'https://api-staging.respond.io/v2',
   production: 'https://app.respond.io',
   test: 'https://a8b4597fcf19.ngrok-free.app'
 }
