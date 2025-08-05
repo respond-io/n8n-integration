@@ -1,4 +1,4 @@
-import { ILoadOptionsFunctions, INodeProperties } from "n8n-workflow"
+import { IExecuteFunctions, ILoadOptionsFunctions, INodeProperties } from "n8n-workflow"
 import { setTimeout as waitFor } from 'timers/promises';
 
 import languagesJSON from './languages.json'
@@ -157,6 +157,7 @@ export async function paginateWithCursor<TItem, TResult>(
     delayMs?: number;
     logger?: { info: (msg: string) => void };
     includeRaw?: boolean;
+    maxResults?: number;
   }
 ): Promise<{ transformed: TResult[]; raw: TItem[] }> {
   const transformed: TResult[] = [];
@@ -166,19 +167,29 @@ export async function paginateWithCursor<TItem, TResult>(
   const limit = options?.limit || 10;
   const delayMs = options?.delayMs || 500;
   const logger = options?.logger || null;
+  const maxResults = options?.maxResults ?? Infinity;
 
   let cursor: string | null = null;
-
   do {
     const { items, nextCursor } = await fetchPageFn(cursor, limit);
+
     if (logger) logger.info(`Fetched ${items.length} items`);
-    transformed.push(...items.map(mapItem));
-    if (includeRaw) raw.push(...items);
+
+    const remaining = maxResults - transformed.length;
+
+    // Slice if adding all items would exceed maxResults
+    const itemsToAdd = remaining >= items.length ? items : items.slice(0, remaining);
+
+    transformed.push(...itemsToAdd.map(mapItem));
+    if (includeRaw) raw.push(...itemsToAdd);
+
+    if (transformed.length >= maxResults || !nextCursor) {
+      break;
+    }
 
     cursor = nextCursor;
-    if (cursor) await waitFor(delayMs);
-  } while (cursor);
-
+    await waitFor(delayMs);
+  } while (true);
   return { transformed, raw };
 }
 
@@ -190,7 +201,7 @@ type PaginatedApiResponse<T> = {
 };
 
 export async function fetchPaginatedOptions<TItem, TResult>(
-  context: ILoadOptionsFunctions,
+  context: ILoadOptionsFunctions | IExecuteFunctions,
   credentialsName: string,
   path: string,
   mapItem: (item: TItem) => TResult,
@@ -198,6 +209,7 @@ export async function fetchPaginatedOptions<TItem, TResult>(
     limit?: number;
     logLabel?: string;
     includeRaw?: boolean;
+    maxResults?: number;
   }
 ): Promise<{ transformed: TResult[]; raw: TItem[] }> {
   const credentials = await context.getCredentials(credentialsName);
@@ -207,6 +219,7 @@ export async function fetchPaginatedOptions<TItem, TResult>(
   const logLabel = options?.logLabel ?? path;
 
   const includeRaw = options?.includeRaw || false;
+  const maxResults = options?.maxResults || Infinity;
 
   const { transformed, raw } = await paginateWithCursor<TItem, TResult>(
     async (cursor, limit) => {
@@ -237,6 +250,7 @@ export async function fetchPaginatedOptions<TItem, TResult>(
       limit: options?.limit ?? 20,
       logger: context.logger,
       includeRaw,
+      maxResults
     }
   );
 

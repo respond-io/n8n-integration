@@ -1,16 +1,30 @@
-import { IExecuteFunctions } from "n8n-workflow";
+import { IExecuteFunctions, INodePropertyOptions } from "n8n-workflow";
 import { ACTION_NAMES } from "../../constants/actions/action_names";
-import { PLATFORM_API_URLS } from "../../constants";
+import { fetchPaginatedOptions } from "../../utils";
+import { Channel } from "../../types";
 
 // @ts-ignore
 const execute = async (action: ACTION_NAMES, executionContext: IExecuteFunctions) => {
   // we only care about GET_ALL_CHANNELS for the CHANNEL operation
-  if (action !== ACTION_NAMES.GET_ALL_CHANNELS) return
+  if (action !== ACTION_NAMES.GET_ALL_CHANNELS) return []
 
-  const credentials = await executionContext.getCredentials('respondIoApi');
-  const executionEnv = credentials?.environment as 'production' | 'staging' || 'staging';
-  // @ts-ignore
-  const platformUrl = PLATFORM_API_URLS[executionEnv];
+  const limit = executionContext.getNodeParameter('limit', 10) as number;
+
+  const { raw } = await fetchPaginatedOptions<Channel, INodePropertyOptions>(
+    executionContext,
+    'respondIoApi',
+    '/space/channel',
+    (item) => ({
+      name: item.name,
+      value: item.id,
+      description: `${item.name} - ${item.source}`,
+    }),
+    { maxResults: limit, logLabel: '[Space Channel]', includeRaw: true, limit: 20 }
+  )
+
+  // Map raw items into n8n output format
+  const returnData = raw.map((item) => ({ json: item }));
+  return [returnData]
 }
 
 export default { execute }

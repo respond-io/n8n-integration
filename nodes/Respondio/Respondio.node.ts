@@ -289,93 +289,14 @@ export class Respondio implements INodeType {
 
     const operation = this.getNodeParameter(Respondio.resourceTypeName, 0) as string;
     this.logger.info(`Operation: ${operation}`);
-    const action = this.getNodeParameter('action', 0) as string;
+    const action = this.getNodeParameter('action', 0, ACTION_NAMES.GET_ALL_CHANNELS) as ACTION_NAMES;
 
     const handler = handlers[operation as keyof typeof handlers];
 
+    if (!action) throw new Error('Action is required');
     if (!handler) throw new Error('Operation not supported')
 
-    switch (action) {
-      case ACTION_NAMES.GET_ALL_CHANNELS:
-        this.logger.info('Fetching all channels');
-        break;
-      case ACTION_NAMES.GET_ALL_CLOSING_NOTES:
-        this.logger.info('Fetching all closing notes');
-        break;
-      case ACTION_NAMES.ADD_COMMENT:
-        this.logger.info('ADDING comment');
-        break;
-      case ACTION_NAMES.ADD_SPACE_TAG:
-        this.logger.info('ADD SPACE TAG');
-        break;
-      case ACTION_NAMES.DELETE_SPACE_TAG:
-        this.logger.info('Deleting space tag');
-        break;
-      case ACTION_NAMES.UPDATE_SPACE_TAG:
-        this.logger.info('Updating space tag');
-        break;
-      case ACTION_NAMES.REMOVE_TAGS:
-        this.logger.info('Removing tags');
-        break;
-      case ACTION_NAMES.DELETE_CONTACT:
-        this.logger.info('Deleting contact');
-        break;
-      case ACTION_NAMES.FIND_CONTACT_CHANNELS:
-        this.logger.info('Fetching all channels for contact');
-        break;
-      case ACTION_NAMES.FIND_CONTACT:
-        this.logger.info('Fetching contact by identifier');
-        break;
-      case ACTION_NAMES.ADD_TAGS:
-        this.logger.info('Adding tags to contact');
-        break;
-      case ACTION_NAMES.GET_MANY_CONTACTS:
-        this.logger.info('Fetching many contacts');
-        break;
-      case ACTION_NAMES.UPDATE_CONTACT:
-        this.logger.info('Updating contact');
-        break;
-      case ACTION_NAMES.CREATE_OR_UPDATE_CONTACT:
-        this.logger.info('Creating or updating contact');
-        break;
-      case ACTION_NAMES.CREATE_CONTACT:
-        this.logger.info('Creating contact');
-        break;
-      case ACTION_NAMES.GET_ALL_CUSTOM_FIELDS:
-        this.logger.info('Fetching all custom fields');
-        break;
-      case ACTION_NAMES.FIND_CUSTOM_FIELD:
-        this.logger.info('Fetching custom field by name');
-        break;
-      case ACTION_NAMES.CREATE_CUSTOM_FIELD:
-        this.logger.info('Creating custom field');
-        break;
-      case ACTION_NAMES.ASSIGN_OR_UNASSIGNED_CONVERSATION:
-        this.logger.info('Assigning or unassigning conversation');
-        break;
-      case ACTION_NAMES.OPEN_OR_CLOSE_CONVERSATION:
-        this.logger.info('Opening or closing conversation');
-        break;
-      case ACTION_NAMES.REMOVE_CONTACT_LIFECYCLE:
-        this.logger.info('Removing contact lifecycle');
-        break;
-      case ACTION_NAMES.UPDATE_CONTACT_LIFECYCLE:
-        this.logger.info('Updating contact lifecycle');
-        break;
-      case ACTION_NAMES.FIND_MESSAGE:
-        this.logger.info('Fetching message by identifier');
-        break;
-      case ACTION_NAMES.SEND_MESSAGE:
-        this.logger.info('Sending message');
-        break;
-      case ACTION_NAMES.FIND_USER:
-        this.logger.info('Fetching user by identifier');
-        break;
-      case ACTION_NAMES.GET_ALL_USERS:
-        this.logger.info('Fetching all users');
-        break;
-    }
-
-    return null
+    const results = await handler.execute(action, this)
+    return results;
   }
 }
