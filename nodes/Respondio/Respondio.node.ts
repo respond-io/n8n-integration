@@ -31,15 +31,14 @@ const getWhatsappTemplates = async (context: ILoadOptionsFunctions): Promise<INo
   } = await fetchPaginatedOptions<WhatsAppTemplate, INodePropertyOptions>(
     context,
     'respondIoApi',
-    '/v2/space/channel',
+    '/space/channel',
     (item) => ({
       name: `${item.name} (${item.languageCode})`,
       value: item.id,
       description: `Namespace: ${item.namespace}, Category: ${item.category}, Status: ${item.status}`,
     }),
-    { limit: 20, logLabel: '[Space Channel]', includeRaw: true }
+    { limit: 20, logLabel: '[WhatsAppTemplate]', includeRaw: true }
   )
-  context.logger.info(`Total whatsapp templates fetched: ${allWhatsappTemplates.length}`);
 
   // store the raw templates in global static data for subsequent usage
   const globalData = context.getWorkflowStaticData('global')
@@ -186,7 +185,7 @@ export class Respondio implements INodeType {
         try {
           const response: getContactResponse = await this.helpers.httpRequest({
             method: 'GET',
-            url: `${platformUrl}/v2/contact/${identifierType}:${identifierValue.toString().trim()}`,
+            url: `${platformUrl}/contact/${identifierType}:${identifierValue.toString().trim()}`,
             headers: {
               Authorization: `Bearer ${credentials.apiKey}`,
             },
@@ -213,21 +212,20 @@ export class Respondio implements INodeType {
         const { transformed: result } = await fetchPaginatedOptions<SpaceUser, INodePropertyOptions>(
           this,
           'respondIoApi',
-          '/v2/space/user',
+          '/space/user',
           (item) => ({
             name: `${item.firstName} ${item.lastName} (${item.email})`,
             value: item.id,
           }),
           { limit: 20, logLabel: '[Space Users]' }
         )
-        this.logger.info(`Total space users fetched: ${result.length}`);
         return result;
       },
       async getClosingNotes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
         const { transformed: allClosingNotes } = await fetchPaginatedOptions<ClosingNote, INodePropertyOptions>(
           this,
           'respondIoApi',
-          '/v2/space/closing_notes',
+          '/space/closing_notes',
           (item) => ({
             name: item.category,
             value: item.category,
@@ -235,14 +233,13 @@ export class Respondio implements INodeType {
           }),
           { limit: 20, logLabel: '[Closing Notes]' }
         )
-        this.logger.info(`Total closing notes fetched: ${allClosingNotes.length}`);
         return allClosingNotes;
       },
       async getSpaceChannels(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
         const { transformed: allSpaceChannels } = await fetchPaginatedOptions<Channel, INodePropertyOptions>(
           this,
           'respondIoApi',
-          '/v2/space/channel',
+          '/space/channel',
           (item) => ({
             name: item.name,
             value: item.id,
@@ -250,7 +247,6 @@ export class Respondio implements INodeType {
           }),
           { limit: 20, logLabel: '[Space Channel]' }
         )
-        this.logger.info(`Total space channels fetched: ${allSpaceChannels.length}`);
         return allSpaceChannels;
       },
       async getWhatsappTemplates(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {

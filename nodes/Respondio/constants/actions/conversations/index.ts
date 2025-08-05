@@ -86,7 +86,7 @@ export default {
       {
         displayName: 'Select Conversation Category',
         name: 'category',
-        type: 'string',
+        type: 'options',
         required: true,
         description: 'The category of the conversation.',
         typeOptions: {
