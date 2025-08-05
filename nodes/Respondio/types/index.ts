@@ -96,3 +96,14 @@ export type GetWhatsAppTemplatesResponse = {
     previous?: string;
   };
 }
+
+export type CustomField = {
+  id: string;
+  name: string;
+  title: string;
+  description: string | null;
+  dataType: string;
+  created_at: number;
+  bundle?: string | null;
+  allowedValues?: string[] | null;
+}
