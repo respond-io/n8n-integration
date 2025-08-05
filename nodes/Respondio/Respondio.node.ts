@@ -294,7 +294,7 @@ export class Respondio implements INodeType {
     const handler = handlers[operation as keyof typeof handlers];
 
     if (!action) throw new Error('Action is required');
-    if (!handler) throw new Error('Operation not supported')
+    if (!handler) throw new Error(`Operation [${operation}] not supported`)
 
     const results = await handler.execute(action, this)
     return results;

@@ -3,7 +3,6 @@ import { ACTION_NAMES } from "../../constants/actions/action_names";
 import { fetchPaginatedOptions } from "../../utils";
 import { Channel } from "../../types";
 
-// @ts-ignore
 const execute = async (action: ACTION_NAMES, executionContext: IExecuteFunctions) => {
   // we only care about GET_ALL_CHANNELS for the CHANNEL operation
   if (action !== ACTION_NAMES.GET_ALL_CHANNELS) return []
@@ -19,7 +18,13 @@ const execute = async (action: ACTION_NAMES, executionContext: IExecuteFunctions
       value: item.id,
       description: `${item.name} - ${item.source}`,
     }),
-    { maxResults: limit, logLabel: '[Space Channel]', includeRaw: true, limit: 20 }
+    {
+      maxResults: limit,
+      logLabel: '[Action - Space Channel]',
+      includeRaw: true,
+      limit: 20,
+      includeTransformed: false
+    }
   )
 
   // Map raw items into n8n output format

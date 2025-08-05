@@ -151,13 +151,14 @@ export async function paginateWithCursor<TItem, TResult>(
     items: TItem[];
     nextCursor: string | null;
   }>,
-  mapItem: (item: TItem) => TResult,
+  mapItem?: (item: TItem) => TResult,
   options?: {
     limit?: number;
     delayMs?: number;
     logger?: { info: (msg: string) => void };
     includeRaw?: boolean;
     maxResults?: number;
+    includeTransformed?: boolean;
   }
 ): Promise<{ transformed: TResult[]; raw: TItem[] }> {
   const transformed: TResult[] = [];
@@ -168,6 +169,7 @@ export async function paginateWithCursor<TItem, TResult>(
   const delayMs = options?.delayMs || 500;
   const logger = options?.logger || null;
   const maxResults = options?.maxResults ?? Infinity;
+  const includeTransformed = options?.includeTransformed ?? true;
 
   let cursor: string | null = null;
   do {
@@ -180,7 +182,7 @@ export async function paginateWithCursor<TItem, TResult>(
     // Slice if adding all items would exceed maxResults
     const itemsToAdd = remaining >= items.length ? items : items.slice(0, remaining);
 
-    transformed.push(...itemsToAdd.map(mapItem));
+    if (includeTransformed && mapItem) transformed.push(...itemsToAdd.map(mapItem));
     if (includeRaw) raw.push(...itemsToAdd);
 
     if (transformed.length >= maxResults || !nextCursor) {
@@ -204,12 +206,13 @@ export async function fetchPaginatedOptions<TItem, TResult>(
   context: ILoadOptionsFunctions | IExecuteFunctions,
   credentialsName: string,
   path: string,
-  mapItem: (item: TItem) => TResult,
+  mapItem?: (item: TItem) => TResult,
   options?: {
     limit?: number;
     logLabel?: string;
     includeRaw?: boolean;
     maxResults?: number;
+    includeTransformed?: boolean;
   }
 ): Promise<{ transformed: TResult[]; raw: TItem[] }> {
   const credentials = await context.getCredentials(credentialsName);
@@ -220,6 +223,7 @@ export async function fetchPaginatedOptions<TItem, TResult>(
 
   const includeRaw = options?.includeRaw || false;
   const maxResults = options?.maxResults || Infinity;
+  const includeTransformed = options?.includeTransformed || true;
 
   const { transformed, raw } = await paginateWithCursor<TItem, TResult>(
     async (cursor, limit) => {
@@ -250,7 +254,8 @@ export async function fetchPaginatedOptions<TItem, TResult>(
       limit: options?.limit ?? 20,
       logger: context.logger,
       includeRaw,
-      maxResults
+      maxResults,
+      includeTransformed
     }
   );
 
