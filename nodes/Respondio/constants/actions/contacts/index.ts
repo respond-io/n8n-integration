@@ -126,7 +126,7 @@ export default {
       ]),
       {
         displayName: 'Select tag(s) to delete',
-        name: 'tagId',
+        name: 'tagIds',
         type: 'multiOptions',
         typeOptions: {
           loadOptionsMethod: 'getTagsForContact',
@@ -134,7 +134,6 @@ export default {
         },
         required: true,
         description: 'Choose the tag(s) to delete from this contact',
-        multiple: true
       },
     ] as unknown as INodeProperties[]
   },

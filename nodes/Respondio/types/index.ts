@@ -114,3 +114,19 @@ export type CreateCommentResponse = {
   text: string;
   created_at: number;
 }
+
+export type CreateSpaceTagResponse = {
+  code: number;
+  message: {
+    id: number;
+    name: string;
+    createdAt: number;
+    colorCode: string;
+    emoji: string;
+    description: string;
+  }
+}
+
+export type DeleteSpaceTagResponse = {
+  message: string;
+}
