@@ -130,3 +130,31 @@ export type CreateSpaceTagResponse = {
 export type DeleteSpaceTagResponse = {
   message: string;
 }
+
+export type DeleteManyTagsResponse = {
+  contactId: number;
+}
+
+export type FindContactChannelsItem = {
+  id: string;
+  name: string;
+  source: string;
+  contactChannelId: number;
+  meta: any | null;
+  lastMessageTime: number;
+  lastIncomingMessageTime: number;
+  created_at: number;
+}
+
+export type GetManyContactsResponse = {
+  items: Array<GetContactResponse>;
+  pagination: {
+    next?: string;
+    previous?: string;
+  };
+}
+
+export type CreateContactResponse = {
+  code: number;
+  message: string;
+}

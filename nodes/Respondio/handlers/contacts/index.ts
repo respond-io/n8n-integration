@@ -1,21 +1,7 @@
-import { IExecuteFunctions, INodeExecutionData, NodeExecutionWithMetadata } from "n8n-workflow";
+import { IExecuteFunctions, INodeExecutionData, INodePropertyOptions, NodeExecutionWithMetadata } from "n8n-workflow";
 import { ACTION_NAMES } from "../../constants/actions/action_names";
-// import { callDeveloperApi, constructIdentifier } from "../../utils";
-import { callDeveloperApi, constructIdentifier } from "../../utils";
-import { CreateSpaceTagResponse, DeleteSpaceTagResponse } from "../../types";
-
-// [ACTION_NAMES.ADD_SPACE_TAG]: contactActions.ADD_SPACE_TAG,
-// [ACTION_NAMES.DELETE_SPACE_TAG]: contactActions.DELETE_SPACE_TAG,
-// [ACTION_NAMES.UPDATE_SPACE_TAG]: contactActions.UPDATE_SPACE_TAG,
-// [ACTION_NAMES.REMOVE_TAGS]: contactActions.REMOVE_TAGS,
-// [ACTION_NAMES.DELETE_CONTACT]: contactActions.DELETE_CONTACT,
-// [ACTION_NAMES.FIND_CONTACT_CHANNELS]: contactActions.FIND_CONTACT_CHANNELS,
-// [ACTION_NAMES.FIND_CONTACT]: contactActions.FIND_CONTACT,
-// [ACTION_NAMES.ADD_TAGS]: contactActions.ADD_TAGS,
-// [ACTION_NAMES.GET_MANY_CONTACTS]: contactActions.GET_MANY_CONTACTS,
-// [ACTION_NAMES.UPDATE_CONTACT]: contactActions.UPDATE_CONTACT,
-// [ACTION_NAMES.CREATE_OR_UPDATE_CONTACT]: contactActions.CREATE_OR_UPDATE_CONTACT,
-// [ACTION_NAMES.CREATE_CONTACT]: contactActions.CREATE_CONTACT,
+import { callDeveloperApi, constructIdentifier, fetchPaginatedOptions } from "../../utils";
+import { CreateContactResponse, CreateSpaceTagResponse, DeleteManyTagsResponse, DeleteSpaceTagResponse, FindContactChannelsItem, GetContactResponse, GetManyContactsResponse } from "../../types";
 
 const execute = async (
   action: ACTION_NAMES,
@@ -100,47 +86,168 @@ const execute = async (
     const identifier = constructIdentifier(executionContext);
 
     const tags = executionContext.getNodeParameter('tagIds', 0, []) as string[];
-    executionContext.logger.info(`Removing tags: ${JSON.stringify(tags)} from contact: ${identifier}`);
+
+    const response = await callDeveloperApi<DeleteManyTagsResponse>(executionContext, {
+      method: 'DELETE',
+      path: `/contact/${identifier}/tag`,
+      body: tags
+    })
+
+    return [[{ json: response }]]
   }
 
-  // if (action === ACTION_NAMES.REMOVE_TAGS) {
-  //   const identifier = constructIdentifier(executionContext);
-  //   const tagId = executionContext.getNodeParameter('tagId', 0, undefined) as string;
-  // }
+  if (action === ACTION_NAMES.DELETE_CONTACT) {
+    const identifier = constructIdentifier(executionContext);
 
-  // if (action === ACTION_NAMES.FIND_CUSTOM_FIELD) {
-  //   const customFieldId = executionContext.getNodeParameter('customFieldId', 0, undefined) as number;
-  //
-  //   const response = await callDeveloperApi(executionContext, {
-  //     method: 'GET',
-  //     path: `/space/custom_field/${customFieldId}`,
-  //   })
-  //
-  //   return [[{ json: response }]];
-  // }
-  //
-  // const name = executionContext.getNodeParameter('name', 0, '') as string;
-  // const description = executionContext.getNodeParameter('description', 0, '') as string;
-  // const slug = executionContext.getNodeParameter('slug', 0, '') as string;
-  // const dataType = executionContext.getNodeParameter('dataType', 0, 'text') as string;
-  // const allowedValues = executionContext.getNodeParameter('allowedValues', 0, []) as string[];
-  //
-  // const payload = {
-  //   name,
-  //   description,
-  //   dataType,
-  //   allowedValues,
-  //   slug
-  // }
-  // executionContext.logger.info(`Payload used: ${JSON.stringify(payload)}`)
-  //
-  // const response = await callDeveloperApi(executionContext, {
-  //   method: 'POST',
-  //   path: `/space/custom_field`,
-  //   body: payload
-  // })
-  //
-  // return [[{ json: response }]]
+    const response = await callDeveloperApi<DeleteManyTagsResponse>(executionContext, {
+      method: 'DELETE',
+      path: `/contact/${identifier}`,
+    })
+
+    return [[{ json: response }]]
+  }
+
+  if (action === ACTION_NAMES.FIND_CONTACT_CHANNELS) {
+    const identifier = constructIdentifier(executionContext);
+
+    const { raw } = await fetchPaginatedOptions<FindContactChannelsItem, INodePropertyOptions>(
+      executionContext,
+      'respondIoApi',
+      `/contact/${identifier}/channels`,
+      undefined,
+      {
+        includeTransformed: false,
+        limit: 100,
+        includeRaw: true,
+        maxResults: Infinity,
+        logLabel: '[Action - Find Contact Channels]',
+      }
+    )
+
+    return [raw.map((item) => ({ json: item }))];
+  }
+
+  if (action === ACTION_NAMES.FIND_CONTACT) {
+    const identifier = constructIdentifier(executionContext);
+
+    const response = await callDeveloperApi<GetContactResponse>(executionContext, {
+      method: 'GET',
+      path: `/contact/${identifier}`,
+    })
+
+    return [[{ json: response }]];
+  }
+
+  if (action === ACTION_NAMES.ADD_TAGS) {
+    const identifier = constructIdentifier(executionContext);
+    const tags = executionContext.getNodeParameter('tags', 0, '') as string;
+
+    const response = await callDeveloperApi<DeleteManyTagsResponse>(executionContext, {
+      method: 'POST',
+      path: `/contact/${identifier}/tag`,
+      body: tags
+    })
+
+    return [[{ json: response }]];
+  }
+
+  if (action === ACTION_NAMES.GET_MANY_CONTACTS) {
+    const search = executionContext.getNodeParameter('search', 0, '') as string;
+    const limit = executionContext.getNodeParameter('limit', 0, 10) as number;
+
+    const response = await callDeveloperApi<GetManyContactsResponse>(executionContext, {
+      method: 'POST',
+      path: `/contact/list?limit=${limit}`,
+      body: {
+        search,
+        timezone: 'utc',
+        filter: { $or: [] }
+      }
+    })
+
+    return [response.items.map((item) => ({ json: item }))];
+  }
+
+  // UPDATE_CONTACT does not have email / phone to be updateable
+  if (action === ACTION_NAMES.UPDATE_CONTACT) {
+    const identifier = constructIdentifier(executionContext);
+    const firstName = executionContext.getNodeParameter('firstName', 0, '') as string;
+    const lastName = executionContext.getNodeParameter('lastName', 0, '') as string;
+    const language = executionContext.getNodeParameter('language', 0, '') as string;
+    const profilePic = executionContext.getNodeParameter('profilePic', 0, '') as string;
+    const countryCode = executionContext.getNodeParameter('countryCode', 0, '') as string;
+
+    const payload = {
+      firstName,
+      lastName,
+      language,
+      profilePic,
+      countryCode
+    }
+
+    const response = await callDeveloperApi<DeleteManyTagsResponse>(executionContext, {
+      method: 'PUT',
+      path: `/contact/${identifier}`,
+      body: payload,
+    })
+
+    return [[{ json: response }]];
+  }
+
+  if (action === ACTION_NAMES.CREATE_OR_UPDATE_CONTACT) {
+    const identifier = constructIdentifier(executionContext);
+    const firstName = executionContext.getNodeParameter('firstName', 0, '') as string;
+    const lastName = executionContext.getNodeParameter('lastName', 0, '') as string;
+    const language = executionContext.getNodeParameter('language', 0, '') as string;
+    const profilePic = executionContext.getNodeParameter('profilePic', 0, '') as string;
+    const countryCode = executionContext.getNodeParameter('countryCode', 0, '') as string;
+
+    const payload = {
+      firstName,
+      lastName,
+      language,
+      profilePic,
+      countryCode
+    }
+
+    const response = await callDeveloperApi<DeleteManyTagsResponse>(executionContext, {
+      method: 'POST',
+      path: `/contact/create_or_update/${identifier}`,
+      body: payload,
+    })
+
+    return [[{ json: response }]];
+  }
+
+  if (action === ACTION_NAMES.CREATE_CONTACT) {
+    const identifier = constructIdentifier(executionContext);
+    const firstName = executionContext.getNodeParameter('firstName', 0, '') as string;
+    const lastName = executionContext.getNodeParameter('lastName', 0, '') as string;
+    const language = executionContext.getNodeParameter('language', 0, '') as string;
+    const profilePic = executionContext.getNodeParameter('profilePic', 0, '') as string;
+    const countryCode = executionContext.getNodeParameter('countryCode', 0, '') as string;
+    const email = executionContext.getNodeParameter('email', 0, '') as string;
+    const phone = executionContext.getNodeParameter('phone', 0, '') as string;
+
+    const payload = {
+      firstName,
+      lastName,
+      language,
+      profilePic,
+      countryCode,
+      email,
+      phone
+    }
+
+    const response = await callDeveloperApi<CreateContactResponse>(executionContext, {
+      method: 'POST',
+      path: `/contact/create_or_update/${identifier}`,
+      body: payload,
+    })
+
+    return [[{ json: response }]];
+  }
+
   return [[]]
 }
 
