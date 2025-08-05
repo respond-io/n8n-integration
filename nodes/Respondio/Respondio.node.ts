@@ -131,7 +131,7 @@ export class Respondio implements INodeType {
       defaults: {
         name: 'Respond.io Actions',
       },
-      inputs: [],
+      inputs: [NodeConnectionType.Main],
       outputs: [NodeConnectionType.Main],
       credentials: [
         {
