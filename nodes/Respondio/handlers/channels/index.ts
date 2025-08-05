@@ -13,11 +13,7 @@ const execute = async (action: ACTION_NAMES, executionContext: IExecuteFunctions
     executionContext,
     'respondIoApi',
     '/space/channel',
-    (item) => ({
-      name: item.name,
-      value: item.id,
-      description: `${item.name} - ${item.source}`,
-    }),
+    undefined,
     {
       maxResults: limit,
       logLabel: '[Action - Space Channel]',

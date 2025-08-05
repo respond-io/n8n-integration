@@ -12,11 +12,7 @@ const execute = async (action: ACTION_NAMES, executionContext: IExecuteFunctions
     executionContext,
     'respondIoApi',
     '/space/closing_notes',
-    (item) => ({
-      name: item.category,
-      value: item.category,
-      description: item.description || item.content,
-    }),
+    undefined,
     {
       maxResults: limit,
       logLabel: '[Action - Closing Notes]',
