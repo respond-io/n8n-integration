@@ -61,7 +61,13 @@ export const generateContactIdentifierInputFields = (
   ]
 }
 
-export const constructIdentifier = (identifierType: IContactIdentifiers, identifierValue: string | number) => {
+export const constructIdentifier = (executionContext: IExecuteFunctions) => {
+  const identifierType = executionContext.getNodeParameter('identifierType', 0, 10) as IContactIdentifiers;
+  const contactId = executionContext.getNodeParameter('contactId', 0, 0) as string;
+  const contactIdentifier = executionContext.getNodeParameter('contactIdentifier', 0, 'email') as string;
+
+  const identifierValue = identifierType === IContactIdentifiers.id ? contactId : contactIdentifier;
+
   const trimmedValue = identifierValue.toString().trim()
   const trimmedType = identifierType.trim().toLowerCase()
   return `${trimmedType}:${trimmedValue}`
