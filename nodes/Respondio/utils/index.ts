@@ -1,6 +1,9 @@
-import { INodeProperties } from "n8n-workflow"
+import { ILoadOptionsFunctions, INodeProperties } from "n8n-workflow"
+import { setTimeout as waitFor } from 'timers/promises';
+
 import languagesJSON from './languages.json'
 import countriesJSON from './countries.json'
+import { PLATFORM_API_URLS } from "../constants";
 
 export enum IContactIdentifiers {
   id = 'id',
@@ -142,3 +145,102 @@ export const generateContactInputFields = (isCreateContact: boolean = false): IN
 
   return result;
 }
+
+export async function paginateWithCursor<TItem, TResult>(
+  fetchPageFn: (cursor: string | null, limit: number) => Promise<{
+    items: TItem[];
+    nextCursor: string | null;
+  }>,
+  mapItem: (item: TItem) => TResult,
+  options?: {
+    limit?: number;
+    delayMs?: number;
+    logger?: { info: (msg: string) => void };
+    includeRaw?: boolean;
+  }
+): Promise<{ transformed: TResult[]; raw: TItem[] }> {
+  const transformed: TResult[] = [];
+  const includeRaw = options?.includeRaw || false;
+  const raw: TItem[] = [];
+
+  const limit = options?.limit || 10;
+  const delayMs = options?.delayMs || 500;
+  const logger = options?.logger || null;
+
+  let cursor: string | null = null;
+
+  do {
+    const { items, nextCursor } = await fetchPageFn(cursor, limit);
+    if (logger) logger.info(`Fetched ${items.length} items`);
+    transformed.push(...items.map(mapItem));
+    if (includeRaw) raw.push(...items);
+
+    cursor = nextCursor;
+    if (cursor) await waitFor(delayMs);
+  } while (cursor);
+
+  return { transformed, raw };
+}
+
+type PaginatedApiResponse<T> = {
+  items: T[];
+  pagination?: {
+    next?: string;
+  };
+};
+
+export async function fetchPaginatedOptions<TItem, TResult>(
+  context: ILoadOptionsFunctions,
+  credentialsName: string,
+  path: string,
+  mapItem: (item: TItem) => TResult,
+  options?: {
+    limit?: number;
+    logLabel?: string;
+    includeRaw?: boolean;
+  }
+): Promise<{ transformed: TResult[]; raw: TItem[] }> {
+  const credentials = await context.getCredentials(credentialsName);
+  const env = credentials?.environment as 'production' | 'staging' || 'staging';
+  const platformUrl = PLATFORM_API_URLS[env];
+  const fullPath = `${platformUrl}${path}`;
+  const logLabel = options?.logLabel ?? path;
+
+  const includeRaw = options?.includeRaw || false;
+
+  const { transformed, raw } = await paginateWithCursor<TItem, TResult>(
+    async (cursor, limit) => {
+      const urlObject = new URL(fullPath);
+      urlObject.searchParams.set('limit', limit.toString());
+      if (cursor) urlObject.searchParams.set('cursorId', cursor);
+
+      context.logger.info(`Fetching ${logLabel} from URL: ${urlObject.toString()}`);
+
+      const response = await context.helpers.request({
+        url: urlObject.toString(),
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${credentials.apiKey}`,
+        },
+        json: true,
+      }) as PaginatedApiResponse<TItem>;
+
+      return {
+        items: response.items,
+        nextCursor: response?.pagination?.next
+          ? new URL(response.pagination.next).searchParams.get('cursorId')
+          : null,
+      };
+    },
+    mapItem,
+    {
+      limit: options?.limit ?? 20,
+      logger: context.logger,
+      includeRaw,
+    }
+  );
+
+  context.logger.info(`Total ${logLabel} fetched: ${transformed.length}`);
+  return { transformed, raw };
+}
+
