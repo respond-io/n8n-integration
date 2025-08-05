@@ -320,7 +320,9 @@ export async function callDeveloperApi<T>(
     abortSignal
   };
 
-  return useHttpRequestHelper ?
+  const response = useHttpRequestHelper ?
     executionContext.helpers.httpRequest(options) :
     executionContext.helpers.request(options);
+
+  return response as T
 }

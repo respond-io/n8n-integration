@@ -39,7 +39,7 @@ const execute = async (
   if (action === ACTION_NAMES.FIND_CUSTOM_FIELD) {
     const customFieldId = executionContext.getNodeParameter('customFieldId', 0, undefined) as number;
 
-    const response = await callDeveloperApi(executionContext, {
+    const response = await callDeveloperApi<CustomField>(executionContext, {
       method: 'GET',
       path: `/space/custom_field/${customFieldId}`,
     })
@@ -62,7 +62,7 @@ const execute = async (
   }
   executionContext.logger.info(`Payload used: ${JSON.stringify(payload)}`)
 
-  const response = await callDeveloperApi(executionContext, {
+  const response = await callDeveloperApi<CustomField>(executionContext, {
     method: 'POST',
     path: `/space/custom_field`,
     body: payload

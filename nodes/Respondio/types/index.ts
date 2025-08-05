@@ -102,8 +102,15 @@ export type CustomField = {
   name: string;
   title: string;
   description: string | null;
+  slug: string | null;
   dataType: string;
   created_at: number;
   bundle?: string | null;
   allowedValues?: string[] | null;
+}
+
+export type CreateCommentResponse = {
+  contactId: number;
+  text: string;
+  created_at: number;
 }
