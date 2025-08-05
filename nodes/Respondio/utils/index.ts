@@ -68,8 +68,12 @@ export const constructIdentifier = (executionContext: IExecuteFunctions) => {
 
   const identifierValue = identifierType === IContactIdentifiers.id ? contactId : contactIdentifier;
 
-  const trimmedValue = identifierValue.toString().trim()
   const trimmedType = identifierType.trim().toLowerCase()
+  let trimmedValue = identifierValue.toString().trim()
+
+  // make sure to normalize the identifier value for phone number
+  if (trimmedType === IContactIdentifiers.phone) trimmedValue = trimmedValue.replace(/[^0-9+]/g, '');
+
   return `${trimmedType}:${trimmedValue}`
 }
 
@@ -269,3 +273,33 @@ export async function fetchPaginatedOptions<TItem, TResult>(
   return { transformed, raw };
 }
 
+export async function callDeveloperApi(
+  executionContext: IExecuteFunctions,
+  {
+    method,
+    path,
+    body,
+  }: {
+    method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+    path: string;
+    body?: any;
+  }
+): Promise<any> {
+  const credentials = await executionContext.getCredentials('respondIoApi');
+  const env = (credentials?.environment as 'production' | 'staging') || 'staging';
+  const platformUrl = PLATFORM_API_URLS[env];
+
+  executionContext.logger.info(`Making API call to: ${platformUrl}${path} with method: ${method} alongside body: ${JSON.stringify(body)}`);
+
+  const options = {
+    url: `${platformUrl}${path}`,
+    headers: {
+      Authorization: `Bearer ${credentials.apiKey}`,
+    },
+    method,
+    body,
+    json: true,
+  };
+
+  return executionContext.helpers.request(options);
+}
