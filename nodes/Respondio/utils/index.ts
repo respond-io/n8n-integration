@@ -156,6 +156,17 @@ export const generateContactInputFields = (isCreateContact: boolean = false): IN
   return result;
 }
 
+function getResponseLength<TItem, TResult>(
+  includeRaw: boolean,
+  includeTransformed: boolean,
+  raw: TItem[],
+  transformed: TResult[]
+): number {
+  if (includeRaw) return raw.length;
+  if (includeTransformed) return transformed.length;
+  return 0;
+}
+
 export async function paginateWithCursor<TItem, TResult>(
   fetchPageFn: (cursor: string | null, limit: number) => Promise<{
     items: TItem[];
@@ -187,7 +198,10 @@ export async function paginateWithCursor<TItem, TResult>(
 
     if (logger) logger.info(`Fetched ${items.length} items`);
 
-    const remaining = maxResults - transformed.length;
+    // dynamically calculate the response length based on what we are including
+    let responseLength = getResponseLength(includeRaw, includeTransformed, raw, transformed)
+
+    const remaining = maxResults - responseLength;
 
     // Slice if adding all items would exceed maxResults
     const itemsToAdd = remaining >= items.length ? items : items.slice(0, remaining);
@@ -195,7 +209,9 @@ export async function paginateWithCursor<TItem, TResult>(
     if (includeTransformed && mapItem) transformed.push(...itemsToAdd.map(mapItem));
     if (includeRaw) raw.push(...itemsToAdd);
 
-    if (transformed.length >= maxResults || !nextCursor) {
+    responseLength = getResponseLength(includeRaw, includeTransformed, raw, transformed);
+
+    if (responseLength >= maxResults || !nextCursor) {
       break;
     }
 
@@ -265,11 +281,11 @@ export async function fetchPaginatedOptions<TItem, TResult>(
       logger: context.logger,
       includeRaw,
       maxResults,
-      includeTransformed
+      includeTransformed,
     }
   );
 
-  context.logger.info(`Total ${logLabel} fetched: ${transformed.length}`);
+  context.logger.info(`Total ${logLabel} fetched: ${transformed.length || raw.length}`);
   return { transformed, raw };
 }
 
