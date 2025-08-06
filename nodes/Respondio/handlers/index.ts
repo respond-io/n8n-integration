@@ -5,6 +5,7 @@ import commentsHandler from './comments'
 import contactFieldsHandler from './contact_fields'
 import contactsHandler from './contacts'
 import conversationsHandler from './conversations'
+import lifecycleHandler from './lifecycles'
 
 export default {
   [OPERATION_NAMES.CHANNELS]: channelHandler,
@@ -13,4 +14,5 @@ export default {
   [OPERATION_NAMES.CONTACT_FIELDS]: contactFieldsHandler,
   [OPERATION_NAMES.CONTACTS]: contactsHandler,
   [OPERATION_NAMES.CONVERSATIONS]: conversationsHandler,
+  [OPERATION_NAMES.LIFECYCLE]: lifecycleHandler,
 }
