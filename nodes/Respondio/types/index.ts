@@ -158,3 +158,24 @@ export type CreateContactResponse = {
   code: number;
   message: string;
 }
+
+export type GetUserResponseItem = {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  team: {
+    id: number;
+    name: string;
+  },
+  restrictions: string[];
+}
+
+export type GetAllUsersResponse = {
+  items: Array<GetUserResponseItem>;
+  pagination: {
+    next?: string;
+    previous?: string;
+  };
+}
