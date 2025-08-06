@@ -1,6 +1,6 @@
 import { IExecuteFunctions, INodeExecutionData, INodePropertyOptions, NodeExecutionWithMetadata } from "n8n-workflow";
 import { ACTION_NAMES } from "../../constants/actions/action_names";
-import { callDeveloperApi, constructIdentifier, fetchPaginatedOptions } from "../../utils";
+import { callDeveloperApi, constructCustomFieldFromResourceMapper, constructIdentifier, fetchPaginatedOptions } from "../../utils";
 import {
   CreateContactResponse,
   CreateSpaceTagResponse,
@@ -187,10 +187,7 @@ const execute = async (
     const countryCode = executionContext.getNodeParameter('countryCode', 0, '') as string;
     const customFieldMapper = executionContext.getNodeParameter('customFields', 0, []) as CustomFieldMapperReturnValue;
 
-    const customFields = Object.entries(customFieldMapper.value).map(([key, value]) => ({
-      name: key,
-      value,
-    }));
+    const customFields = constructCustomFieldFromResourceMapper(customFieldMapper);
 
     const payload = {
       firstName,
@@ -219,10 +216,7 @@ const execute = async (
     const countryCode = executionContext.getNodeParameter('countryCode', 0, '') as string;
     const customFieldMapper = executionContext.getNodeParameter('customFields', 0, []) as CustomFieldMapperReturnValue;
 
-    const customFields = Object.entries(customFieldMapper.value).map(([key, value]) => ({
-      name: key,
-      value,
-    }));
+    const customFields = constructCustomFieldFromResourceMapper(customFieldMapper);
 
     const payload = {
       firstName,
@@ -253,10 +247,7 @@ const execute = async (
     const phone = executionContext.getNodeParameter('phone', 0, '') as string;
     const customFieldMapper = executionContext.getNodeParameter('customFields', 0, []) as CustomFieldMapperReturnValue;
 
-    const customFields = Object.entries(customFieldMapper.value).map(([key, value]) => ({
-      name: key,
-      value,
-    }));
+    const customFields = constructCustomFieldFromResourceMapper(customFieldMapper);
 
     const payload = {
       firstName,

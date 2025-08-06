@@ -4,6 +4,7 @@ import { setTimeout as waitFor } from 'timers/promises';
 import languagesJSON from './languages.json'
 import countriesJSON from './countries.json'
 import { PLATFORM_API_URLS } from "../constants";
+import { CustomFieldMapperReturnValue } from "../types";
 
 export enum IContactIdentifiers {
   id = 'id',
@@ -351,4 +352,26 @@ export async function callDeveloperApi<T>(
     executionContext.helpers.request(options);
 
   return response as T
+}
+
+export const constructCustomFieldFromResourceMapper = (
+  customFieldMapper: CustomFieldMapperReturnValue,
+): Array<{ name: string; value: string | number | boolean | Date }> => {
+  const values = customFieldMapper?.value || null;
+  if (!values) return [];
+
+  return Object.entries(values).map(([key, value]) => {
+    const result = {
+      name: key,
+      value,
+    }
+
+    const matchingSchema = customFieldMapper.schema.find((field) => field.id === key);
+
+    if (matchingSchema && matchingSchema?.type === 'dateTime' && typeof value === 'string') {
+      result.value = new Date(value).toISOString().split('T')[0];
+    }
+
+    return result
+  });
 }
