@@ -1,7 +1,16 @@
 import { IExecuteFunctions, INodeExecutionData, INodePropertyOptions, NodeExecutionWithMetadata } from "n8n-workflow";
 import { ACTION_NAMES } from "../../constants/actions/action_names";
 import { callDeveloperApi, constructIdentifier, fetchPaginatedOptions } from "../../utils";
-import { CreateContactResponse, CreateSpaceTagResponse, DeleteManyTagsResponse, DeleteSpaceTagResponse, FindContactChannelsItem, GetContactResponse, GetManyContactsResponse } from "../../types";
+import {
+  CreateContactResponse,
+  CreateSpaceTagResponse,
+  CustomFieldMapperReturnValue,
+  DeleteManyTagsResponse,
+  DeleteSpaceTagResponse,
+  FindContactChannelsItem,
+  GetContactResponse,
+  GetManyContactsResponse,
+} from "../../types";
 
 const execute = async (
   action: ACTION_NAMES,
@@ -176,13 +185,20 @@ const execute = async (
     const language = executionContext.getNodeParameter('language', 0, '') as string;
     const profilePic = executionContext.getNodeParameter('profilePic', 0, '') as string;
     const countryCode = executionContext.getNodeParameter('countryCode', 0, '') as string;
+    const customFieldMapper = executionContext.getNodeParameter('customFields', 0, []) as CustomFieldMapperReturnValue;
+
+    const customFields = Object.entries(customFieldMapper.value).map(([key, value]) => ({
+      name: key,
+      value,
+    }));
 
     const payload = {
       firstName,
       lastName,
       language,
       profilePic,
-      countryCode
+      countryCode,
+      ...(customFields.length && { custom_fields: customFields }),
     }
 
     const response = await callDeveloperApi<DeleteManyTagsResponse>(executionContext, {
@@ -201,13 +217,20 @@ const execute = async (
     const language = executionContext.getNodeParameter('language', 0, '') as string;
     const profilePic = executionContext.getNodeParameter('profilePic', 0, '') as string;
     const countryCode = executionContext.getNodeParameter('countryCode', 0, '') as string;
+    const customFieldMapper = executionContext.getNodeParameter('customFields', 0, []) as CustomFieldMapperReturnValue;
+
+    const customFields = Object.entries(customFieldMapper.value).map(([key, value]) => ({
+      name: key,
+      value,
+    }));
 
     const payload = {
       firstName,
       lastName,
       language,
       profilePic,
-      countryCode
+      countryCode,
+      ...(customFields.length && { custom_fields: customFields }),
     }
 
     const response = await callDeveloperApi<DeleteManyTagsResponse>(executionContext, {
@@ -228,6 +251,12 @@ const execute = async (
     const countryCode = executionContext.getNodeParameter('countryCode', 0, '') as string;
     const email = executionContext.getNodeParameter('email', 0, '') as string;
     const phone = executionContext.getNodeParameter('phone', 0, '') as string;
+    const customFieldMapper = executionContext.getNodeParameter('customFields', 0, []) as CustomFieldMapperReturnValue;
+
+    const customFields = Object.entries(customFieldMapper.value).map(([key, value]) => ({
+      name: key,
+      value,
+    }));
 
     const payload = {
       firstName,
@@ -236,7 +265,8 @@ const execute = async (
       profilePic,
       countryCode,
       email,
-      phone
+      phone,
+      ...(customFields.length && { custom_fields: customFields }),
     }
 
     const response = await callDeveloperApi<CreateContactResponse>(executionContext, {

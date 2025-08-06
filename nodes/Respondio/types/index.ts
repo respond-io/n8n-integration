@@ -192,3 +192,35 @@ export type GetAllUsersResponse = {
     previous?: string;
   };
 }
+
+export type GetMessageResponseStatusItem = {
+  value: string;
+  timestamp: number;
+  message: string;
+}
+
+export type GetMessageResponse = {
+  messageId: number;
+  channelMessageId: string;
+  contactId: number;
+  channelId: number;
+  traffic: string;
+  message: {
+    type: string;
+    text: string;
+    messageTag: string;
+    subType?: string;
+    title?: string;
+    replies?: string[];
+  },
+  status: Array<GetMessageResponseStatusItem>;
+}
+
+export type CustomFieldMapperReturnValue = {
+  mappingMode: 'defineBelow',
+  value: Record<string, string | number | boolean | Date>,
+  matchingColumns: string[],
+  schema: Array<Record<string, any>>,
+  attemptToConvertTypes: boolean,
+  convertFieldsToString: boolean
+}

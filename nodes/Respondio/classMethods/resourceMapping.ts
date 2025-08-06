@@ -29,7 +29,7 @@ export async function getCustomFields(this: ILoadOptionsFunctions): Promise<Reso
     // Convert API response to n8n ResourceMapperField format
     const fields: ResourceMapperField[] = customFields.map((field) => {
       const baseField: ResourceMapperField = {
-        id: field.id.toString(),
+        id: field?.slug?.toString() || field?.id?.toString(),
         displayName: field.name,
         required: false,
         defaultMatch: false,
