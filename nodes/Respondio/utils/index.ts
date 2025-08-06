@@ -262,7 +262,6 @@ export async function fetchPaginatedOptions<TItem, TResult>(
   mapItem?: (item: TItem) => TResult,
   options?: {
     limit?: number;
-    logLabel?: string;
     includeRaw?: boolean;
     maxResults?: number;
     includeTransformed?: boolean;
@@ -272,7 +271,6 @@ export async function fetchPaginatedOptions<TItem, TResult>(
   const env = credentials?.environment as 'production' | 'staging' || 'staging';
   const platformUrl = PLATFORM_API_URLS[env];
   const fullPath = `${platformUrl}${path}`;
-  const logLabel = options?.logLabel ?? path;
 
   const includeRaw = options?.includeRaw || false;
   const maxResults = options?.maxResults || Infinity;
@@ -283,8 +281,6 @@ export async function fetchPaginatedOptions<TItem, TResult>(
       const urlObject = new URL(fullPath);
       urlObject.searchParams.set('limit', limit.toString());
       if (cursor) urlObject.searchParams.set('cursorId', cursor);
-
-      context.logger.info(`Fetching ${logLabel} from URL: ${urlObject.toString()}`);
 
       const response = await context.helpers.request({
         url: urlObject.toString(),
@@ -312,7 +308,6 @@ export async function fetchPaginatedOptions<TItem, TResult>(
     }
   );
 
-  context.logger.info(`Total ${logLabel} fetched: ${transformed.length || raw.length}`);
   return { transformed, raw };
 }
 
@@ -335,8 +330,6 @@ export async function callDeveloperApi<T>(
   const credentials = await executionContext.getCredentials('respondIoApi');
   const env = (credentials?.environment as 'production' | 'staging') || 'staging';
   const platformUrl = PLATFORM_API_URLS[env];
-
-  executionContext.logger.info(`Making API call to: ${platformUrl}${path} with method: ${method} alongside body: ${JSON.stringify(body)}`);
 
   const options = {
     url: `${platformUrl}${path}`,

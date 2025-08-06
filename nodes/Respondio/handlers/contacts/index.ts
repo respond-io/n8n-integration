@@ -129,7 +129,6 @@ const execute = async (
         limit: 100,
         includeRaw: true,
         maxResults: Infinity,
-        logLabel: '[Action - Find Contact Channels]',
       }
     )
 

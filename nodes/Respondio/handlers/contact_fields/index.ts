@@ -25,7 +25,6 @@ const execute = async (
       undefined,
       {
         maxResults: limit,
-        logLabel: '[Action - Custom Field]',
         includeRaw: true,
         limit: 20,
         includeTransformed: false
@@ -60,7 +59,6 @@ const execute = async (
     allowedValues,
     slug
   }
-  executionContext.logger.info(`Payload used: ${JSON.stringify(payload)}`)
 
   const response = await callDeveloperApi<CustomField>(executionContext, {
     method: 'POST',

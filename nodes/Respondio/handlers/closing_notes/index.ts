@@ -15,7 +15,6 @@ const execute = async (action: ACTION_NAMES, executionContext: IExecuteFunctions
     undefined,
     {
       maxResults: limit,
-      logLabel: '[Action - Closing Notes]',
       includeRaw: true,
       limit: 20,
       includeTransformed: false

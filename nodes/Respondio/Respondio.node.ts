@@ -104,11 +104,7 @@ export class Respondio implements INodeType {
   methods = { loadOptions, resourceMapping };
 
   async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][] | NodeExecutionWithMetadata[][] | null> {
-    const inputData = this.getInputData()
-    this.logger.info(JSON.stringify(inputData, null, 2));
-
     const operation = this.getNodeParameter(Respondio.resourceTypeName, 0) as string;
-    this.logger.info(`Operation: ${operation}`);
     const action = this.getNodeParameter('action', 0, ACTION_NAMES.GET_ALL_CHANNELS) as ACTION_NAMES;
 
     const handler = handlers[operation as keyof typeof handlers];

@@ -110,7 +110,7 @@ export class RespondioTrigger implements INodeType {
           if (workflow) bundle.workflowDetails = workflow
 
           try {
-            const response = await this.helpers.request({
+            await this.helpers.request({
               method: 'POST',
               url: `${platformUrl}/integration/n8n/subscribe`,
               headers: {
@@ -124,7 +124,6 @@ export class RespondioTrigger implements INodeType {
               },
               json: true,
             });
-            this.logger.info(`Response: ${JSON.stringify(response)}`);
           } catch (error) {
             this.logger.info(`Error: ${JSON.stringify(error)}`);
             throw new NodeOperationError(this.getNode(), `Failed to create webhook subscription: ${error.message}`);
@@ -195,7 +194,6 @@ export class RespondioTrigger implements INodeType {
     },
   };
 
-
   async webhook(this: IWebhookFunctions): Promise<IWebhookResponseData> {
     const req = this.getRequestObject();
     const body = req.body;
@@ -205,4 +203,3 @@ export class RespondioTrigger implements INodeType {
     };
   }
 }
-

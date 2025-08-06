@@ -224,3 +224,12 @@ export type CustomFieldMapperReturnValue = {
   attemptToConvertTypes: boolean,
   convertFieldsToString: boolean
 }
+
+export enum SendMessageTypes {
+  TEXT = 'text',
+  ATTACHMENT = 'attachment',
+  CUSTOM_PAYLOAD = 'custom_payload',
+  QUICK_REPLY = 'quick_reply',
+  EMAIL = 'email',
+  WHATSAPP_TEMPLATE = 'whatsapp_template',
+}

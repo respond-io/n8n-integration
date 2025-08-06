@@ -15,34 +15,42 @@ function toGenericAbortSignal(signal: AbortSignal) {
 }
 
 const getWhatsappTemplatesFunction = async (context: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> => {
+  const channelId = context.getNodeParameter('channelId', 0) as string;
   const {
     transformed: allWhatsappTemplates,
     raw: rawWhatsappTemplates,
   } = await fetchPaginatedOptions<WhatsAppTemplate, INodePropertyOptions>(
     context,
     'respondIoApi',
-    '/space/channel',
+    `/space/channel/${channelId}/mtm`,
     (item) => ({
       name: `${item.name} (${item.languageCode})`,
       value: item.id,
       description: `Namespace: ${item.namespace}, Category: ${item.category}, Status: ${item.status}`,
     }),
-    { limit: 20, logLabel: '[WhatsAppTemplate]', includeRaw: true }
+    { limit: 20, includeRaw: true }
   )
 
-  // store the raw templates in global static data for subsequent usage
   const globalData = context.getWorkflowStaticData('global')
+  if (!allWhatsappTemplates || allWhatsappTemplates.length === 0) {
+    globalData.whatsappTemplates = undefined;
+    return [{
+      name: '⚠️ No WhatsApp templates found for this channel',
+      value: '__EMPTY__',
+      description: 'Please check if the channelId is correct or if templates exist.',
+    }]
+  }
+
+  // store the raw templates in global static data for subsequent usage
   globalData.whatsappTemplates = JSON.stringify(rawWhatsappTemplates);
   return allWhatsappTemplates;
 }
 
 export async function getActionsForResource(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
   const resource = this.getNodeParameter('resource', 0) as keyof typeof ACTION_SETTINGS;
-  this.logger.info(`resource: ${JSON.stringify(resource)}`);
 
   // Make sure resource exists
   const actionsForResource = ACTION_SETTINGS[resource] ?? {};
-  // this.logger.info(`actionsForResource: ${JSON.stringify(actionsForResource)}`);
 
   return Object.values(actionsForResource).map(action => ({
     name: action.name,
@@ -70,7 +78,6 @@ export async function getTagsForContact(this: ILoadOptionsFunctions): Promise<IN
       useHttpRequestHelper: true
     })
 
-    this.logger.info(`Response from API: [${nodeId}] ${JSON.stringify(response)}`);
     return response.tags.map((tag: any) => ({
       name: tag,
       value: tag,
@@ -95,7 +102,7 @@ export async function getSpaceUsers(this: ILoadOptionsFunctions): Promise<INodeP
       name: `${item.firstName} ${item.lastName} (${item.email})`,
       value: item.id,
     }),
-    { limit: 20, logLabel: '[Space Users]' }
+    { limit: 20 }
   )
   return result;
 }
@@ -110,7 +117,7 @@ export async function getClosingNotes(this: ILoadOptionsFunctions): Promise<INod
       value: item.category,
       description: item.description || item.content,
     }),
-    { limit: 20, logLabel: '[Closing Notes]' }
+    { limit: 20 }
   )
   return allClosingNotes;
 }
@@ -125,7 +132,7 @@ export async function getSpaceChannels(this: ILoadOptionsFunctions): Promise<INo
       value: item.id,
       description: `${item.name} - ${item.source}`,
     }),
-    { limit: 20, logLabel: '[Space Channel]' }
+    { limit: 20 }
   )
   return allSpaceChannels;
 }
@@ -144,19 +151,26 @@ export async function getWhatsappTemplateLanguageCodes(this: ILoadOptionsFunctio
       JSON.parse(globalData.whatsappTemplates as string) as Array<WhatsAppTemplate> :
       [];
     if (whatsappTemplates?.length) {
-      return whatsappTemplates.map((template: WhatsAppTemplate) => ({
-        name: template.languageCode,
-        value: template.languageCode,
+      const dedupedTemplateLanguages = Array.from(
+        new Map(whatsappTemplates.map(t => [t.languageCode, t])).values()
+      ).map(t => ({
+        name: t.languageCode,
+        value: t.languageCode,
       }));
+
+      return dedupedTemplateLanguages;
     }
+    return [];
   }
 
   const whatsappTemplates = globalData.whatsappTemplates ?
     JSON.parse(globalData.whatsappTemplates as string) as Array<WhatsAppTemplate> :
     [];
 
-  return whatsappTemplates.map((template: WhatsAppTemplate) => ({
-    name: template.languageCode,
-    value: template.languageCode,
-  }))
+  return Array.from(
+    new Map(whatsappTemplates.map(t => [t.languageCode, t])).values()
+  ).map(t => ({
+    name: t.languageCode,
+    value: t.languageCode,
+  }));
 }
