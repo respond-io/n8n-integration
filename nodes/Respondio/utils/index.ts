@@ -1,4 +1,9 @@
-import { INodeProperties } from "n8n-workflow"
+import { IExecuteFunctions, ILoadOptionsFunctions, INodeProperties } from "n8n-workflow"
+import { setTimeout as waitFor } from 'timers/promises';
+
+import languagesJSON from './languages.json'
+import countriesJSON from './countries.json'
+import { PLATFORM_API_URLS } from "../constants";
 
 export enum IContactIdentifiers {
   id = 'id',
@@ -38,7 +43,7 @@ export const generateContactIdentifierInputFields = (
           identifierType: [IContactIdentifiers.id],
         },
       },
-      default: undefined,
+      default: '',
     },
     {
       displayName: 'Contact Identifier',
@@ -56,8 +61,261 @@ export const generateContactIdentifierInputFields = (
   ]
 }
 
-export const constructIdentifier = (identifierType: IContactIdentifiers, identifierValue: string | number) => {
-  const trimmedValue = identifierValue.toString().trim()
+export const constructIdentifier = (executionContext: IExecuteFunctions) => {
+  const identifierType = executionContext.getNodeParameter('identifierType', 0, 10) as IContactIdentifiers;
+  const contactId = executionContext.getNodeParameter('contactId', 0, 0) as string;
+  const contactIdentifier = executionContext.getNodeParameter('contactIdentifier', 0, 'email') as string;
+
+  const identifierValue = identifierType === IContactIdentifiers.id ? contactId : contactIdentifier;
+
   const trimmedType = identifierType.trim().toLowerCase()
+  let trimmedValue = identifierValue.toString().trim()
+
+  // make sure to normalize the identifier value for phone number
+  if (trimmedType === IContactIdentifiers.phone) trimmedValue = trimmedValue.replace(/[^0-9+]/g, '');
+
   return `${trimmedType}:${trimmedValue}`
+}
+
+export const generateContactInputFields = (isCreateContact: boolean = false): INodeProperties[] => {
+  const result: INodeProperties[] = [
+    {
+      displayName: 'Contact\'s First Name',
+      required: isCreateContact,
+      name: 'firstName',
+      type: 'string',
+      description: 'First name of the contact',
+      default: '',
+    },
+    {
+      displayName: 'Contact\'s Last Name',
+      required: false,
+      name: 'lastName',
+      type: 'string',
+      description: 'Last name of the contact',
+      default: '',
+    },
+    {
+      displayName: 'Contact\'s Preferred Language',
+      required: false,
+      name: 'language',
+      type: 'options',
+      options: languagesJSON.map((language) => ({
+        name: language.English,
+        value: language.alpha2,
+      })),
+      description: 'Preferred language of the contact',
+      default: '',
+    },
+    {
+      displayName: 'Contact\'s Profile Picture URL',
+      required: false,
+      name: 'profilePic',
+      type: 'string',
+      description: 'Profile picture URL of the contact',
+      default: '',
+    },
+    {
+      displayName: 'Contact\'s Country',
+      required: false,
+      name: 'countryCode',
+      type: 'options',
+      options: countriesJSON.map((country) => ({
+        name: country.Name,
+        value: country.Code,
+      })),
+      description: 'Country of the contact',
+      default: '',
+    },
+  ];
+
+  if (isCreateContact) {
+    const lastNameIndex = 1;
+    result.splice(
+      lastNameIndex + 1,
+      0,
+      {
+        displayName: 'Contact\'s Email Address',
+        required: false,
+        name: 'email',
+        type: 'string' as const,
+        description: 'Email address of the contact',
+        default: '',
+      },
+      {
+        displayName: 'Contact\'s Phone Number',
+        required: false,
+        name: 'phone',
+        type: 'string' as const,
+        description: 'Phone number of the contact',
+        default: '',
+      }
+    )
+  }
+
+  return result;
+}
+
+function getResponseLength<TItem, TResult>(
+  includeRaw: boolean,
+  includeTransformed: boolean,
+  raw: TItem[],
+  transformed: TResult[]
+): number {
+  if (includeRaw) return raw.length;
+  if (includeTransformed) return transformed.length;
+  return 0;
+}
+
+export async function paginateWithCursor<TItem, TResult>(
+  fetchPageFn: (cursor: string | null, limit: number) => Promise<{
+    items: TItem[];
+    nextCursor: string | null;
+  }>,
+  mapItem?: (item: TItem) => TResult,
+  options?: {
+    limit?: number;
+    delayMs?: number;
+    logger?: { info: (msg: string) => void };
+    includeRaw?: boolean;
+    maxResults?: number;
+    includeTransformed?: boolean;
+  }
+): Promise<{ transformed: TResult[]; raw: TItem[] }> {
+  const transformed: TResult[] = [];
+  const includeRaw = options?.includeRaw || false;
+  const raw: TItem[] = [];
+
+  const limit = options?.limit || 10;
+  const delayMs = options?.delayMs || 500;
+  const logger = options?.logger || null;
+  const maxResults = options?.maxResults ?? Infinity;
+  const includeTransformed = options?.includeTransformed ?? true;
+
+  let cursor: string | null = null;
+  do {
+    const { items, nextCursor } = await fetchPageFn(cursor, limit);
+
+    if (logger) logger.info(`Fetched ${items.length} items`);
+
+    // dynamically calculate the response length based on what we are including
+    let responseLength = getResponseLength(includeRaw, includeTransformed, raw, transformed)
+
+    const remaining = maxResults - responseLength;
+
+    // Slice if adding all items would exceed maxResults
+    const itemsToAdd = remaining >= items.length ? items : items.slice(0, remaining);
+
+    if (includeTransformed && mapItem) transformed.push(...itemsToAdd.map(mapItem));
+    if (includeRaw) raw.push(...itemsToAdd);
+
+    responseLength = getResponseLength(includeRaw, includeTransformed, raw, transformed);
+
+    if (responseLength >= maxResults || !nextCursor) {
+      break;
+    }
+
+    cursor = nextCursor;
+    await waitFor(delayMs);
+  } while (true);
+  return { transformed, raw };
+}
+
+type PaginatedApiResponse<T> = {
+  items: T[];
+  pagination?: {
+    next?: string;
+  };
+};
+
+export async function fetchPaginatedOptions<TItem, TResult>(
+  context: ILoadOptionsFunctions | IExecuteFunctions,
+  credentialsName: string,
+  path: string,
+  mapItem?: (item: TItem) => TResult,
+  options?: {
+    limit?: number;
+    logLabel?: string;
+    includeRaw?: boolean;
+    maxResults?: number;
+    includeTransformed?: boolean;
+  }
+): Promise<{ transformed: TResult[]; raw: TItem[] }> {
+  const credentials = await context.getCredentials(credentialsName);
+  const env = credentials?.environment as 'production' | 'staging' || 'staging';
+  const platformUrl = PLATFORM_API_URLS[env];
+  const fullPath = `${platformUrl}${path}`;
+  const logLabel = options?.logLabel ?? path;
+
+  const includeRaw = options?.includeRaw || false;
+  const maxResults = options?.maxResults || Infinity;
+  const includeTransformed = options?.includeTransformed || true;
+
+  const { transformed, raw } = await paginateWithCursor<TItem, TResult>(
+    async (cursor, limit) => {
+      const urlObject = new URL(fullPath);
+      urlObject.searchParams.set('limit', limit.toString());
+      if (cursor) urlObject.searchParams.set('cursorId', cursor);
+
+      context.logger.info(`Fetching ${logLabel} from URL: ${urlObject.toString()}`);
+
+      const response = await context.helpers.request({
+        url: urlObject.toString(),
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${credentials.apiKey}`,
+        },
+        json: true,
+      }) as PaginatedApiResponse<TItem>;
+
+      return {
+        items: response.items,
+        nextCursor: response?.pagination?.next
+          ? new URL(response.pagination.next).searchParams.get('cursorId')
+          : null,
+      };
+    },
+    mapItem,
+    {
+      limit: options?.limit ?? 20,
+      logger: context.logger,
+      includeRaw,
+      maxResults,
+      includeTransformed,
+    }
+  );
+
+  context.logger.info(`Total ${logLabel} fetched: ${transformed.length || raw.length}`);
+  return { transformed, raw };
+}
+
+export async function callDeveloperApi(
+  executionContext: IExecuteFunctions,
+  {
+    method,
+    path,
+    body,
+  }: {
+    method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+    path: string;
+    body?: any;
+  }
+): Promise<any> {
+  const credentials = await executionContext.getCredentials('respondIoApi');
+  const env = (credentials?.environment as 'production' | 'staging') || 'staging';
+  const platformUrl = PLATFORM_API_URLS[env];
+
+  executionContext.logger.info(`Making API call to: ${platformUrl}${path} with method: ${method} alongside body: ${JSON.stringify(body)}`);
+
+  const options = {
+    url: `${platformUrl}${path}`,
+    headers: {
+      Authorization: `Bearer ${credentials.apiKey}`,
+    },
+    method,
+    body,
+    json: true,
+  };
+
+  return executionContext.helpers.request(options);
 }

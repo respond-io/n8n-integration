@@ -238,4 +238,3 @@ export class RespondioV1 implements INodeType {
 		return [returnData];
 	}
 }
-

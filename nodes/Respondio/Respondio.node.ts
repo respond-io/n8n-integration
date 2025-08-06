@@ -10,32 +10,40 @@ import {
   NodeExecutionWithMetadata,
 } from 'n8n-workflow';
 
+import ACTION_NAMES from './constants/actions/action_names'
 import { ACTION_SETTINGS, PLATFORM_API_URLS } from './constants';
+import {
+  Channel,
+  ClosingNote,
+  getContactResponse,
+  SpaceUser,
+  WhatsAppTemplate,
+} from './types';
+import handlers from './handlers';
+import { fetchPaginatedOptions } from './utils';
 
 const abortControllers: Record<string, AbortController> = {};
 
-type getContactResponse = {
-  id: string | null;
-  firstName: string | null;
-  lastName: string | null;
-  phone: string | null;
-  email: string | null;
-  language: string | null;
-  profilePic: string;
-  locale: string | null;
-  countryCode: string | null;
-  status: 'open' | 'closed' | 'done' | 'snoozed' | 'unsnoozed' | null;
-  isBlocked: boolean;
-  custom_fields: Array<{ name: string; value: string | null }>;
-  tags: Array<{ id: string; name: string }>;
-  assignee: {
-    id: string | null;
-    firstName: string | null;
-    lastName: string | null;
-    email: string | null;
-  } | null;
-  lifecycle: string | null;
-  created_at: number | null;
+const getWhatsappTemplates = async (context: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> => {
+  const {
+    transformed: allWhatsappTemplates,
+    raw: rawWhatsappTemplates,
+  } = await fetchPaginatedOptions<WhatsAppTemplate, INodePropertyOptions>(
+    context,
+    'respondIoApi',
+    '/space/channel',
+    (item) => ({
+      name: `${item.name} (${item.languageCode})`,
+      value: item.id,
+      description: `Namespace: ${item.namespace}, Category: ${item.category}, Status: ${item.status}`,
+    }),
+    { limit: 20, logLabel: '[WhatsAppTemplate]', includeRaw: true }
+  )
+
+  // store the raw templates in global static data for subsequent usage
+  const globalData = context.getWorkflowStaticData('global')
+  globalData.whatsappTemplates = JSON.stringify(rawWhatsappTemplates);
+  return allWhatsappTemplates;
 }
 
 function toGenericAbortSignal(signal: AbortSignal) {
@@ -123,7 +131,7 @@ export class Respondio implements INodeType {
       defaults: {
         name: 'Respond.io Actions',
       },
-      inputs: [],
+      inputs: [NodeConnectionType.Main],
       outputs: [NodeConnectionType.Main],
       credentials: [
         {
@@ -143,7 +151,7 @@ export class Respondio implements INodeType {
 
         // Make sure resource exists
         const actionsForResource = ACTION_SETTINGS[resource] ?? {};
-        this.logger.info(`actionsForResource: ${JSON.stringify(actionsForResource)}`);
+        // this.logger.info(`actionsForResource: ${JSON.stringify(actionsForResource)}`);
 
         return Object.values(actionsForResource).map(action => ({
           name: action.name,
@@ -177,7 +185,7 @@ export class Respondio implements INodeType {
         try {
           const response: getContactResponse = await this.helpers.httpRequest({
             method: 'GET',
-            url: `${platformUrl}/n8n/contact/${identifierType}:${identifierValue.toString().trim()}`,
+            url: `${platformUrl}/contact/${identifierType}:${identifierValue.toString().trim()}`,
             headers: {
               Authorization: `Bearer ${credentials.apiKey}`,
             },
@@ -200,16 +208,95 @@ export class Respondio implements INodeType {
           return [];
         }
       },
+      async getSpaceUsers(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+        const { transformed: result } = await fetchPaginatedOptions<SpaceUser, INodePropertyOptions>(
+          this,
+          'respondIoApi',
+          '/space/user',
+          (item) => ({
+            name: `${item.firstName} ${item.lastName} (${item.email})`,
+            value: item.id,
+          }),
+          { limit: 20, logLabel: '[Space Users]' }
+        )
+        return result;
+      },
+      async getClosingNotes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+        const { transformed: allClosingNotes } = await fetchPaginatedOptions<ClosingNote, INodePropertyOptions>(
+          this,
+          'respondIoApi',
+          '/space/closing_notes',
+          (item) => ({
+            name: item.category,
+            value: item.category,
+            description: item.description || item.content,
+          }),
+          { limit: 20, logLabel: '[Closing Notes]' }
+        )
+        return allClosingNotes;
+      },
+      async getSpaceChannels(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+        const { transformed: allSpaceChannels } = await fetchPaginatedOptions<Channel, INodePropertyOptions>(
+          this,
+          'respondIoApi',
+          '/space/channel',
+          (item) => ({
+            name: item.name,
+            value: item.id,
+            description: `${item.name} - ${item.source}`,
+          }),
+          { limit: 20, logLabel: '[Space Channel]' }
+        )
+        return allSpaceChannels;
+      },
+      async getWhatsappTemplates(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+        this.logger.info('Fetching WhatsApp templates');
+        return getWhatsappTemplates(this);
+      },
+      async getWhatsappTemplateLanguageCodes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+        const globalData = this.getWorkflowStaticData('global')
+
+        if (!globalData.whatsappTemplates) {
+          await getWhatsappTemplates(this);
+          const globalData = this.getWorkflowStaticData('global')
+          const whatsappTemplates = globalData.whatsappTemplates ?
+            JSON.parse(globalData.whatsappTemplates as string) as Array<WhatsAppTemplate> :
+            [];
+          if (whatsappTemplates?.length) {
+            return whatsappTemplates.map((template: WhatsAppTemplate) => ({
+              name: template.languageCode,
+              value: template.languageCode,
+            }));
+          }
+        }
+
+        const whatsappTemplates = globalData.whatsappTemplates ?
+          JSON.parse(globalData.whatsappTemplates as string) as Array<WhatsAppTemplate> :
+          [];
+
+        return whatsappTemplates.map((template: WhatsAppTemplate) => ({
+          name: template.languageCode,
+          value: template.languageCode,
+        }))
+      }
     },
   };
 
   // async async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][] | NodeExecutionWithMetadata[][] | null> {
   async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][] | NodeExecutionWithMetadata[][] | null> {
-    this.logger.info('Testing')
-    const temp = buildDynamicProperties(Respondio.resourceTypeName, Respondio.resourceTypeDefault);
-    this.logger.info(JSON.stringify(temp, null, 2));
+    const inputData = this.getInputData()
+    this.logger.info(JSON.stringify(inputData, null, 2));
 
-    return null
+    const operation = this.getNodeParameter(Respondio.resourceTypeName, 0) as string;
+    this.logger.info(`Operation: ${operation}`);
+    const action = this.getNodeParameter('action', 0, ACTION_NAMES.GET_ALL_CHANNELS) as ACTION_NAMES;
+
+    const handler = handlers[operation as keyof typeof handlers];
+
+    if (!action) throw new Error('Action is required');
+    if (!handler) throw new Error(`Operation [${operation}] not supported`)
+
+    const results = await handler.execute(action, this)
+    return results;
   }
 }
-

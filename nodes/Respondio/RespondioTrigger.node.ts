@@ -112,7 +112,7 @@ export class RespondioTrigger implements INodeType {
           try {
             const response = await this.helpers.request({
               method: 'POST',
-              url: `${platformUrl}/n8n/subscribe`,
+              url: `${platformUrl}/integration/n8n/subscribe`,
               headers: {
                 Authorization: `Bearer ${credentials.apiKey}`,
               },
@@ -146,7 +146,7 @@ export class RespondioTrigger implements INodeType {
           try {
             const response = await this.helpers.request({
               method: 'DELETE',
-              url: `${platformUrl}/n8n/unsubscribe/${webhookId}`,
+              url: `${platformUrl}/integration/n8n/unsubscribe/${webhookId}`,
               headers: {
                 Authorization: `Bearer ${credentials.apiKey}`,
               },
