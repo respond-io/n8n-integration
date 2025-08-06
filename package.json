@@ -16,7 +16,7 @@
     "url": "https://github.com/respond-io/n8n-integration.git"
   },
   "engines": {
-    "node": ">=20.15"
+    "node": ">=18.0.0"
   },
   "main": "index.js",
   "scripts": {
@@ -41,6 +41,7 @@
     ]
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.20",
     "@types/node": "^24.1.0",
     "@typescript-eslint/parser": "~8.32.0",
     "eslint": "^8.57.0",
@@ -51,5 +52,8 @@
   },
   "peerDependencies": {
     "n8n-workflow": "*"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21"
   }
 }
