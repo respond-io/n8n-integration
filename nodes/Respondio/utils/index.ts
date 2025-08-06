@@ -105,7 +105,7 @@ export const generateContactInputFields = (isCreateContact: boolean = false): IN
         value: language.alpha2,
       })),
       description: 'Preferred language of the contact',
-      default: '',
+      default: 'en',
     },
     {
       displayName: 'Contact\'s Profile Picture URL',
@@ -125,7 +125,7 @@ export const generateContactInputFields = (isCreateContact: boolean = false): IN
         value: country.Code,
       })),
       description: 'Country of the contact',
-      default: '',
+      default: 'US',
     },
   ];
 
@@ -152,6 +152,32 @@ export const generateContactInputFields = (isCreateContact: boolean = false): IN
       }
     )
   }
+
+  result.push({
+    displayName: 'Custom Fields',
+    name: 'customFields',
+    type: 'resourceMapper',
+    default: {
+      mappingMode: 'defineBelow',
+      value: null,
+    },
+    noDataExpression: true,
+    required: false,
+    typeOptions: {
+      resourceMapper: {
+        resourceMapperMethod: 'getCustomFields',
+        mode: 'add',
+        addAllFields: true,
+        multiKeyMatch: true,
+        supportAutoMap: false,
+      }
+    },
+    displayOptions: {
+      show: {
+        firstName: [{ _cnd: { exists: true } }]
+      }
+    }
+  })
 
   return result;
 }

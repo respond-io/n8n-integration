@@ -97,16 +97,29 @@ export type GetWhatsAppTemplatesResponse = {
   };
 }
 
+export enum CustomFieldDataTypes {
+  TEXT = 'text',
+  LIST = 'list',
+  CHECKBOX = 'checkbox',
+  NUMBER = 'number',
+  EMAIL = 'email',
+  URL = 'url',
+  DATE = 'date',
+  TIME = 'time'
+}
+
 export type CustomField = {
-  id: string;
+  id: number;
   name: string;
   title: string;
   description: string | null;
   slug: string | null;
-  dataType: string;
+  dataType: CustomFieldDataTypes;
   created_at: number;
   bundle?: string | null;
-  allowedValues?: string[] | null;
+  allowedValues?: {
+    listValues?: string[]
+  }
 }
 
 export type CreateCommentResponse = {
