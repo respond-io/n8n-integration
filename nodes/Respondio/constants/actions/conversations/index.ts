@@ -87,7 +87,7 @@ export default {
         displayName: 'Select Conversation Category',
         name: 'category',
         type: 'options',
-        required: true,
+        required: false,
         description: 'The category of the conversation.',
         typeOptions: {
           loadOptionsMethod: 'getClosingNotes',

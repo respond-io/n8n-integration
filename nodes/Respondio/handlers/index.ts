@@ -4,11 +4,13 @@ import closingNotesHandler from './closing_notes'
 import commentsHandler from './comments'
 import contactFieldsHandler from './contact_fields'
 import contactsHandler from './contacts'
+import conversationsHandler from './conversations'
 
 export default {
   [OPERATION_NAMES.CHANNELS]: channelHandler,
   [OPERATION_NAMES.CLOSING_NOTES]: closingNotesHandler,
   [OPERATION_NAMES.COMMENTS]: commentsHandler,
   [OPERATION_NAMES.CONTACT_FIELDS]: contactFieldsHandler,
-  [OPERATION_NAMES.CONTACTS]: contactsHandler
+  [OPERATION_NAMES.CONTACTS]: contactsHandler,
+  [OPERATION_NAMES.CONVERSATIONS]: conversationsHandler,
 }
