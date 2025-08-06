@@ -1,63 +1,17 @@
 import {
   IExecuteFunctions,
-  ILoadOptionsFunctions,
   INodeExecutionData,
   INodeProperties,
-  INodePropertyOptions,
   type INodeType,
   type INodeTypeDescription,
   NodeConnectionType,
   NodeExecutionWithMetadata,
-  ResourceMapperField,
-  ResourceMapperFields,
 } from 'n8n-workflow';
 
 import ACTION_NAMES from './constants/actions/action_names'
 import { ACTION_SETTINGS } from './constants';
-import {
-  Channel,
-  ClosingNote,
-  CustomField,
-  CustomFieldDataTypes,
-  GetContactResponse,
-  SpaceUser,
-  WhatsAppTemplate,
-} from './types';
 import handlers from './handlers';
-import { callDeveloperApi, constructIdentifier, fetchPaginatedOptions } from './utils';
-
-const abortControllers: Record<string, AbortController> = {};
-
-const getWhatsappTemplates = async (context: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> => {
-  const {
-    transformed: allWhatsappTemplates,
-    raw: rawWhatsappTemplates,
-  } = await fetchPaginatedOptions<WhatsAppTemplate, INodePropertyOptions>(
-    context,
-    'respondIoApi',
-    '/space/channel',
-    (item) => ({
-      name: `${item.name} (${item.languageCode})`,
-      value: item.id,
-      description: `Namespace: ${item.namespace}, Category: ${item.category}, Status: ${item.status}`,
-    }),
-    { limit: 20, logLabel: '[WhatsAppTemplate]', includeRaw: true }
-  )
-
-  // store the raw templates in global static data for subsequent usage
-  const globalData = context.getWorkflowStaticData('global')
-  globalData.whatsappTemplates = JSON.stringify(rawWhatsappTemplates);
-  return allWhatsappTemplates;
-}
-
-function toGenericAbortSignal(signal: AbortSignal) {
-  return {
-    aborted: signal.aborted,
-    onabort: signal.onabort,
-    addEventListener: signal.addEventListener.bind(signal),
-    removeEventListener: signal.removeEventListener.bind(signal),
-  };
-}
+import { loadOptions, resourceMapping } from './classMethods';
 
 function buildDynamicProperties(resourceTypeName: string, resourceTypeDefault: string): INodeProperties[] {
   const properties: INodeProperties[] = [];
@@ -147,187 +101,8 @@ export class Respondio implements INodeType {
     };
   }
 
-  methods = {
-    loadOptions: {
-      async getActionsForResource(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-        const resource = this.getNodeParameter('resource', 0) as keyof typeof ACTION_SETTINGS;
-        this.logger.info(`resource: ${JSON.stringify(resource)}`);
+  methods = { loadOptions, resourceMapping };
 
-        // Make sure resource exists
-        const actionsForResource = ACTION_SETTINGS[resource] ?? {};
-        // this.logger.info(`actionsForResource: ${JSON.stringify(actionsForResource)}`);
-
-        return Object.values(actionsForResource).map(action => ({
-          name: action.name,
-          value: action.value,
-          description: action.description,
-        }));
-      },
-      async getTagsForContact(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-        const nodeId = this.getNode().id;
-        // Abort previous request for this node
-        if (abortControllers[nodeId]) {
-          abortControllers[nodeId].abort();
-        }
-
-        const abortController = new AbortController();
-        abortControllers[nodeId] = abortController;
-
-        const identifier = constructIdentifier(this);
-
-        try {
-          const response = await callDeveloperApi<GetContactResponse>(this, {
-            method: 'GET',
-            path: `/contact/${identifier}`,
-            abortSignal: toGenericAbortSignal(abortController.signal),
-            useHttpRequestHelper: true
-          })
-
-          this.logger.info(`Response from API: [${nodeId}] ${JSON.stringify(response)}`);
-          return response.tags.map((tag: any) => ({
-            name: tag,
-            value: tag,
-          }));
-        } catch (error: any) {
-          if (error.name === 'AbortError') {
-            this.logger.info('Previous request aborted due to new input.');
-            return [];
-          }
-
-          this.logger.error(`Failed to load tags: ${error.message || error}`);
-          return [];
-        }
-      },
-      async getSpaceUsers(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-        const { transformed: result } = await fetchPaginatedOptions<SpaceUser, INodePropertyOptions>(
-          this,
-          'respondIoApi',
-          '/space/user',
-          (item) => ({
-            name: `${item.firstName} ${item.lastName} (${item.email})`,
-            value: item.id,
-          }),
-          { limit: 20, logLabel: '[Space Users]' }
-        )
-        return result;
-      },
-      async getClosingNotes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-        const { transformed: allClosingNotes } = await fetchPaginatedOptions<ClosingNote, INodePropertyOptions>(
-          this,
-          'respondIoApi',
-          '/space/closing_notes',
-          (item) => ({
-            name: item.category,
-            value: item.category,
-            description: item.description || item.content,
-          }),
-          { limit: 20, logLabel: '[Closing Notes]' }
-        )
-        return allClosingNotes;
-      },
-      async getSpaceChannels(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-        const { transformed: allSpaceChannels } = await fetchPaginatedOptions<Channel, INodePropertyOptions>(
-          this,
-          'respondIoApi',
-          '/space/channel',
-          (item) => ({
-            name: item.name,
-            value: item.id,
-            description: `${item.name} - ${item.source}`,
-          }),
-          { limit: 20, logLabel: '[Space Channel]' }
-        )
-        return allSpaceChannels;
-      },
-      async getWhatsappTemplates(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-        this.logger.info('Fetching WhatsApp templates');
-        return getWhatsappTemplates(this);
-      },
-      async getWhatsappTemplateLanguageCodes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-        const globalData = this.getWorkflowStaticData('global')
-
-        if (!globalData.whatsappTemplates) {
-          await getWhatsappTemplates(this);
-          const globalData = this.getWorkflowStaticData('global')
-          const whatsappTemplates = globalData.whatsappTemplates ?
-            JSON.parse(globalData.whatsappTemplates as string) as Array<WhatsAppTemplate> :
-            [];
-          if (whatsappTemplates?.length) {
-            return whatsappTemplates.map((template: WhatsAppTemplate) => ({
-              name: template.languageCode,
-              value: template.languageCode,
-            }));
-          }
-        }
-
-        const whatsappTemplates = globalData.whatsappTemplates ?
-          JSON.parse(globalData.whatsappTemplates as string) as Array<WhatsAppTemplate> :
-          [];
-
-        return whatsappTemplates.map((template: WhatsAppTemplate) => ({
-          name: template.languageCode,
-          value: template.languageCode,
-        }))
-      },
-    },
-    resourceMapping: {
-      async getCustomFields(this: ILoadOptionsFunctions): Promise<ResourceMapperFields> {
-        try {
-          const { raw: customFields } = await fetchPaginatedOptions<CustomField, INodePropertyOptions>(
-            this,
-            'respondIoApi',
-            '/space/custom_field',
-            undefined,
-            {
-              includeRaw: true,
-              includeTransformed: false,
-              limit: 100,
-            }
-          );
-          const typeMap: Record<CustomFieldDataTypes, ResourceMapperField['type']> = {
-            [CustomFieldDataTypes.TEXT]: 'string',
-            [CustomFieldDataTypes.URL]: 'string',
-            [CustomFieldDataTypes.EMAIL]: 'string',
-            [CustomFieldDataTypes.TIME]: 'string',
-            [CustomFieldDataTypes.NUMBER]: 'number',
-            [CustomFieldDataTypes.CHECKBOX]: 'boolean',
-            [CustomFieldDataTypes.DATE]: 'dateTime',
-            [CustomFieldDataTypes.LIST]: 'options',
-          };
-
-          // Convert API response to n8n ResourceMapperField format
-          const fields: ResourceMapperField[] = customFields.map((field) => {
-            const baseField: ResourceMapperField = {
-              id: field.id.toString(),
-              displayName: field.name,
-              required: false,
-              defaultMatch: false,
-              display: true,
-              type: typeMap[field.dataType] || 'string',
-            };
-
-            if (field.dataType === CustomFieldDataTypes.LIST) {
-              baseField.options = field.allowedValues?.listValues?.map((value) => ({
-                name: value,
-                value,
-              })) || []
-            }
-
-            return baseField
-          });
-
-          return { fields }
-        } catch (error) {
-          console.error('Error fetching custom fields:', error);
-          return {
-            fields: [],
-          };
-        }
-      },
-    },
-  };
-
-  // async async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][] | NodeExecutionWithMetadata[][] | null> {
   async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][] | NodeExecutionWithMetadata[][] | null> {
     const inputData = this.getInputData()
     this.logger.info(JSON.stringify(inputData, null, 2));
