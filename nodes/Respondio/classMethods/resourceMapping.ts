@@ -1,6 +1,7 @@
 import { ILoadOptionsFunctions, INodePropertyOptions, ResourceMapperField, ResourceMapperFields } from "n8n-workflow";
-import { fetchPaginatedOptions } from "../utils";
-import { CustomField, CustomFieldDataTypes } from "../types";
+import { callDeveloperApi, fetchPaginatedOptions } from "../utils";
+import { CustomField, CustomFieldDataTypes, FetchWhatsappTemplateResponse } from "../types";
+import _ from 'lodash';
 
 export async function getCustomFields(this: ILoadOptionsFunctions): Promise<ResourceMapperFields> {
   try {
@@ -54,4 +55,132 @@ export async function getCustomFields(this: ILoadOptionsFunctions): Promise<Reso
       fields: [],
     };
   }
+}
+
+const INPUT_IDENTIFIER = '$input$';
+const HIDDEN_INPUT_IDENTIFIER = '$hidden$';
+
+const emptyParameter = (itemType: string, parameter = 1): ResourceMapperField => ({
+  id: `${INPUT_IDENTIFIER}_${itemType}_${parameter}`,
+  display: true,
+  required: true,
+  displayName: `Param {{${parameter}}}`,
+  type: 'string',
+  defaultMatch: false
+});
+
+const createEmptyResourceMapper = (text: string = '', itemType: string = '') => {
+  const parameters: ResourceMapperField[] = [];
+  const params = text.match(/\{\{.*?\}}|.+?(?=\{{|$)/g) || [];
+
+  /* Ensure params found are unique */
+  let paramCount = 1;
+  _.uniq(params).forEach((param) => {
+    const match = param.match(/{{.*}}/);
+    if (match) {
+      parameters.push(emptyParameter(itemType, paramCount));
+      paramCount = paramCount + 1;
+
+    }
+  });
+  return parameters;
+}
+
+const createTemplateParameters = (template: FetchWhatsappTemplateResponse['data']): ResourceMapperFields => {
+  const fields: ResourceMapperField[] = [];
+
+  const components = _.cloneDeep(template?.components || []) || [];
+
+  for (const item of components) {
+    switch (item.type) {
+      case 'body':
+        fields.push(...createEmptyResourceMapper(item.text, 'body'));
+        break;
+
+      case 'header':
+        if (item.format === 'text') {
+          fields.push(...createEmptyResourceMapper(item.text, 'header'));
+        }
+
+        if (['image', 'document', 'video'].includes(item.format)) {
+          fields.push({
+            id: `${INPUT_IDENTIFIER}_${item.format}`,
+            displayName: `Header ${item.format} link`,
+            required: true,
+            display: true,
+            type: 'string',
+            defaultMatch: false,
+          });
+        }
+
+        if (item.format === 'location') {
+          ['latitude', 'longitude', 'name', 'address'].forEach((field) => {
+            fields.push({
+              id: `${INPUT_IDENTIFIER}_location_${field}`,
+              displayName: `Location (${field})`,
+              required: true,
+              display: true,
+              type: 'string',
+              defaultMatch: false,
+            })
+          })
+        }
+        break;
+
+      case 'buttons':
+        for (const button of item.buttons ?? []) {
+          if (button.type === 'url') {
+            fields.push(...createEmptyResourceMapper(button.url, 'buttons'));
+          }
+
+          if (button.type === 'mpm') {
+            fields.push({
+              id: `${INPUT_IDENTIFIER}_catalog_products`,
+              displayName: 'Catalog Products',
+              required: true,
+              display: true,
+              type: 'string',
+              defaultMatch: false,
+            });
+          }
+
+          if (button.type === 'catalog') {
+            fields.push({
+              id: `${HIDDEN_INPUT_IDENTIFIER}_catalog_products`,
+              displayName: '',
+              required: true,
+              display: false,
+              type: 'string',
+              defaultMatch: false,
+            });
+          }
+        }
+        break;
+
+      case 'footer':
+        fields.push(...createEmptyResourceMapper(item.text, 'footer'));
+        break;
+    }
+  }
+
+  return { fields };
+}
+
+export async function getWhatsappTemplateComponentFields(this: ILoadOptionsFunctions): Promise<ResourceMapperFields> {
+  this.logger.info('getting whatsapp template component fields...');
+  const templateId = this.getNodeParameter('templateId', 0) as number;
+
+  const response = await callDeveloperApi<FetchWhatsappTemplateResponse>(this, {
+    method: 'GET',
+    path: `/space/mtm/${templateId}`,
+  })
+
+  if (!response?.data?.id) return { fields: [] };
+
+  const { data: chosenTemplate } = response;
+
+  const { fields } = createTemplateParameters(chosenTemplate)
+  this.logger.info(`Template ${templateId} has ${JSON.stringify(fields)} components.`);
+
+  return { fields }
 }
