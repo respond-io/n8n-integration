@@ -1,6 +1,6 @@
 import { ILoadOptionsFunctions, INodePropertyOptions } from "n8n-workflow";
 import { ACTION_SETTINGS } from "../constants";
-import { callDeveloperApi, constructIdentifier, fetchPaginatedOptions } from "../utils";
+import { callDeveloperApi, constructIdentifier, fetchPaginatedOptions, getWhatsappTemplatesFunction } from "../utils";
 import { Channel, ClosingNote, GetContactResponse, SpaceUser, WhatsAppTemplate } from "../types";
 
 const abortControllers: Record<string, AbortController> = {};
@@ -12,38 +12,6 @@ function toGenericAbortSignal(signal: AbortSignal) {
     addEventListener: signal.addEventListener.bind(signal),
     removeEventListener: signal.removeEventListener.bind(signal),
   };
-}
-
-const getWhatsappTemplatesFunction = async (context: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> => {
-  const channelId = context.getNodeParameter('channelId', 0) as string;
-  const {
-    transformed: allWhatsappTemplates,
-    raw: rawWhatsappTemplates,
-  } = await fetchPaginatedOptions<WhatsAppTemplate, INodePropertyOptions>(
-    context,
-    'respondIoApi',
-    `/space/channel/${channelId}/mtm`,
-    (item) => ({
-      name: `${item.name} (${item.languageCode})`,
-      value: item.id,
-      description: `Namespace: ${item.namespace}, Category: ${item.category}, Status: ${item.status}`,
-    }),
-    { limit: 20, includeRaw: true }
-  )
-
-  const globalData = context.getWorkflowStaticData('global')
-  if (!allWhatsappTemplates || allWhatsappTemplates.length === 0) {
-    globalData.whatsappTemplates = undefined;
-    return [{
-      name: '⚠️ No WhatsApp templates found for this channel',
-      value: '__EMPTY__',
-      description: 'Please check if the channelId is correct or if templates exist.',
-    }]
-  }
-
-  // store the raw templates in global static data for subsequent usage
-  globalData.whatsappTemplates = JSON.stringify(rawWhatsappTemplates);
-  return allWhatsappTemplates;
 }
 
 export async function getActionsForResource(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
