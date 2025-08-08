@@ -1,10 +1,10 @@
-import { IExecuteFunctions, ILoadOptionsFunctions, INodeProperties } from "n8n-workflow"
+import { IExecuteFunctions, ILoadOptionsFunctions, INodeProperties, INodePropertyOptions } from "n8n-workflow"
 import { setTimeout as waitFor } from 'timers/promises';
 
 import languagesJSON from './languages.json'
 import countriesJSON from './countries.json'
 import { PLATFORM_API_URLS } from "../constants";
-import { CustomFieldMapperReturnValue } from "../types";
+import { CustomFieldMapperReturnValue, WhatsAppTemplate } from "../types";
 
 export enum IContactIdentifiers {
   id = 'id',
@@ -215,15 +215,12 @@ export async function paginateWithCursor<TItem, TResult>(
 
   const limit = options?.limit || 10;
   const delayMs = options?.delayMs || 500;
-  const logger = options?.logger || null;
   const maxResults = options?.maxResults ?? Infinity;
   const includeTransformed = options?.includeTransformed ?? true;
 
   let cursor: string | null = null;
   do {
     const { items, nextCursor } = await fetchPageFn(cursor, limit);
-
-    if (logger) logger.info(`Fetched ${items.length} items`);
 
     // dynamically calculate the response length based on what we are including
     let responseLength = getResponseLength(includeRaw, includeTransformed, raw, transformed)
@@ -368,3 +365,36 @@ export const constructCustomFieldFromResourceMapper = (
     return result
   });
 }
+
+export const getWhatsappTemplatesFunction = async (context: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> => {
+  const channelId = context.getNodeParameter('channelId', 0) as string;
+  const {
+    transformed: allWhatsappTemplates,
+    raw: rawWhatsappTemplates,
+  } = await fetchPaginatedOptions<WhatsAppTemplate, INodePropertyOptions>(
+    context,
+    'respondIoApi',
+    `/space/channel/${channelId}/mtm`,
+    (item) => ({
+      name: `${item.name} (${item.languageCode})`,
+      value: item.id,
+      description: `Namespace: ${item.namespace}, Category: ${item.category}, Status: ${item.status}`,
+    }),
+    { limit: 20, includeRaw: true }
+  )
+
+  const globalData = context.getWorkflowStaticData('global')
+  if (!allWhatsappTemplates || allWhatsappTemplates.length === 0) {
+    globalData.whatsappTemplates = undefined;
+    return [{
+      name: '⚠️ No WhatsApp templates found for this channel',
+      value: '__EMPTY__',
+      description: 'Please check if the channelId is correct or if templates exist.',
+    }]
+  }
+
+  // store the raw templates in global static data for subsequent usage
+  globalData.whatsappTemplates = JSON.stringify(rawWhatsappTemplates);
+  return allWhatsappTemplates;
+}
+

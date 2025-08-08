@@ -22,6 +22,7 @@ export default {
       required: true,
       default: '{}',
       description: 'Enter your custom payload as a JSON object.',
+      typeOptions: { rows: 20 },
       displayOptions: {
         show: {
           messageType: ['custom_payload'],

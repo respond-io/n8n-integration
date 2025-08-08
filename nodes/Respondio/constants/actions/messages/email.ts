@@ -5,9 +5,10 @@ export default {
     displayName: 'Message',
     name: 'text',
     type: 'string',
-    required: false,
+    required: true,
     description: 'Enter your email text',
     default: '',
+    typeOptions: { rows: 20 },
     displayOptions: {
       show: {
         messageType: ['email'],
@@ -57,38 +58,46 @@ export default {
   },
   {
     displayName: 'Attachments',
-    name: 'attachments',
-    type: 'collection',
+    name: 'attachmentCollection',
+    type: 'fixedCollection',
     placeholder: 'Add Attachment',
-    description: 'Enter your Attachments details.',
-    default: {},
+    description: 'Add one or more attachments.',
+    typeOptions: { multipleValues: true },
+    default: [],
+    required: false,
     options: [
       {
-        displayName: 'Attachment Type',
-        name: 'type',
-        type: 'options',
-        options: [
-          { name: 'Image', value: 'image' },
-          { name: 'Video', value: 'video' },
-          { name: 'Audio', value: 'audio' },
-          { name: 'File', value: 'file' },
+        displayName: 'Attachment',
+        name: 'attachments',
+        values: [
+          {
+            displayName: 'Attachment Type',
+            name: 'type',
+            type: 'options',
+            options: [
+              { name: 'Image', value: 'image' },
+              { name: 'Video', value: 'video' },
+              { name: 'Audio', value: 'audio' },
+              { name: 'File', value: 'file' },
+            ],
+            description: 'Choose the type of attachment.',
+            default: 'image',
+          },
+          {
+            displayName: 'File Name',
+            name: 'fileName',
+            type: 'string',
+            description: 'Enter the file name.',
+            default: '',
+          },
+          {
+            displayName: 'File Link',
+            name: 'url',
+            type: 'string',
+            description: 'Enter the URL of the file.',
+            default: '',
+          },
         ],
-        description: 'Choose your attachment type.',
-        default: 'image'
-      },
-      {
-        displayName: 'File Name',
-        name: 'fileName',
-        type: 'string',
-        description: 'Enter your attachment file name.',
-        default: '',
-      },
-      {
-        displayName: 'File Link',
-        name: 'url',
-        type: 'string',
-        description: 'Enter your attachment link.',
-        default: '',
       },
     ],
     displayOptions: {

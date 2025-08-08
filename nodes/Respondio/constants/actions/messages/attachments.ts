@@ -17,20 +17,20 @@ export default {
       default: 'image',
       displayOptions: {
         show: {
-          messageType: ['attachments']
+          messageType: ['attachment']
         }
       }
     },
     {
       displayName: 'Attachment Link',
       required: true,
-      name: 'attachmentLink',
+      name: 'attachmentUrl',
       type: 'string',
       description: 'The URL link of the attachment.',
       default: '',
       displayOptions: {
         show: {
-          messageType: ['attachments']
+          messageType: ['attachment']
         }
       }
     },

@@ -233,3 +233,18 @@ export enum SendMessageTypes {
   EMAIL = 'email',
   WHATSAPP_TEMPLATE = 'whatsapp_template',
 }
+
+export type FetchWhatsappTemplateResponse = {
+  status: string;
+  message: string;
+  data: Omit<WhatsAppTemplate, 'components'> & {
+    components: Record<string, any>[];
+    bundle: Record<string, any>;
+    channel: Record<string, any>;
+    catalogProducts: Record<string, any>[];
+  }
+}
+
+export type SendTextMessageResponse = {
+  messageId: number;
+}

@@ -2,6 +2,7 @@ import { ILoadOptionsFunctions, INodePropertyOptions, ResourceMapperField, Resou
 import { callDeveloperApi, fetchPaginatedOptions } from "../utils";
 import { CustomField, CustomFieldDataTypes, FetchWhatsappTemplateResponse } from "../types";
 import _ from 'lodash';
+import { HIDDEN_INPUT_IDENTIFIER, INPUT_IDENTIFIER } from "../constants";
 
 export async function getCustomFields(this: ILoadOptionsFunctions): Promise<ResourceMapperFields> {
   try {
@@ -57,8 +58,33 @@ export async function getCustomFields(this: ILoadOptionsFunctions): Promise<Reso
   }
 }
 
-const INPUT_IDENTIFIER = '$input$';
-const HIDDEN_INPUT_IDENTIFIER = '$hidden$';
+function capitalizeFirstLetter(string: string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+function getTemplateParametersLabel(inputPlaceHolder: string): string {
+  let labelName = '';
+  ['image', 'document', 'video'].forEach(v => {
+    if (inputPlaceHolder.includes(v)) {
+      labelName = `Header ${v} link`;
+    }
+  });
+
+  ['longitude', 'latitude', 'name', 'address'].forEach((v) => {
+    if (inputPlaceHolder.includes(v)) {
+      const parts = inputPlaceHolder.split('_');
+      labelName = `${capitalizeFirstLetter(parts[1])} ${capitalizeFirstLetter(parts[2])}`;
+    }
+  });
+
+  if (labelName) return labelName;
+  if (inputPlaceHolder.includes('buttons')) return 'Buttons url';
+  if (inputPlaceHolder.includes('products')) return 'Products';
+
+  const parts = inputPlaceHolder.split('_');
+  if (parts.length !== 3) return inputPlaceHolder;
+  return `${capitalizeFirstLetter(parts[1])} {{${parts[2]}}}`;
+}
 
 const emptyParameter = (itemType: string, parameter = 1): ResourceMapperField => ({
   id: `${INPUT_IDENTIFIER}_${itemType}_${parameter}`,
@@ -177,10 +203,82 @@ export async function getWhatsappTemplateComponentFields(this: ILoadOptionsFunct
 
   if (!response?.data?.id) return { fields: [] };
 
-  const { data: chosenTemplate } = response;
+  const { data: template } = response;
 
-  const { fields } = createTemplateParameters(chosenTemplate)
+  let { fields } = createTemplateParameters(template)
   this.logger.info(`Template ${templateId} has ${JSON.stringify(fields)} components.`);
 
-  return { fields }
+  fields = fields.map((field) => {
+    // Add product choices if catalog products
+    if (field.id.includes('catalog_products') && !field.id.includes(HIDDEN_INPUT_IDENTIFIER)) {
+      return {
+        ...field,
+        type: 'options',
+        options: template.catalogProducts?.map((product: any) => ({
+          name: product.name,
+          value: JSON.stringify(product),
+        })) || [],
+      };
+    }
+
+    if (field.id.includes(HIDDEN_INPUT_IDENTIFIER)) {
+      return {
+        ...field,
+        display: false,
+        required: true,
+      };
+    }
+
+    return field;
+  });
+
+  // Step 3: Optional "copy/help" preview fields
+  const bodyTexts: Record<string, string> = {};
+  for (const comp of template.components) {
+    if (comp.text && ['header', 'body'].includes(comp.type)) {
+      bodyTexts[capitalizeFirstLetter(comp.type)] = comp.text;
+    }
+  }
+
+  if (fields.length) {
+    const extraFields: ResourceMapperField[] = [
+      {
+        id: 'helpText',
+        displayName: 'WhatsApp template required fields',
+        required: true,
+        display: true,
+        type: 'string',
+        defaultMatch: false,
+      },
+    ];
+
+    if (bodyTexts.Header) {
+      extraFields.push({
+        id: 'templateComponentsHeader',
+        displayName: `Header ${bodyTexts.Header}`,
+        required: true,
+        display: true,
+        type: 'string',
+        defaultMatch: false,
+      });
+    }
+
+    if (bodyTexts.Body) {
+      extraFields.push({
+        id: 'templateComponentsBody',
+        displayName: `Body ${bodyTexts.Body}`,
+        required: true,
+        display: true,
+        type: 'string',
+        defaultMatch: false,
+      });
+    }
+
+    fields = [...extraFields, ...fields];
+
+
+    return { fields }
+  }
+
+  return { fields: [] }
 }
