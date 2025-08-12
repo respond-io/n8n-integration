@@ -1,7 +1,13 @@
 import { ILoadOptionsFunctions, INodePropertyOptions } from "n8n-workflow";
 import { ACTION_SETTINGS } from "../constants";
-import { callDeveloperApi, constructIdentifier, fetchPaginatedOptions, getWhatsappTemplatesFunction } from "../utils";
-import { Channel, ClosingNote, GetContactResponse, SpaceUser, WhatsAppTemplate } from "../types";
+import { callDeveloperApi, capitalizeFirstLetter, constructIdentifier, fetchPaginatedOptions, getWhatsappTemplatesFunction } from "../utils";
+import {
+  Channel,
+  ClosingNote,
+  FetchWhatsappTemplateResponse,
+  GetContactResponse,
+  SpaceUser,
+} from "../types";
 
 const abortControllers: Record<string, AbortController> = {};
 
@@ -110,35 +116,41 @@ export async function getWhatsappTemplates(this: ILoadOptionsFunctions): Promise
 }
 
 export async function getWhatsappTemplateLanguageCodes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-  const globalData = this.getWorkflowStaticData('global')
+  const templateId = this.getNodeParameter('templateId', 0) as string;
 
-  if (!globalData.whatsappTemplates) {
-    await getWhatsappTemplatesFunction(this);
-    const globalData = this.getWorkflowStaticData('global')
-    const whatsappTemplates = globalData.whatsappTemplates ?
-      JSON.parse(globalData.whatsappTemplates as string) as Array<WhatsAppTemplate> :
-      [];
-    if (whatsappTemplates?.length) {
-      const dedupedTemplateLanguages = Array.from(
-        new Map(whatsappTemplates.map(t => [t.languageCode, t])).values()
-      ).map(t => ({
-        name: t.languageCode,
-        value: t.languageCode,
-      }));
+  if (!templateId) throw new Error('Template Id not provided');
 
-      return dedupedTemplateLanguages;
+  const template = await callDeveloperApi<FetchWhatsappTemplateResponse>(this, {
+    method: 'GET',
+    path: `/space/mtm/${templateId}`,
+  })
+
+  return [{ name: template.data.languageCode, value: template.data.languageCode }];
+}
+
+export async function getTemplatePreviewOptions(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+  const templateId = this.getNodeParameter('templateId', 0) as number;
+
+  if (!templateId) return [];
+
+  const response = await callDeveloperApi<FetchWhatsappTemplateResponse>(this, {
+    method: 'GET',
+    path: `/space/mtm/${templateId}`,
+  });
+
+  if (!response?.data?.id) return [];
+
+  const { data: template } = response;
+  const options: INodePropertyOptions[] = [];
+
+  for (const comp of template.components) {
+    if (typeof comp === 'object' && comp.text && ['header', 'body'].includes(comp.type)) {
+      options.push({
+        name: `${capitalizeFirstLetter(comp.type)}: ${comp.text}`,
+        value: comp.type,
+      });
     }
-    return [];
   }
 
-  const whatsappTemplates = globalData.whatsappTemplates ?
-    JSON.parse(globalData.whatsappTemplates as string) as Array<WhatsAppTemplate> :
-    [];
-
-  return Array.from(
-    new Map(whatsappTemplates.map(t => [t.languageCode, t])).values()
-  ).map(t => ({
-    name: t.languageCode,
-    value: t.languageCode,
-  }));
+  return options;
 }
