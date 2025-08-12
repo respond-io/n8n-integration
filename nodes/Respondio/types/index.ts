@@ -238,13 +238,21 @@ export type FetchWhatsappTemplateResponse = {
   status: string;
   message: string;
   data: Omit<WhatsAppTemplate, 'components'> & {
-    components: Record<string, any>[];
+    components: Record<string, any>[] | string; // JSON string of components
     bundle: Record<string, any>;
     channel: Record<string, any>;
     catalogProducts: Record<string, any>[];
   }
 }
 
-export type SendTextMessageResponse = {
+export type SendMessageResponse = {
   messageId: number;
+}
+
+export type WhatsappTemplateComponentField = {
+  type: 'text' | 'header' | 'buttons' | 'image' | 'video' | 'document' | 'audio';
+  format?: 'text' | 'date' | 'time';
+  text?: string;
+  example: Record<string, any> | string;
+  buttons?: any[] | null;
 }

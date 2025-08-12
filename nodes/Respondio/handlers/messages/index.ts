@@ -3,7 +3,7 @@ import { IExecuteFunctions, INodeExecutionData, NodeExecutionWithMetadata } from
 import { ACTION_NAMES } from "../../constants/actions/action_names";
 import { callDeveloperApi, constructIdentifier, IContactIdentifiers } from "../../utils";
 // @ts-ignore
-import { CustomFieldMapperReturnValue, FetchWhatsappTemplateResponse, GetMessageResponse, SendMessageTypes, SendTextMessageResponse } from "../../types";
+import { CustomFieldMapperReturnValue, FetchWhatsappTemplateResponse, GetMessageResponse, SendMessageTypes, SendMessageResponse } from "../../types";
 import { BaseRequestBody, sendMessagePayloadFormatter, SharedInputFields } from "../../constants/actions/messages";
 
 const execute = async (
@@ -56,12 +56,6 @@ const execute = async (
         text,
         messageTag
       })
-
-      // const response = await callDeveloperApi<SendTextMessageResponse>(executionContext, {
-      //   method: 'POST',
-      //   path: sendMessagePath,
-      //   body: payload
-      // })
     }
 
     if (messageType === SendMessageTypes.EMAIL) {
@@ -83,12 +77,6 @@ const execute = async (
         text,
         subject
       })
-
-      // const response = await callDeveloperApi<SendTextMessageResponse>(executionContext, {
-      //   method: 'POST',
-      //   path: sendMessagePath,
-      //   body: payload
-      // })
     }
 
     if (messageType === SendMessageTypes.ATTACHMENT) {
@@ -130,7 +118,6 @@ const execute = async (
 
     if (messageType === SendMessageTypes.WHATSAPP_TEMPLATE) {
       const templateId = executionContext.getNodeParameter('templateId', 0, '') as number;
-      const templateLanguageCode = executionContext.getNodeParameter('templateLanguageCode', 0, '') as string;
       const templateComponentsFields = executionContext.getNodeParameter('whatsappTemplateComponentFields', 0, {}) as CustomFieldMapperReturnValue;
 
       const templateDetails = await callDeveloperApi<FetchWhatsappTemplateResponse>(executionContext, {
@@ -138,23 +125,24 @@ const execute = async (
         path: `/space/mtm/${templateId}`,
       })
 
-      const templateName = templateDetails.data.name;
-
-      executionContext.logger.info(`WA Template Id: ${templateId}`);
-      executionContext.logger.info(`WA Template Language Code: ${templateLanguageCode}`);
-      executionContext.logger.info(`WA Template item: ${JSON.stringify(templateComponentsFields)}`);
       payload = sendMessagePayloadFormatter({
         messageType,
         channelId,
         channelType,
-        templateLanguageCode,
-        templateName,
-        templateComponentsFields: templateComponentsFields.value,
-        inputData: {},
+        templateComponentsFields,
+        templateDetails: templateDetails.data,
+        executionContext
       })
     }
 
-    executionContext.logger.info(`Sending message with the payload: ${JSON.stringify(payload)}, sendMessagePath: ${sendMessagePath}`);
+    executionContext.logger.info(`Sending message with payload: ${JSON.stringify(payload)}`)
+    const response = await callDeveloperApi<SendMessageResponse>(executionContext, {
+      method: 'POST',
+      path: sendMessagePath,
+      body: payload
+    })
+
+    return [[{ json: response }]]
   }
 
 

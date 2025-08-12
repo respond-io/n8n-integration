@@ -1,4 +1,4 @@
-import { INodeProperties } from "n8n-workflow";
+import { IExecuteFunctions, INodeProperties, ResourceMapperField } from "n8n-workflow";
 
 import { generateContactIdentifierInputFields, IContactIdentifiers } from "../../../utils";
 import email from './email';
@@ -8,103 +8,211 @@ import quick_reply from './quick_reply';
 import whatsapp_template from './whatsapp_template';
 import text_message from './text_message';
 import ACTION_NAMES from "../action_names";
-import { HIDDEN_INPUT_IDENTIFIER, INPUT_IDENTIFIER } from "../..";
-import { SendMessageTypes } from "../../../types";
+import { CustomFieldMapperReturnValue, FetchWhatsappTemplateResponse, SendMessageTypes, WhatsappTemplateComponentField } from "../../../types";
+// import { HIDDEN_INPUT_IDENTIFIER, INPUT_IDENTIFIER } from "../..";
 
-const CATTALOG_PRODUCTS_KEY = 'catalog_products'
+// const CATTALOG_PRODUCTS_KEY = 'catalog_products'
 
-function unflatten(data: Record<string, any>, separator = '.'): Record<string, any> {
-  const result: Record<string, any> = {};
-
-  for (const flatKey in data) {
-    const value = data[flatKey];
-    const keys = flatKey.split(separator);
-
-    let current = result;
-    for (let i = 0; i < keys.length; i++) {
-      const key = keys[i];
-      if (i === keys.length - 1) {
-        current[key] = value;
-      } else {
-        if (!current[key] || typeof current[key] !== 'object') {
-          current[key] = {};
-        }
-        current = current[key];
-      }
-    }
-  }
-
-  return result;
-}
+// function unflatten(data: Record<string, any>, separator = '.'): Record<string, any> {
+//   const result: Record<string, any> = {};
+//
+//   for (const flatKey in data) {
+//     const value = data[flatKey];
+//     const keys = flatKey.split(separator);
+//
+//     let current = result;
+//     for (let i = 0; i < keys.length; i++) {
+//       const key = keys[i];
+//       if (i === keys.length - 1) {
+//         current[key] = value;
+//       } else {
+//         if (!current[key] || typeof current[key] !== 'object') {
+//           current[key] = {};
+//         }
+//         current = current[key];
+//       }
+//     }
+//   }
+//
+//   return result;
+// }
 
 type GetWhatsappTemplateMessageInput = {
-  templateName: string;
-  templateLanguageCode: string;
   messageType: SendMessageTypes;
-  templateComponentsFields: Record<string, any> | string;
-  inputData: Record<string, any>;
+  templateComponentsFields: CustomFieldMapperReturnValue;
+  templateDetails: FetchWhatsappTemplateResponse['data'];
+  executionContext: IExecuteFunctions;
+}
+
+const convertSchemaToDefaultComponent = (
+  valuePresent: boolean,
+  templateComponentsFieldsSchema: GetWhatsappTemplateMessageInput['templateComponentsFields']['schema'],
+  templateComponentsFieldsValue: GetWhatsappTemplateMessageInput['templateComponentsFields']['value'],
+) => {
+  if (valuePresent) {
+    const returningFields: Array<Record<string, any>> =
+      Object.entries(templateComponentsFieldsValue)
+        .filter(([, value]) => !(typeof value === 'boolean' && !value))
+        .map(([key, value]) => ({ [key]: value }));
+
+    templateComponentsFieldsSchema.forEach((field) => {
+      if (field.id.includes('_details')) {
+        returningFields.push({ [field.id]: field })
+      }
+    })
+    return returningFields
+  }
+
+  return templateComponentsFieldsSchema.map((field) => {
+    if (typeof Object.values(field)[0] === 'boolean') { return { [field.id]: true } }
+
+    return { [field.id]: field }
+  })
+}
+
+const extractProductFromRawComponents = (rawComponents: ReturnType<typeof convertSchemaToDefaultComponent>, includeDetails: boolean) => {
+  return rawComponents.filter((obj) => {
+    const key = Object.keys(obj)[0];
+    return includeDetails ? key.includes('_details') : !key.includes('_details');
+  })
 }
 
 const getWhatsappTemplateMessage = (input: GetWhatsappTemplateMessageInput) => {
-  let templateComponentsFieldsParsed: Record<string, any> | null = null
   const {
-    templateName,
-    templateLanguageCode,
     messageType,
     templateComponentsFields,
-    inputData,
+    templateDetails,
   } = input;
 
-  try {
-    templateComponentsFieldsParsed = typeof templateComponentsFields === 'string' ?
-      JSON.parse(templateComponentsFields) :
-      templateComponentsFields;
+  const valuePresent = templateComponentsFields?.value && Object.keys(templateComponentsFields.value).length > 0;
+  const rawComponents = convertSchemaToDefaultComponent(
+    valuePresent,
+    templateComponentsFields.schema,
+    templateComponentsFields.value,
+  );
 
-    for (const key in templateComponentsFieldsParsed) {
-      if (
-        templateComponentsFieldsParsed[key].includes(INPUT_IDENTIFIER) &&
-        inputData[key]
-      ) {
-        if (
-          templateComponentsFieldsParsed[key].includes(CATTALOG_PRODUCTS_KEY) &&
-          (
-            inputData[key].length < 1 ||
-            inputData[key].length > 30
-          )
-        ) {
-          const error = new Error('Can not select more than 30 products');
-          error.name = 'ValidationError'
-          throw error;
-        }
+  const originalComponents: Array<WhatsappTemplateComponentField> = typeof templateDetails.components === 'string' ?
+    JSON.parse(templateDetails.components) :
+    templateDetails.components;
 
-        templateComponentsFieldsParsed[key] = inputData[key]
-      } else if (
-        templateComponentsFieldsParsed[key].includes(
-          HIDDEN_INPUT_IDENTIFIER
-        ) &&
-        inputData[key]
-      ) {
-        templateComponentsFieldsParsed[key] = inputData[key];
-      }
-    }
-  } catch (error) {
-    console.log('error: ', error);
-    if (error.name === 'ValidationError') {
-      throw error
-    }
-    templateComponentsFieldsParsed = null;
+  const nonButtonComponents: Array<WhatsappTemplateComponentField> = originalComponents.filter((item) => item.type !== 'buttons');
+  const resultingComponents: any[] = [];
+
+  for (const component of nonButtonComponents) {
+    resultingComponents.push({
+      type: component.type,
+      format: component.format || undefined,
+      text: component.text || undefined,
+      parameters: [],
+    })
   }
 
-  return {
+  const hasProducts = templateDetails.catalogProducts.length > 0;
+
+  if (hasProducts) {
+    const buttonComponent = originalComponents.find((item) => item.type === 'buttons' && item.buttons?.length) as { type: 'buttons', buttons: any[] } | undefined;
+
+    // a template can only have either mpm or catalog_products
+    const buttonType = buttonComponent?.buttons?.[0]?.type
+
+    // mpm allows user to select products
+    if (buttonComponent && buttonType === 'mpm') {
+      const mpmProductsWithoutDetails = extractProductFromRawComponents(rawComponents, false);
+      const mpmProductDetails = extractProductFromRawComponents(rawComponents, true);
+      const hasNotChosenProducts = mpmProductsWithoutDetails.every(obj => Object.values(obj)[0] === false);
+
+      if (hasNotChosenProducts) throw new Error('Please select at least one product from the MPM products list.');
+
+      const { options } = Object.values(mpmProductDetails[0])[0] as Record<string, any>
+      const { value: productDetailsString } = options[0];
+      const firstProductDetail = JSON.parse(productDetailsString as string)
+      resultingComponents.push({
+        type: 'buttons',
+        buttons: [
+          {
+            type: 'mpm',
+            text: buttonComponent?.buttons?.[0].text || 'View items',
+            parameters: [
+              {
+                type: 'action',
+                action: {
+                  thumbnail_product_retailer_id: firstProductDetail.retailer_id,
+                  thumbnail_product_image_url: firstProductDetail.image_url,
+                  sections: mpmProductsWithoutDetails.map((product) => {
+                    const key = Object.keys(product)[0];
+                    const mappedProduct = mpmProductDetails.find((detail) => Object.keys(detail)[0] === `${key}_details`) as ResourceMapperField | undefined;
+
+                    if (!mappedProduct) return null;
+
+                    const { options } = Object.values(mappedProduct)[0] as ResourceMapperField;
+                    if (!options) return null;
+
+                    const { value: productDetailsString } = options[0];
+
+                    const productDetails = JSON.parse(productDetailsString as string)
+                    return productDetails
+                  }).filter(Boolean),
+                }
+              }
+            ]
+          }
+        ],
+      })
+    }
+
+    // catalog does not allow user to select products
+    if (buttonComponent && buttonType === 'catalog') {
+      const catalogProductsWithoutDetails = extractProductFromRawComponents(rawComponents, false);
+      const catalogProductDetails = extractProductFromRawComponents(rawComponents, true);
+      const { options } = Object.values(catalogProductDetails[0])[0] as Record<string, any>
+      const { value: productDetailsString } = options[0];
+      const firstProductDetail = JSON.parse(productDetailsString as string)
+
+      resultingComponents.push({
+        type: 'buttons',
+        buttons: [
+          {
+            type: 'catalog',
+            text: buttonComponent?.buttons?.[0].text || 'View items',
+            parameters: [
+              {
+                type: 'action',
+                action: {
+                  thumbnail_product_retailer_id: firstProductDetail.retailer_id,
+                  thumbnail_product_image_url: firstProductDetail.image_url,
+                  sections: catalogProductsWithoutDetails.map((product) => {
+                    const key = Object.keys(product)[0];
+                    const mappedProduct = catalogProductDetails.find((detail) => Object.keys(detail)[0] === `${key}_details`) as ResourceMapperField | undefined;
+
+                    if (!mappedProduct) return null;
+
+                    const { options } = Object.values(mappedProduct)[0] as ResourceMapperField;
+                    if (!options) return null;
+
+                    const { value: productDetailsString } = options[0];
+
+                    const productDetails = JSON.parse(productDetailsString as string)
+                    return productDetails
+                  }).filter(Boolean),
+                }
+              }
+            ]
+          }
+        ]
+      })
+    }
+  }
+
+  const payload = {
     type: messageType,
     template: {
-      name: templateName,
-      languageCode: templateLanguageCode,
-      ...(templateComponentsFieldsParsed
-        ? unflatten(templateComponentsFieldsParsed) as Record<string, any>
-        : {}),
+      name: templateDetails.name,
+      languageCode: templateDetails.languageCode,
+      components: resultingComponents
     }
   }
+
+  return payload
 }
 
 export type BaseRequestBody = {
@@ -159,10 +267,9 @@ interface EmailInputData {
 interface WhatsappTemplateInputData {
   messageType: SendMessageTypes.WHATSAPP_TEMPLATE;
   [key: string]: any;
-  templateName: string;
-  templateLanguageCode: string;
-  templateComponentsFields: Record<string, any> | string;
-  inputData: Record<string, any>;
+  templateComponentsFields: CustomFieldMapperReturnValue;
+  templateDetails: FetchWhatsappTemplateResponse['data'];
+  executionContext: IExecuteFunctions
 }
 
 export type SendMessagePayloadFormatterInput =
@@ -240,17 +347,15 @@ export const sendMessagePayloadFormatter = (input: SendMessagePayloadFormatterIn
   if (messageType === SendMessageTypes.WHATSAPP_TEMPLATE) {
     const {
       templateComponentsFields,
-      templateLanguageCode,
-      templateName,
-      inputData,
-      messageType,
+      templateDetails,
+      executionContext
     } = rest as WhatsappTemplateInputData;
+
     requestBody.message = getWhatsappTemplateMessage({
       messageType,
-      inputData,
-      templateName,
-      templateLanguageCode,
-      templateComponentsFields
+      templateComponentsFields,
+      templateDetails,
+      executionContext
     })
   }
 

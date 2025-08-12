@@ -38,6 +38,20 @@ export default {
       },
     },
     {
+      displayName: 'Template\'s Header / Body preview will be available at the bottom of the section',
+      name: 'templatePreviewNotice',
+      type: 'notice',
+      required: false,
+      default: '',
+      description: 'This is informational only. The template\'s header and body preview will be available at the bottom of the section after selecting the template.',
+      displayOptions: {
+        show: {
+          messageType: ['whatsapp_template'],
+          templateId: [{ _cnd: { exists: true } }]
+        }
+      },
+    },
+    {
       displayName: 'WhatsApp Template Component Fields',
       name: 'whatsappTemplateComponentFields',
       type: 'resourceMapper',
@@ -63,6 +77,23 @@ export default {
           templateId: [{ _cnd: { exists: true } }],
         }
       }
+    },
+    {
+      displayName: 'Template Preview (Informational Only)',
+      name: 'templatePreview',
+      type: 'options',
+      description: 'Template content preview (informational only)',
+      default: [],
+      displayOptions: {
+        show: {
+          templateId: [{ _cnd: { exists: true } }],
+        }
+      },
+      typeOptions: {
+        loadOptionsDependsOn: ['templateId'],
+        loadOptionsMethod: 'getTemplatePreviewOptions',
+      },
+      options: []
     }
   ]
 }

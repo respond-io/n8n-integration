@@ -1,4 +1,4 @@
-import { IExecuteFunctions, ILoadOptionsFunctions, INodeProperties, INodePropertyOptions } from "n8n-workflow"
+import { IExecuteFunctions, IHttpRequestOptions, ILoadOptionsFunctions, INodeProperties, INodePropertyOptions, IRequestOptions } from "n8n-workflow"
 import { setTimeout as waitFor } from 'timers/promises';
 
 import languagesJSON from './languages.json'
@@ -286,6 +286,7 @@ export async function fetchPaginatedOptions<TItem, TResult>(
           Authorization: `Bearer ${credentials.apiKey}`,
         },
         json: true,
+        timeout: 30000, // 30 seconds timeout
       }) as PaginatedApiResponse<TItem>;
 
       return {
@@ -328,13 +329,14 @@ export async function callDeveloperApi<T>(
   const env = (credentials?.environment as 'production' | 'staging') || 'staging';
   const platformUrl = PLATFORM_API_URLS[env];
 
-  const options = {
+  const options: IHttpRequestOptions | IRequestOptions = {
     url: `${platformUrl}${path}`,
     headers: { Authorization: `Bearer ${credentials.apiKey}` },
     method,
     body,
     json: true,
-    abortSignal
+    abortSignal,
+    timeout: 30000, // 30 seconds timeout
   };
 
   const response = useHttpRequestHelper ?
@@ -398,3 +400,6 @@ export const getWhatsappTemplatesFunction = async (context: ILoadOptionsFunction
   return allWhatsappTemplates;
 }
 
+export function capitalizeFirstLetter(string: string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
