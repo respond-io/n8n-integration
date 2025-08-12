@@ -32,6 +32,7 @@ export async function getActionsForResource(this: ILoadOptionsFunctions): Promis
     description: action.description,
   }));
 }
+
 export async function getTagsForContact(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
   const nodeId = this.getNode().id;
   // Abort previous request for this node
