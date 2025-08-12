@@ -142,14 +142,27 @@ export async function getTemplatePreviewOptions(this: ILoadOptionsFunctions): Pr
 
   const { data: template } = response;
   const options: INodePropertyOptions[] = [];
+  const templateComponents = (typeof template?.components === 'string' ?
+    JSON.parse(template.components) :
+    template?.components) || [];
 
-  for (const comp of template.components) {
-    if (typeof comp === 'object' && comp.text && ['header', 'body'].includes(comp.type)) {
+  for (const comp of templateComponents) {
+    if (typeof comp === 'object' && comp.text && ['header', 'body', 'footer'].includes(comp.type)) {
       options.push({
         name: `${capitalizeFirstLetter(comp.type)}: ${comp.text}`,
         value: comp.type,
       });
     }
+  }
+
+  if (template.catalogProducts && template.catalogProducts.length > 0) {
+    template.catalogProducts.forEach((product) => {
+      options.push({
+        name: `Product: ${product.name} (${product.currency}${product.price} - ${product.availability})`,
+        value: product.id,
+        description: `Description: ${product.description}`
+      })
+    })
   }
 
   return options;

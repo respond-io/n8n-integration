@@ -103,7 +103,12 @@ const getWhatsappTemplateMessage = (input: GetWhatsappTemplateMessageInput) => {
       type: component.type,
       format: component.format || undefined,
       text: component.text || undefined,
-      parameters: [],
+      parameters: [
+        {
+          type: "text",
+          text: "Something testing"
+        }
+      ],
     })
   }
 
@@ -138,20 +143,27 @@ const getWhatsappTemplateMessage = (input: GetWhatsappTemplateMessageInput) => {
                 action: {
                   thumbnail_product_retailer_id: firstProductDetail.retailer_id,
                   thumbnail_product_image_url: firstProductDetail.image_url,
-                  sections: mpmProductsWithoutDetails.map((product) => {
-                    const key = Object.keys(product)[0];
-                    const mappedProduct = mpmProductDetails.find((detail) => Object.keys(detail)[0] === `${key}_details`) as ResourceMapperField | undefined;
+                  sections: [
+                    {
+                      product_items: mpmProductsWithoutDetails.map((product) => {
+                        const key = Object.keys(product)[0];
+                        const mappedProduct = mpmProductDetails.find((detail) => Object.keys(detail)[0] === `${key}_details`) as ResourceMapperField | undefined;
 
-                    if (!mappedProduct) return null;
+                        if (!mappedProduct) return null;
 
-                    const { options } = Object.values(mappedProduct)[0] as ResourceMapperField;
-                    if (!options) return null;
+                        const { options } = Object.values(mappedProduct)[0] as ResourceMapperField;
+                        if (!options) return null;
 
-                    const { value: productDetailsString } = options[0];
+                        const { value: productDetailsString } = options[0];
 
-                    const productDetails = JSON.parse(productDetailsString as string)
-                    return productDetails
-                  }).filter(Boolean),
+                        const productDetails = JSON.parse(productDetailsString as string)
+                        return {
+                          ...productDetails,
+                          product_retailer_id: productDetails.retailer_id,
+                        }
+                      }).filter(Boolean),
+                    }
+                  ]
                 }
               }
             ]

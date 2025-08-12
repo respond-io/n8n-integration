@@ -111,7 +111,10 @@ const createEmptyResourceMapper = (text: string = '', itemType: string = '') => 
 const createTemplateParameters = (template: FetchWhatsappTemplateResponse['data']): ResourceMapperFields => {
   const fields: ResourceMapperField[] = [];
 
-  const components = _.cloneDeep(template?.components || []) || [];
+  const templateComponents = typeof template?.components === 'string' ?
+    JSON.parse(template.components) :
+    template?.components;
+  const components = _.cloneDeep(templateComponents || []) || [];
 
   for (const item of components) {
     if (typeof item === 'object') {
