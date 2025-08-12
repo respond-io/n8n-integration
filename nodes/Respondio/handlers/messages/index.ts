@@ -43,7 +43,7 @@ const execute = async (
 
     if (!channelId) throw new Error('Channel ID is required to send a message');
 
-    const sendMessagePath = `/contact/${identifier}/message`;
+    // const sendMessagePath = `/contact/${identifier}/message`;
     let payload: BaseRequestBody = {};
 
     if (messageType === SendMessageTypes.TEXT) {
@@ -131,18 +131,17 @@ const execute = async (
         channelType,
         templateComponentsFields,
         templateDetails: templateDetails.data,
-        executionContext
       })
     }
 
     executionContext.logger.info(`Sending message with payload: ${JSON.stringify(payload)}`)
-    const response = await callDeveloperApi<SendMessageResponse>(executionContext, {
-      method: 'POST',
-      path: sendMessagePath,
-      body: payload
-    })
-
-    return [[{ json: response }]]
+    // const response = await callDeveloperApi<SendMessageResponse>(executionContext, {
+    //   method: 'POST',
+    //   path: sendMessagePath,
+    //   body: payload
+    // })
+    //
+    // return [[{ json: response }]]
   }
 
 

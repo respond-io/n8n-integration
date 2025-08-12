@@ -52,6 +52,20 @@ export default {
       },
     },
     {
+      displayName: 'Catalog type buttons will always send all products in the catalog, only MPM will allow to select products (updating the switch to disable for catalog will not actually remove it from the template message)',
+      name: 'templateCatalogNotice',
+      type: 'notice',
+      required: false,
+      default: '',
+      description: 'This is informational only.',
+      displayOptions: {
+        show: {
+          messageType: ['whatsapp_template'],
+          templateId: [{ _cnd: { exists: true } }]
+        }
+      },
+    },
+    {
       displayName: 'WhatsApp Template Component Fields',
       name: 'whatsappTemplateComponentFields',
       type: 'resourceMapper',
@@ -94,6 +108,6 @@ export default {
         loadOptionsMethod: 'getTemplatePreviewOptions',
       },
       options: []
-    }
+    },
   ]
 }

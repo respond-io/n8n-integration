@@ -58,30 +58,6 @@ export async function getCustomFields(this: ILoadOptionsFunctions): Promise<Reso
   }
 }
 
-// function getTemplateParametersLabel(inputPlaceHolder: string): string {
-//   let labelName = '';
-//   ['image', 'document', 'video'].forEach(v => {
-//     if (inputPlaceHolder.includes(v)) {
-//       labelName = `Header ${v} link`;
-//     }
-//   });
-//
-//   ['longitude', 'latitude', 'name', 'address'].forEach((v) => {
-//     if (inputPlaceHolder.includes(v)) {
-//       const parts = inputPlaceHolder.split('_');
-//       labelName = `${capitalizeFirstLetter(parts[1])} ${capitalizeFirstLetter(parts[2])}`;
-//     }
-//   });
-//
-//   if (labelName) return labelName;
-//   if (inputPlaceHolder.includes('buttons')) return 'Buttons url';
-//   if (inputPlaceHolder.includes('products')) return 'Products';
-//
-//   const parts = inputPlaceHolder.split('_');
-//   if (parts.length !== 3) return inputPlaceHolder;
-//   return `${capitalizeFirstLetter(parts[1])} {{${parts[2]}}}`;
-// }
-
 const emptyParameter = (itemType: string, parameter = 1): ResourceMapperField => ({
   id: `${INPUT_IDENTIFIER}_${itemType}_${parameter}`,
   display: true,
@@ -102,7 +78,6 @@ const createEmptyResourceMapper = (text: string = '', itemType: string = '') => 
     if (match) {
       parameters.push(emptyParameter(itemType, paramCount));
       paramCount = paramCount + 1;
-
     }
   });
   return parameters;
