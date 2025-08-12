@@ -8,7 +8,12 @@ import quick_reply from './quick_reply';
 import whatsapp_template from './whatsapp_template';
 import text_message from './text_message';
 import ACTION_NAMES from "../action_names";
-import { CustomFieldMapperReturnValue, FetchWhatsappTemplateResponse, SendMessageTypes, WhatsappTemplateComponentField } from "../../../types";
+import {
+  CustomFieldMapperReturnValue,
+  FetchWhatsappTemplateResponse,
+  SendMessageTypes,
+  WhatsappTemplateComponentField,
+} from "../../../types";
 import { INPUT_IDENTIFIER } from "../..";
 
 type GetWhatsappTemplateMessageInput = {
@@ -17,36 +22,67 @@ type GetWhatsappTemplateMessageInput = {
   templateDetails: FetchWhatsappTemplateResponse['data'];
 }
 
+const createDefaultFieldValue = (field: any) => {
+  if (typeof Object.values(field)[0] === 'boolean') {
+    return { [field.id]: true };
+  }
+  return { [field.id]: field };
+};
+
+// Helper function to filter out false boolean values
+const filterValidValues = (templateValue: Record<string, any>) => {
+  return Object.entries(templateValue)
+    .filter(([, value]) => !(typeof value === 'boolean' && !value))
+    .map(([key, value]) => ({ [key]: value }));
+};
+
+// Helper function to add detail fields
+const addDetailFields = (
+  fields: Array<Record<string, any>>,
+  schema: any[]
+) => {
+  schema.forEach((field) => {
+    if (field.id.includes('_details')) {
+      fields.push({ [field.id]: field });
+    }
+  });
+};
+
 const convertSchemaToDefaultComponent = (
   valuePresent: boolean,
   templateComponentsFieldsSchema: GetWhatsappTemplateMessageInput['templateComponentsFields']['schema'],
   templateComponentsFieldsValue: GetWhatsappTemplateMessageInput['templateComponentsFields']['value'],
+  buttonType?: string,
 ) => {
-  if (valuePresent) {
-    const returningFields: Array<Record<string, any>> =
-      Object.entries(templateComponentsFieldsValue)
-        .filter(([, value]) => !(typeof value === 'boolean' && !value))
-        .map(([key, value]) => ({ [key]: value }));
+  // For catalog type, return all items regardless of selection
+  if (buttonType === 'catalog') {
+    const returningFields: Array<Record<string, any>> = [];
 
     templateComponentsFieldsSchema.forEach((field) => {
       if (field.id.includes('_details')) {
-        returningFields.push({ [field.id]: field })
+        returningFields.push({ [field.id]: field });
+      } else {
+        // For catalog, include all product fields (not just selected ones)
+        returningFields.push({ [field.id]: field });
       }
-    })
-    return returningFields
+    });
+
+    return returningFields;
   }
 
-  return templateComponentsFieldsSchema.map((field) => {
-    if (typeof Object.values(field)[0] === 'boolean') { return { [field.id]: true } }
+  if (valuePresent) {
+    const returningFields = filterValidValues(templateComponentsFieldsValue);
+    addDetailFields(returningFields, templateComponentsFieldsSchema);
+    return returningFields;
+  }
 
-    return { [field.id]: field }
-  })
-}
+  return templateComponentsFieldsSchema.map(createDefaultFieldValue);
+};
 
 const extractProductFromRawComponents = (rawComponents: ReturnType<typeof convertSchemaToDefaultComponent>, includeDetails: boolean) => {
   return rawComponents.filter((obj) => {
     const key = Object.keys(obj)[0];
-    return includeDetails ? key.includes('_details') : !key.includes('_details');
+    return includeDetails ? key.includes('_details') : (!key.includes('_details') && !key.includes(INPUT_IDENTIFIER));
   })
 }
 
@@ -126,7 +162,7 @@ const mapProductsWithDetails = (
 
 const createMpmButtonComponent = (
   buttonComponent: any,
-  rawComponents: Array<Record<string, any>>
+  rawComponents: Array<Record<string, any>>,
 ) => {
   const mpmProductsWithoutDetails = extractProductFromRawComponents(rawComponents, false);
   const mpmProductDetails = extractProductFromRawComponents(rawComponents, true);
@@ -200,7 +236,7 @@ const createCatalogButtonComponent = (
 
 const createProductButtonComponent = (
   originalComponents: Array<WhatsappTemplateComponentField>,
-  rawComponents: Array<Record<string, any>>
+  rawComponents: Array<Record<string, any>>,
 ) => {
   const buttonComponent = originalComponents.find((item) =>
     item.type === 'buttons' && item.buttons?.length
@@ -228,16 +264,26 @@ const getWhatsappTemplateMessage = (input: GetWhatsappTemplateMessageInput) => {
     templateDetails,
   } = input;
 
-  const valuePresent = templateComponentsFields?.value && Object.keys(templateComponentsFields.value).length > 0;
+  const originalComponents: Array<WhatsappTemplateComponentField> = typeof templateDetails.components === 'string' ?
+    JSON.parse(templateDetails.components) :
+    templateDetails.components;
+
+  const buttonComponent = originalComponents.find((item) =>
+    item.type === 'buttons' && item.buttons?.length
+  ) as { type: 'buttons', buttons: any[] } | undefined;
+
+  const buttonType = buttonComponent?.buttons?.[0]?.type;
+
+  // Convert schema to components
+  const valuePresent = templateComponentsFields?.value &&
+    Object.keys(templateComponentsFields.value).length > 0;
+
   const rawComponents = convertSchemaToDefaultComponent(
     valuePresent,
     templateComponentsFields.schema,
     templateComponentsFields.value,
+    buttonType,
   );
-
-  const originalComponents: Array<WhatsappTemplateComponentField> = typeof templateDetails.components === 'string' ?
-    JSON.parse(templateDetails.components) :
-    templateDetails.components;
 
   const nonButtonComponents: Array<WhatsappTemplateComponentField> = originalComponents.filter((item) => item.type !== 'buttons');
 

@@ -2,8 +2,13 @@ import { IExecuteFunctions, INodeExecutionData, NodeExecutionWithMetadata } from
 
 import { ACTION_NAMES } from "../../constants/actions/action_names";
 import { callDeveloperApi, constructIdentifier, IContactIdentifiers } from "../../utils";
-// @ts-ignore
-import { CustomFieldMapperReturnValue, FetchWhatsappTemplateResponse, GetMessageResponse, SendMessageTypes, SendMessageResponse } from "../../types";
+import {
+  CustomFieldMapperReturnValue,
+  FetchWhatsappTemplateResponse,
+  GetMessageResponse,
+  SendMessageTypes,
+  SendMessageResponse,
+} from "../../types";
 import { BaseRequestBody, sendMessagePayloadFormatter, SharedInputFields } from "../../constants/actions/messages";
 
 const execute = async (
@@ -43,7 +48,7 @@ const execute = async (
 
     if (!channelId) throw new Error('Channel ID is required to send a message');
 
-    // const sendMessagePath = `/contact/${identifier}/message`;
+    const sendMessagePath = `/contact/${identifier}/message`;
     let payload: BaseRequestBody = {};
 
     if (messageType === SendMessageTypes.TEXT) {
@@ -134,16 +139,14 @@ const execute = async (
       })
     }
 
-    executionContext.logger.info(`Sending message with payload: ${JSON.stringify(payload)}`)
-    // const response = await callDeveloperApi<SendMessageResponse>(executionContext, {
-    //   method: 'POST',
-    //   path: sendMessagePath,
-    //   body: payload
-    // })
-    //
-    // return [[{ json: response }]]
-  }
+    const response = await callDeveloperApi<SendMessageResponse>(executionContext, {
+      method: 'POST',
+      path: sendMessagePath,
+      body: payload
+    })
 
+    return [[{ json: response }]]
+  }
 
   return [[{ json: { message: 'Action not handled' } }]]
 }
