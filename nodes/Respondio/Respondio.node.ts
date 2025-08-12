@@ -1,133 +1,40 @@
 import {
-  IExecuteFunctions,
-  INodeExecutionData,
-  INodeProperties,
-  type INodeType,
-  type INodeTypeDescription,
-  NodeConnectionType,
-  NodeExecutionWithMetadata,
+  INodeType,
+  INodeTypeBaseDescription,
+  type VersionedNodeType
 } from 'n8n-workflow';
 
-import ACTION_NAMES from './constants/actions/action_names'
-import { ACTION_SETTINGS } from './constants';
-import handlers from './handlers';
-import { loadOptions, resourceMapping } from './classMethods';
+import { RespondioV1 } from './v1/RespondioV1.node';
 
-function buildDynamicProperties(resourceTypeName: string, resourceTypeDefault: string): INodeProperties[] {
-  const properties: INodeProperties[] = [];
-
-  // 🔹 Resource selector
-  properties.push({
-    displayName: 'Resource',
-    name: resourceTypeName,
-    type: 'options',
-    noDataExpression: true,
-    options: Object.keys(ACTION_SETTINGS).map((resource) => {
-      const resourceName = resource
-        .toLowerCase()
-        .replace(/_/g, ' ')
-        .replace(/\b\w/g, c => c.toUpperCase());
-
-      return {
-        name: resourceName,
-        value: resource,
-      }
-    }),
-    default: resourceTypeDefault,
-    required: true,
-  });
-
-
-  for (const [resource, actions] of Object.entries(ACTION_SETTINGS)) {
-    properties.push({
-      displayName: 'Operations',
-      name: 'operation',
-      type: 'options',
-      noDataExpression: true,
-      displayOptions: { show: { resource: [resource] } },
-      options: Object.values(actions).map(action => ({
-        name: action.name,
-        value: action.value,
-        description: action.description,
-      })),
-      default: Object.values(actions)[0]?.value || '',
-      required: true,
-    });
-  }
-
-  // Add parameter properties for each resource/operation combination
-  for (const [resource, actions] of Object.entries(ACTION_SETTINGS)) {
-    for (const action of Object.values(actions)) {
-      if (action.params) {
-        for (const param of action.params) {
-          const mergedDisplayOptions = param.displayOptions
-            ? {
-              show: {
-                ...param.displayOptions.show,
-                resource: [resource],
-                operation: [action.value],
-              },
-            }
-            : {
-              show: {
-                resource: [resource],
-                operation: [action.value],
-              },
-            };
-
-          properties.push({
-            ...param,
-            displayOptions: mergedDisplayOptions,
-          });
-        }
-      }
-    }
-  }
-
-  return properties;
-}
-
-export class Respondio implements INodeType {
-  description: INodeTypeDescription;
-  static resourceTypeName = 'resource'
-  static resourceTypeDefault = Object.keys(ACTION_SETTINGS)[0] || 'CHANNELS'
+export class Respondio implements VersionedNodeType {
+  currentVersion: number = 1;
+  nodeVersions: { [key: number]: INodeType; };
+  description: INodeTypeBaseDescription;
 
   constructor() {
-    this.description = {
+    const baseDescription: INodeTypeBaseDescription = {
       displayName: 'Respond.io',
       name: 'respondio',
       icon: 'file:respondio.svg',
       group: ['input'],
       description: 'Read, update, write and delete data from Respond.io',
-      defaultVersion: 1.0,
-      version: 1,
-      defaults: {
-        name: 'Respond.io Actions',
-      },
-      inputs: [NodeConnectionType.Main],
-      outputs: [NodeConnectionType.Main],
-      credentials: [
-        {
-          name: 'respondIoApi',
-          required: true,
-        },
-      ],
-      properties: buildDynamicProperties(Respondio.resourceTypeName, Respondio.resourceTypeDefault),
+      defaultVersion: 1,
     };
+
+    this.nodeVersions = {
+      1: new RespondioV1(baseDescription),
+    };
+    this.description = baseDescription
   }
 
-  methods = { loadOptions, resourceMapping };
+  getLatestVersion(): number {
+    return this.currentVersion;
+  }
 
-  async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][] | NodeExecutionWithMetadata[][] | null> {
-    const operation = this.getNodeParameter(Respondio.resourceTypeName, 0) as string;
-    const action = this.getNodeParameter('operation', 0, ACTION_NAMES.GET_ALL_CHANNELS) as ACTION_NAMES;
-
-    const handler = handlers[operation as keyof typeof handlers];
-
-    if (!action) throw new Error('Action is required');
-    if (!handler) throw new Error(`Operation [${operation}] not supported`)
-
-    const results = await handler.execute(action, this)
-    return results;
+  getNodeType(version?: number): INodeType {
+    if (version === undefined || version === 1) {
+      return this.nodeVersions[this.currentVersion];
+    }
+    throw new Error(`Version ${version} not supported for Respondio node`);
   }
 }
