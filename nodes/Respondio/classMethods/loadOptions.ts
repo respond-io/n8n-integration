@@ -1,5 +1,4 @@
 import { ILoadOptionsFunctions, INodePropertyOptions } from "n8n-workflow";
-import { ACTION_SETTINGS } from "../constants";
 import { callDeveloperApi, capitalizeFirstLetter, constructIdentifier, fetchPaginatedOptions, getWhatsappTemplatesFunction } from "../utils";
 import {
   Channel,
@@ -18,19 +17,6 @@ function toGenericAbortSignal(signal: AbortSignal) {
     addEventListener: signal.addEventListener.bind(signal),
     removeEventListener: signal.removeEventListener.bind(signal),
   };
-}
-
-export async function getActionsForResource(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-  const resource = this.getNodeParameter('resource', 0) as keyof typeof ACTION_SETTINGS;
-
-  // Make sure resource exists
-  const actionsForResource = ACTION_SETTINGS[resource] ?? {};
-
-  return Object.values(actionsForResource).map(action => ({
-    name: action.name,
-    value: action.value,
-    description: action.description,
-  }));
 }
 
 export async function getTagsForContact(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {

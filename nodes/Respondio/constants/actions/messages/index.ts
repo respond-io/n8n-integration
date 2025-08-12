@@ -109,16 +109,17 @@ const createTextComponents = (
   for (const component of nonButtonComponents) {
     if (!component.text) continue;
 
+    const parameterIncluded = /\{\{\d+\}\}/.test(component.text)
     const componentText = replaceTextPlaceholders(component.text, component.type, inputMap);
 
     components.push({
       type: component.type,
       format: component.format || undefined,
       text: component.text || undefined,
-      parameters: [{
+      parameters: parameterIncluded ? [{
         type: "text",
         text: componentText
-      }],
+      }] : undefined,
     });
   }
 

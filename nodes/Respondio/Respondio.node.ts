@@ -21,26 +21,41 @@ function buildDynamicProperties(resourceTypeName: string, resourceTypeDefault: s
     displayName: 'Resource',
     name: resourceTypeName,
     type: 'options',
-    options: Object.keys(ACTION_SETTINGS).map(resource => ({
-      name: resource,
-      value: resource,
-    })),
+    noDataExpression: true,
+    options: Object.keys(ACTION_SETTINGS).map((resource) => {
+      const resourceName = resource
+        .toLowerCase()
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, c => c.toUpperCase());
+
+      return {
+        name: resourceName,
+        value: resource,
+      }
+    }),
     default: resourceTypeDefault,
     required: true,
   });
 
-  properties.push({
-    displayName: 'Action',
-    name: 'action',
-    type: 'options',
-    typeOptions: {
-      loadOptionsMethod: 'getActionsForResource',
-      loadOptionsDependsOn: [resourceTypeName],
-    },
-    default: '',
-    required: true,
-  });
 
+  for (const [resource, actions] of Object.entries(ACTION_SETTINGS)) {
+    properties.push({
+      displayName: 'Operations',
+      name: 'operation',
+      type: 'options',
+      noDataExpression: true,
+      displayOptions: { show: { resource: [resource] } },
+      options: Object.values(actions).map(action => ({
+        name: action.name,
+        value: action.value,
+        description: action.description,
+      })),
+      default: Object.values(actions)[0]?.value || '',
+      required: true,
+    });
+  }
+
+  // Add parameter properties for each resource/operation combination
   for (const [resource, actions] of Object.entries(ACTION_SETTINGS)) {
     for (const action of Object.values(actions)) {
       if (action.params) {
@@ -49,14 +64,14 @@ function buildDynamicProperties(resourceTypeName: string, resourceTypeDefault: s
             ? {
               show: {
                 ...param.displayOptions.show,
-                [resourceTypeName]: [resource],
-                action: [action.value],
+                resource: [resource],
+                operation: [action.value],
               },
             }
             : {
               show: {
-                [resourceTypeName]: [resource],
-                action: [action.value],
+                resource: [resource],
+                operation: [action.value],
               },
             };
 
@@ -105,7 +120,7 @@ export class Respondio implements INodeType {
 
   async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][] | NodeExecutionWithMetadata[][] | null> {
     const operation = this.getNodeParameter(Respondio.resourceTypeName, 0) as string;
-    const action = this.getNodeParameter('action', 0, ACTION_NAMES.GET_ALL_CHANNELS) as ACTION_NAMES;
+    const action = this.getNodeParameter('operation', 0, ACTION_NAMES.GET_ALL_CHANNELS) as ACTION_NAMES;
 
     const handler = handlers[operation as keyof typeof handlers];
 
