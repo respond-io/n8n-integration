@@ -119,7 +119,7 @@ const createTextComponents = (
       parameters: parameterIncluded ? [{
         type: "text",
         text: componentText
-      }] : undefined,
+      }] : [],
     });
   }
 
@@ -208,16 +208,7 @@ const createCatalogButtonComponent = (
   const firstProductDetail = getFirstProductDetail(catalogProductDetails);
   if (!firstProductDetail) return null;
 
-  const sections = catalogProductsWithoutDetails.map((product) => {
-    const key = Object.keys(product)[0];
-    const mappedProduct = catalogProductDetails.find((detail) =>
-      Object.keys(detail)[0] === `${key}_details`
-    );
-
-    if (!mappedProduct) return null;
-    return parseProductDetails(mappedProduct);
-  }).filter(Boolean);
-
+  const productItems = mapProductsWithDetails(catalogProductsWithoutDetails, catalogProductDetails);
   return {
     type: 'buttons',
     buttons: [{
@@ -228,7 +219,7 @@ const createCatalogButtonComponent = (
         action: {
           thumbnail_product_retailer_id: firstProductDetail.retailer_id,
           thumbnail_product_image_url: firstProductDetail.image_url,
-          sections,
+          sections: [{ product_items: productItems }]
         }
       }]
     }]
