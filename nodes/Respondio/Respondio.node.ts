@@ -1,4 +1,5 @@
 import {
+  ApplicationError,
   INodeType,
   INodeTypeBaseDescription,
   type VersionedNodeType
@@ -35,6 +36,6 @@ export class Respondio implements VersionedNodeType {
     if (version === undefined || version === 1) {
       return this.nodeVersions[this.currentVersion];
     }
-    throw new Error(`Version ${version} not supported for Respondio node`);
+    throw new ApplicationError(`Version ${version} not supported for Respondio node`);
   }
 }
