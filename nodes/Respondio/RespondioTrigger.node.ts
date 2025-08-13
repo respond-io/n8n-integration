@@ -19,7 +19,7 @@ export class RespondioTrigger implements VersionedNodeType {
       icon: 'file:respondio.svg',
       group: ['trigger'],
       defaultVersion: 1,
-      description: 'Trigger workflow via Respond.io webhook',
+      description: 'Trigger workflow via Respond.io webhook / perform actions on Respond.io',
     };
 
     this.nodeVersions = {
