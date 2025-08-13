@@ -482,6 +482,7 @@ export default {
         name: 'channelType',
         type: 'options',
         options: [
+          { name: '', value: '' },
           { name: 'Specific Channel', value: 'specificChannel' },
           { name: 'Last Interacted Channel', value: 'lastInteractedChannel' },
         ],
@@ -511,6 +512,7 @@ export default {
         name: 'messageType',
         type: 'options',
         options: [
+          { name: '', value: '' },
           { name: 'Text', value: 'text' },
           { name: 'Attachments', value: 'attachment' },
           { name: 'Quick Reply', value: 'quick_reply' },

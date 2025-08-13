@@ -8,6 +8,7 @@ export default {
       name: 'attachmentType',
       type: 'options',
       options: [
+        { name: '', value: '' },
         { name: 'Image', value: 'image' },
         { name: 'Video', value: 'video' },
         { name: 'Audio', value: 'audio' },

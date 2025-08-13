@@ -2,6 +2,18 @@ import { INodeProperties } from "n8n-workflow";
 import { generateContactIdentifierInputFields, generateContactInputFields, IContactIdentifiers } from "../../../utils";
 import ACTION_NAMES from "../action_names";
 
+const colorCodeOptions = [
+  { name: '', value: '' },
+  { name: 'Gray', value: 'tag-grey' },
+  { name: 'Red', value: 'tag-red' },
+  { name: 'Orange', value: 'tag-orange' },
+  { name: 'Yellow', value: 'tag-yellow' },
+  { name: 'Green', value: 'tag-green' },
+  { name: 'Blue', value: 'tag-blue' },
+  { name: 'Indigo', value: 'tag-indigo' },
+  { name: 'Purple', value: 'tag-purple' },
+]
+
 export default {
   [ACTION_NAMES.ADD_SPACE_TAG]: {
     name: 'Add a Space Tag',
@@ -26,16 +38,7 @@ export default {
         displayName: 'Color Code',
         name: 'colorCode',
         type: 'options',
-        options: [
-          { name: 'Gray', value: 'tag-grey' },
-          { name: 'Red', value: 'tag-red' },
-          { name: 'Orange', value: 'tag-orange' },
-          { name: 'Yellow', value: 'tag-yellow' },
-          { name: 'Green', value: 'tag-green' },
-          { name: 'Blue', value: 'tag-blue' },
-          { name: 'Indigo', value: 'tag-indigo' },
-          { name: 'Purple', value: 'tag-purpole' },
-        ],
+        options: colorCodeOptions,
         required: false,
         description: 'Color code of space tag'
       },
@@ -92,16 +95,7 @@ export default {
         displayName: 'Color Code',
         name: 'colorCode',
         type: 'options',
-        options: [
-          { name: 'Gray', value: 'tag-grey' },
-          { name: 'Red', value: 'tag-red' },
-          { name: 'Orange', value: 'tag-orange' },
-          { name: 'Yellow', value: 'tag-yellow' },
-          { name: 'Green', value: 'tag-green' },
-          { name: 'Blue', value: 'tag-blue' },
-          { name: 'Indigo', value: 'tag-indigo' },
-          { name: 'Purple', value: 'tag-purpole' },
-        ],
+        options: colorCodeOptions,
         required: false,
         description: 'Color code of space tag'
       },

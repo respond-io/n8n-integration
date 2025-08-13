@@ -22,6 +22,7 @@ export default {
       type: 'options',
       required: false,
       options: [
+        { name: '', value: '' },
         { name: 'ACCOUNT_UPDATE', value: 'ACCOUNT_UPDATE' },
         { name: 'POST_PURCHASE_UPDATE', value: 'POST_PURCHASE_UPDATE' },
         { name: 'CONFIRMED_EVENT_UPDATE', value: 'CONFIRMED_EVENT_UPDATE' },

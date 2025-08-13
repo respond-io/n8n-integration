@@ -75,6 +75,7 @@ export default {
             name: 'type',
             type: 'options',
             options: [
+              { name: '', value: '' },
               { name: 'Image', value: 'image' },
               { name: 'Video', value: 'video' },
               { name: 'Audio', value: 'audio' },

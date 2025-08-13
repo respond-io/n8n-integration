@@ -18,6 +18,7 @@ export default {
         name: 'assignmentType',
         type: 'options',
         options: [
+          { name: '', value: '' },
           { name: 'Unassign the Contact', value: 'none' },
           { name: 'Assign by User ID', value: 'userId' },
           { name: 'Assign by User Email', value: 'userEmail' },
@@ -79,6 +80,7 @@ export default {
         required: true,
         description: 'Status of the conversation',
         options: [
+          { name: '', value: '' },
           { name: 'Open', value: 'open' },
           { name: 'Close', value: 'close' },
         ],
