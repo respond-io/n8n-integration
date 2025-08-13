@@ -148,7 +148,6 @@ const ACTION_SETTINGS = {
 const PLATFORM_API_URLS = {
   staging: 'https://api-staging.respond.io/v2',
   production: 'https://app.respond.io',
-  test: 'https://a8b4597fcf19.ngrok-free.app'
 }
 
 export const INPUT_IDENTIFIER = '$input$';

@@ -32,10 +32,6 @@ export class RespondIoApi implements ICredentialType {
         {
           name: 'Staging',
           value: 'staging',
-        },
-        {
-          name: 'Testing',
-          value: 'test'
         }
       ],
       default: 'live',
