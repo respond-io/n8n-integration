@@ -266,7 +266,9 @@ export async function fetchPaginatedOptions<TItem, TResult>(
 ): Promise<{ transformed: TResult[]; raw: TItem[] }> {
   const credentials = await context.getCredentials(credentialsName);
   const platformUrl = credentials.domain || PLATFORM_API_URLS.staging.developerApi;
-  const fullPath = `${platformUrl}/v2${path}`;
+  // remove preceding slash if exists
+  const safePath = path.startsWith('/') ? path.slice(1) : path
+  const fullPath = `${platformUrl}/v2/${safePath}`;
 
   const includeRaw = options?.includeRaw || false;
   const maxResults = options?.maxResults || Infinity;
@@ -326,9 +328,11 @@ export async function callDeveloperApi<T>(
 ): Promise<T> {
   const credentials = await executionContext.getCredentials('respondIoApi');
   const platformUrl = credentials.domain || PLATFORM_API_URLS.staging.developerApi;
+  // remove preceding slash if exists
+  const safePath = path.startsWith('/') ? path.slice(1) : path
 
   const options: IHttpRequestOptions | IRequestOptions = {
-    url: `${platformUrl}/v2${path}`,
+    url: `${platformUrl}/v2/${safePath}`,
     headers: { Authorization: `Bearer ${credentials.apiKey}` },
     method,
     body,

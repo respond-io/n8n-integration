@@ -499,7 +499,7 @@ export const sendMessagePayloadFormatter = (input: SendMessagePayloadFormatterIn
       type: messageType,
       attachment: {
         type: attachmentType,
-        url: `https://${attachmentUrl}`
+        url: attachmentUrl
       }
     };
   }
