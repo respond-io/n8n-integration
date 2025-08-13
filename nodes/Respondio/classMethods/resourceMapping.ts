@@ -1,7 +1,7 @@
 import { ILoadOptionsFunctions, INodePropertyOptions, ResourceMapperField, ResourceMapperFields } from "n8n-workflow";
 import { callDeveloperApi, fetchPaginatedOptions } from "../utils";
 import { CustomField, CustomFieldDataTypes, FetchWhatsappTemplateResponse } from "../types";
-import _ from 'lodash';
+
 import { HIDDEN_INPUT_IDENTIFIER, INPUT_IDENTIFIER } from "../constants";
 
 export async function getCustomFields(this: ILoadOptionsFunctions): Promise<ResourceMapperFields> {
@@ -73,7 +73,7 @@ const createEmptyResourceMapper = (text: string = '', itemType: string = '') => 
 
   /* Ensure params found are unique */
   let paramCount = 1;
-  _.uniq(params).forEach((param) => {
+  [...new Set(params)].forEach((param) => {
     const match = param.match(/{{.*}}/);
     if (match) {
       parameters.push(emptyParameter(itemType, paramCount));
@@ -89,7 +89,7 @@ const createTemplateParameters = (template: FetchWhatsappTemplateResponse['data'
   const templateComponents = typeof template?.components === 'string' ?
     JSON.parse(template.components) :
     template?.components;
-  const components = _.cloneDeep(templateComponents || []) || [];
+  const components = JSON.parse(JSON.stringify(templateComponents || [])) || [];
 
   for (const item of components) {
     if (typeof item === 'object') {
