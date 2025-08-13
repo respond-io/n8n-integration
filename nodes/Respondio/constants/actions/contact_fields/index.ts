@@ -62,6 +62,7 @@ export default {
         name: 'dataType',
         type: 'options',
         options: [
+          { name: '', value: '' },
           { name: 'Text', value: 'text' },
           { name: 'List', value: 'list' },
           { name: 'Checkbox', value: 'checkbox' },

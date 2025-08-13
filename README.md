@@ -1,48 +1,157 @@
-![Banner image](https://user-images.githubusercontent.com/10284570/173569848-c624317f-42b1-45a6-ab09-f0ea3c247648.png)
+# n8n-nodes-respondio
 
-# n8n-nodes-starter
+This is an n8n community node. It lets you use Respond.io in your n8n workflows.
 
-This repo contains example nodes to help you get started building your own custom integrations for [n8n](https://n8n.io). It includes the node linter and other dependencies.
+Respond.io is a customer conversation management platform that helps businesses manage customer conversations across multiple channels like WhatsApp, Facebook Messenger, Instagram, and more. This node provides comprehensive integration with the Respond.io API to automate customer communication workflows.
 
-To make your custom node available to the community, you must create it as an npm package, and [submit it to the npm registry](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry).
+[n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
-If you would like your node to be available on n8n cloud you can also [submit your node for verification](https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes/).
+[Installation](#installation)
+[Operations](#operations)
+[Triggers](#triggers)
+[Credentials](#credentials)
+[Compatibility](#compatibility)
+[Usage](#usage)
+[Resources](#resources)
+[Version history](#version-history)
 
-## Prerequisites
+## Installation
 
-You need the following installed on your development machine:
+Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
 
-* [git](https://git-scm.com/downloads)
-* Node.js and npm. Minimum version Node 20. You can find instructions on how to install both using nvm (Node Version Manager) for Linux, Mac, and WSL [here](https://github.com/nvm-sh/nvm). For Windows users, refer to Microsoft's guide to [Install NodeJS on Windows](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-windows).
-* Install n8n with:
-  ```
-  npm install n8n -g
-  ```
-* Recommended: follow n8n's guide to [set up your development environment](https://docs.n8n.io/integrations/creating-nodes/build/node-development-environment/).
+## Operations
 
-## Using this starter
+### Respond.io Actions Node
 
-These are the basic steps for working with the starter. For detailed guidance on creating and publishing nodes, refer to the [documentation](https://docs.n8n.io/integrations/creating-nodes/).
+The Respond.io Actions node supports the following operations:
 
-1. [Generate a new repository](https://github.com/n8n-io/n8n-nodes-starter/generate) from this template repository.
-2. Clone your new repo:
-   ```
-   git clone https://github.com/<your organization>/<your-repo-name>.git
-   ```
-3. Run `npm i` to install dependencies.
-4. Open the project in your editor.
-5. Browse the examples in `/nodes` and `/credentials`. Modify the examples, or replace them with your own nodes.
-6. Update the `package.json` to match your details.
-7. Run `npm run lint` to check for errors or `npm run lintfix` to automatically fix errors when possible.
-8. Test your node locally. Refer to [Run your node locally](https://docs.n8n.io/integrations/creating-nodes/test/run-node-locally/) for guidance.
-9. Replace this README with documentation for your node. Use the [README_TEMPLATE](README_TEMPLATE.md) to get started.
-10. Update the LICENSE file to use your details.
-11. [Publish](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry) your package to npm.
+#### Channels
 
-## More information
+- **Get All Channels** - Retrieve all channels connected to your workspace
 
-Refer to our [documentation on creating nodes](https://docs.n8n.io/integrations/creating-nodes/) for detailed information on building your own nodes.
+#### Closing Notes
 
-## License
+- **Get All Closing Notes** - Retrieve all closing notes templates
 
-[MIT](https://github.com/n8n-io/n8n-nodes-starter/blob/master/LICENSE.md)
+#### Comments
+
+- **Add Comment** - Add a comment to a conversation
+
+#### Contacts
+
+- **Create Contact** - Create a new contact
+- **Create or Update Contact** - Create or update an existing contact
+- **Update Contact** - Update an existing contact's information
+- **Find Contact** - Find a specific contact by identifier
+- **Get Many Contacts** - Retrieve multiple contacts with search filtering
+- **Add Tags** - Add tags to a contact
+- **Remove Tags** - Remove tags from a contact
+- **Add Space Tag** - Add a space tag to a contact
+- **Delete Space Tag** - Delete a space tag
+- **Update Space Tag** - Update a space tag
+- **Delete Contact** - Delete a contact
+- **Find Contact Channels** - Find channels associated with a contact
+
+#### Contact Fields
+
+- **Get All Custom Fields** - Retrieve all custom fields
+- **Find Custom Field** - Find a specific custom field
+- **Create Custom Field** - Create a new custom field
+
+#### Conversations
+
+- **Assign or Unassign Conversation** - Assign or unassign a conversation to/from a user
+- **Open or Close Conversation** - Open or close a conversation
+
+#### Lifecycle
+
+- **Update Contact Lifecycle** - Update a contact's lifecycle stage
+- **Remove Contact Lifecycle** - Remove a contact's lifecycle stage
+
+#### Messages
+
+- **Send Message** - Send a message to a contact (supports text, email, attachments, quick replies, WhatsApp templates, and custom payloads)
+- **Find Message** - Find a specific message by ID
+
+#### Users
+
+- **Find User** - Find a specific user by ID
+- **Get All Users** - Retrieve all users in the workspace
+
+## Triggers
+
+### Respond.io Trigger Node
+
+The Respond.io Trigger node can listen for the following events:
+
+- **New Incoming Message** - Triggered when a new message is received
+- **New Outgoing Message** - Triggered when a new outgoing message is sent
+- **New Comment** - Triggered when a new comment is added to a conversation
+- **Conversation Opened** - Triggered when a conversation is opened
+- **Conversation Closed** - Triggered when a conversation is closed
+- **New Contact** - Triggered when a new contact is created
+- **Contact Updated** - Triggered when a contact is updated
+- **Contact Assignee Updated** - Triggered when a contact's assignee is changed
+- **Contact Tag Updated** - Triggered when a contact's tags are modified
+- **Contact Lifecycle Updated** - Triggered when a contact's lifecycle stage changes
+
+## Credentials
+
+To use this node, you need to authenticate with Respond.io. You'll need:
+
+1. **API Key** - Your Respond.io API key
+2. **Environment** - Choose between:
+   - **Live** (Production)
+   - **Staging**
+
+### How to get your API Key
+
+1. Log in to your Respond.io account
+2. Go to **Settings** → **Integrations** → **N8N**
+3. Generate a new API key
+4. Copy the API key and use it in the credentials
+
+## Compatibility
+
+- **Minimum n8n version**: 1.0.0
+- **Tested with n8n versions**: 1.0.0+
+- **Node.js version**: >=18.0.0
+
+## Usage
+
+### Basic Workflow Example
+
+1. **Set up a trigger** - Use the Respond.io Trigger node to listen for new incoming messages
+2. **Process the message** - Use the Respond.io Actions node to find the contact and send a response
+3. **Add automation** - Create workflows that automatically assign conversations, update contact information, or send follow-up messages
+
+### Advanced Workflow Example
+
+1. **New message trigger** → **Find contact** → **Check contact tags** → **Send automated response** → **Assign to team member**
+
+### Message Types Supported
+
+The Send Message operation supports multiple message types:
+
+- **Text messages** - Simple text messages
+- **Email messages** - Rich email content with subject and body
+- **Attachments** - Send files and media
+- **Quick replies** - Interactive quick reply buttons
+- **WhatsApp templates** - Pre-approved WhatsApp message templates
+- **Custom payloads** - Custom message formats for specific channels
+
+## Resources
+
+- [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)
+- [Respond.io API Documentation](https://developers.respond.io/)
+- [Respond.io Platform](https://respond.io/)
+
+## Version history
+
+### Version 1.0.0
+
+- Initial release
+- Support for all major Respond.io API operations
+- Webhook triggers for real-time events
+- Comprehensive contact and conversation management
+- Multi-channel message sending capabilities

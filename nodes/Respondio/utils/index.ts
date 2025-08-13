@@ -1,9 +1,10 @@
-import { IExecuteFunctions, ILoadOptionsFunctions, INodeProperties } from "n8n-workflow"
+import { IExecuteFunctions, IHttpRequestOptions, ILoadOptionsFunctions, INodeProperties, INodePropertyOptions, IRequestOptions } from "n8n-workflow"
 import { setTimeout as waitFor } from 'timers/promises';
 
 import languagesJSON from './languages.json'
 import countriesJSON from './countries.json'
 import { PLATFORM_API_URLS } from "../constants";
+import { CustomFieldMapperReturnValue, WhatsAppTemplate } from "../types";
 
 export enum IContactIdentifiers {
   id = 'id',
@@ -61,7 +62,7 @@ export const generateContactIdentifierInputFields = (
   ]
 }
 
-export const constructIdentifier = (executionContext: IExecuteFunctions) => {
+export const constructIdentifier = (executionContext: IExecuteFunctions | ILoadOptionsFunctions) => {
   const identifierType = executionContext.getNodeParameter('identifierType', 0, 10) as IContactIdentifiers;
   const contactId = executionContext.getNodeParameter('contactId', 0, 0) as string;
   const contactIdentifier = executionContext.getNodeParameter('contactIdentifier', 0, 'email') as string;
@@ -105,7 +106,7 @@ export const generateContactInputFields = (isCreateContact: boolean = false): IN
         value: language.alpha2,
       })),
       description: 'Preferred language of the contact',
-      default: '',
+      default: 'en',
     },
     {
       displayName: 'Contact\'s Profile Picture URL',
@@ -125,7 +126,7 @@ export const generateContactInputFields = (isCreateContact: boolean = false): IN
         value: country.Code,
       })),
       description: 'Country of the contact',
-      default: '',
+      default: 'US',
     },
   ];
 
@@ -152,6 +153,32 @@ export const generateContactInputFields = (isCreateContact: boolean = false): IN
       }
     )
   }
+
+  result.push({
+    displayName: 'Custom Fields',
+    name: 'customFields',
+    type: 'resourceMapper',
+    default: {
+      mappingMode: 'defineBelow',
+      value: null,
+    },
+    noDataExpression: true,
+    required: false,
+    typeOptions: {
+      resourceMapper: {
+        resourceMapperMethod: 'getCustomFields',
+        mode: 'add',
+        addAllFields: true,
+        multiKeyMatch: true,
+        supportAutoMap: false,
+      }
+    },
+    displayOptions: {
+      show: {
+        firstName: [{ _cnd: { exists: true } }]
+      }
+    }
+  })
 
   return result;
 }
@@ -188,15 +215,12 @@ export async function paginateWithCursor<TItem, TResult>(
 
   const limit = options?.limit || 10;
   const delayMs = options?.delayMs || 500;
-  const logger = options?.logger || null;
   const maxResults = options?.maxResults ?? Infinity;
   const includeTransformed = options?.includeTransformed ?? true;
 
   let cursor: string | null = null;
   do {
     const { items, nextCursor } = await fetchPageFn(cursor, limit);
-
-    if (logger) logger.info(`Fetched ${items.length} items`);
 
     // dynamically calculate the response length based on what we are including
     let responseLength = getResponseLength(includeRaw, includeTransformed, raw, transformed)
@@ -235,17 +259,16 @@ export async function fetchPaginatedOptions<TItem, TResult>(
   mapItem?: (item: TItem) => TResult,
   options?: {
     limit?: number;
-    logLabel?: string;
     includeRaw?: boolean;
     maxResults?: number;
     includeTransformed?: boolean;
   }
 ): Promise<{ transformed: TResult[]; raw: TItem[] }> {
   const credentials = await context.getCredentials(credentialsName);
-  const env = credentials?.environment as 'production' | 'staging' || 'staging';
-  const platformUrl = PLATFORM_API_URLS[env];
-  const fullPath = `${platformUrl}${path}`;
-  const logLabel = options?.logLabel ?? path;
+  const platformUrl = credentials.domain || PLATFORM_API_URLS.staging.developerApi;
+  // remove preceding slash if exists
+  const safePath = path.startsWith('/') ? path.slice(1) : path
+  const fullPath = `${platformUrl}/v2/${safePath}`;
 
   const includeRaw = options?.includeRaw || false;
   const maxResults = options?.maxResults || Infinity;
@@ -257,8 +280,6 @@ export async function fetchPaginatedOptions<TItem, TResult>(
       urlObject.searchParams.set('limit', limit.toString());
       if (cursor) urlObject.searchParams.set('cursorId', cursor);
 
-      context.logger.info(`Fetching ${logLabel} from URL: ${urlObject.toString()}`);
-
       const response = await context.helpers.request({
         url: urlObject.toString(),
         method: 'GET',
@@ -266,6 +287,7 @@ export async function fetchPaginatedOptions<TItem, TResult>(
           Authorization: `Bearer ${credentials.apiKey}`,
         },
         json: true,
+        timeout: 30000, // 30 seconds timeout
       }) as PaginatedApiResponse<TItem>;
 
       return {
@@ -285,37 +307,101 @@ export async function fetchPaginatedOptions<TItem, TResult>(
     }
   );
 
-  context.logger.info(`Total ${logLabel} fetched: ${transformed.length || raw.length}`);
   return { transformed, raw };
 }
 
-export async function callDeveloperApi(
-  executionContext: IExecuteFunctions,
+export async function callDeveloperApi<T>(
+  executionContext: IExecuteFunctions | ILoadOptionsFunctions,
   {
     method,
     path,
     body,
+    abortSignal,
+    useHttpRequestHelper = false,
   }: {
     method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
     path: string;
     body?: any;
+    abortSignal?: any;
+    useHttpRequestHelper?: boolean;
   }
-): Promise<any> {
+): Promise<T> {
   const credentials = await executionContext.getCredentials('respondIoApi');
-  const env = (credentials?.environment as 'production' | 'staging') || 'staging';
-  const platformUrl = PLATFORM_API_URLS[env];
+  const platformUrl = credentials.domain || PLATFORM_API_URLS.staging.developerApi;
+  // remove preceding slash if exists
+  const safePath = path.startsWith('/') ? path.slice(1) : path
 
-  executionContext.logger.info(`Making API call to: ${platformUrl}${path} with method: ${method} alongside body: ${JSON.stringify(body)}`);
-
-  const options = {
-    url: `${platformUrl}${path}`,
-    headers: {
-      Authorization: `Bearer ${credentials.apiKey}`,
-    },
+  const options: IHttpRequestOptions | IRequestOptions = {
+    url: `${platformUrl}/v2/${safePath}`,
+    headers: { Authorization: `Bearer ${credentials.apiKey}` },
     method,
     body,
     json: true,
+    abortSignal,
+    timeout: 30000, // 30 seconds timeout
   };
 
-  return executionContext.helpers.request(options);
+  const response = useHttpRequestHelper ?
+    executionContext.helpers.httpRequest(options) :
+    executionContext.helpers.request(options);
+
+  return response as T
+}
+
+export const constructCustomFieldFromResourceMapper = (
+  customFieldMapper: CustomFieldMapperReturnValue,
+): Array<{ name: string; value: string | number | boolean | Date }> => {
+  const values = customFieldMapper?.value || null;
+  if (!values) return [];
+
+  return Object.entries(values).map(([key, value]) => {
+    const result = {
+      name: key,
+      value,
+    }
+
+    const matchingSchema = customFieldMapper.schema.find((field) => field.id === key);
+
+    if (matchingSchema && matchingSchema?.type === 'dateTime' && typeof value === 'string') {
+      result.value = new Date(value).toISOString().split('T')[0];
+    }
+
+    return result
+  });
+}
+
+export const getWhatsappTemplatesFunction = async (context: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> => {
+  const channelId = context.getNodeParameter('channelId', 0) as string;
+  const {
+    transformed: allWhatsappTemplates,
+    raw: rawWhatsappTemplates,
+  } = await fetchPaginatedOptions<WhatsAppTemplate, INodePropertyOptions>(
+    context,
+    'respondIoApi',
+    `/space/channel/${channelId}/mtm`,
+    (item) => ({
+      name: `${item.name} (${item.languageCode})`,
+      value: item.id,
+      description: `Namespace: ${item.namespace}, Category: ${item.category}, Status: ${item.status}`,
+    }),
+    { limit: 20, includeRaw: true }
+  )
+
+  const globalData = context.getWorkflowStaticData('global')
+  if (!allWhatsappTemplates || allWhatsappTemplates.length === 0) {
+    globalData.whatsappTemplates = undefined;
+    return [{
+      name: '⚠️ No WhatsApp templates found for this channel',
+      value: '__EMPTY__',
+      description: 'Please check if the channelId is correct or if templates exist.',
+    }]
+  }
+
+  // store the raw templates in global static data for subsequent usage
+  globalData.whatsappTemplates = JSON.stringify(rawWhatsappTemplates);
+  return allWhatsappTemplates;
+}
+
+export function capitalizeFirstLetter(string: string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
 }

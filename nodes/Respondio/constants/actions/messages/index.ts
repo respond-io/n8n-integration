@@ -8,95 +8,413 @@ import quick_reply from './quick_reply';
 import whatsapp_template from './whatsapp_template';
 import text_message from './text_message';
 import ACTION_NAMES from "../action_names";
+import {
+  CustomFieldMapperReturnValue,
+  FetchWhatsappTemplateResponse,
+  SendMessageTypes,
+  WhatsappTemplateComponentField,
+} from "../../../types";
+import { INPUT_IDENTIFIER } from "../..";
 
-const INPUT_IDENTIFIER = '$input$';
-const HIDDEN_INPUT_IDENTIFIER = '$hidden$';
-const CATTALOG_PRODUCTS_KEY = 'catalog_products'
+type GetWhatsappTemplateMessageInput = {
+  messageType: SendMessageTypes;
+  templateComponentsFields: CustomFieldMapperReturnValue;
+  templateDetails: FetchWhatsappTemplateResponse['data'];
+}
 
-function unflatten(data: Record<string, any>, separator = '.'): Record<string, any> {
-  const result: Record<string, any> = {};
+const createDefaultFieldValue = (field: any) => {
+  if (typeof Object.values(field)[0] === 'boolean') {
+    return { [field.id]: true };
+  }
+  return { [field.id]: field };
+};
 
-  for (const flatKey in data) {
-    const value = data[flatKey];
-    const keys = flatKey.split(separator);
+// Helper function to filter out false boolean values
+const filterValidValues = (templateValue: Record<string, any>) => {
+  return Object.entries(templateValue)
+    .filter(([, value]) => !(typeof value === 'boolean' && !value))
+    .map(([key, value]) => ({ [key]: value }));
+};
 
-    let current = result;
-    for (let i = 0; i < keys.length; i++) {
-      const key = keys[i];
-      if (i === keys.length - 1) {
-        current[key] = value;
+// Helper function to add detail fields
+const addDetailFields = (
+  fields: Array<Record<string, any>>,
+  schema: any[]
+) => {
+  schema.forEach((field) => {
+    if (field.id.includes('_details')) {
+      fields.push({ [field.id]: field });
+    }
+  });
+};
+
+const convertSchemaToDefaultComponent = (
+  valuePresent: boolean,
+  templateComponentsFieldsSchema: GetWhatsappTemplateMessageInput['templateComponentsFields']['schema'],
+  templateComponentsFieldsValue: GetWhatsappTemplateMessageInput['templateComponentsFields']['value'],
+  buttonType?: string,
+) => {
+  // For catalog type, return all items regardless of selection
+  if (buttonType === 'catalog') {
+    const returningFields: Array<Record<string, any>> = [];
+
+    templateComponentsFieldsSchema.forEach((field) => {
+      if (field.id.includes('_details')) {
+        returningFields.push({ [field.id]: field });
       } else {
-        if (!current[key] || typeof current[key] !== 'object') {
-          current[key] = {};
-        }
-        current = current[key];
+        // For catalog, include all product fields (not just selected ones)
+        returningFields.push({ [field.id]: field });
       }
+    });
+
+    return returningFields;
+  }
+
+  if (valuePresent) {
+    const returningFields = filterValidValues(templateComponentsFieldsValue);
+    addDetailFields(returningFields, templateComponentsFieldsSchema);
+    return returningFields;
+  }
+
+  return templateComponentsFieldsSchema.map(createDefaultFieldValue);
+};
+
+const extractProductFromRawComponents = (rawComponents: ReturnType<typeof convertSchemaToDefaultComponent>, includeDetails: boolean) => {
+  return rawComponents.filter((obj) => {
+    const key = Object.keys(obj)[0];
+    return includeDetails ? key.includes('_details') : (!key.includes('_details') && !key.includes(INPUT_IDENTIFIER));
+  })
+}
+
+const createInputMap = (rawComponents: Array<Record<string, any>>) => {
+  const inputValues = rawComponents.filter((obj) =>
+    Object.keys(obj)[0].includes(INPUT_IDENTIFIER)
+  );
+  return Object.assign({}, ...inputValues);
+};
+
+const createTextComponents = (
+  nonButtonComponents: Array<WhatsappTemplateComponentField>,
+  inputMap: Record<string, string>,
+) => {
+  const components: any[] = [];
+  for (const component of nonButtonComponents) {
+    if (!component.text) continue;
+
+    const parameterIncluded = /\{\{\d+\}\}/.test(component.text);
+
+    let parameters: any[] = [];
+
+    if (parameterIncluded) {
+      // Extract all placeholder indices from the text
+      const placeholderMatches = component.text.match(/\{\{(\d+)\}\}/g);
+      if (placeholderMatches) {
+        // Get unique placeholder indices and sort them
+        const uniqueIndices = [...new Set(placeholderMatches.map(match => {
+          const indexMatch = match.match(/\{\{(\d+)\}\}/);
+          return indexMatch ? indexMatch[1] : null;
+        }).filter(Boolean))].sort();
+
+        // Create a parameter for each placeholder
+        parameters = uniqueIndices.map(idx => {
+          const key = `${INPUT_IDENTIFIER}_${component.type}_${idx}`;
+          const replacementValue = inputMap[key] ?? '';
+          return {
+            type: "text",
+            text: replacementValue
+          };
+        });
+      }
+    }
+
+    components.push({
+      type: component.type,
+      format: component.format || undefined,
+      text: component.text || undefined,
+      parameters: parameters,
+    });
+  }
+
+  return components;
+};
+
+const parseProductDetails = (productDetailsField: any) => {
+  const { options } = Object.values(productDetailsField)[0] as Record<string, any>;
+  const { value: productDetailsString } = options[0];
+  return JSON.parse(productDetailsString as string);
+};
+
+// Helper function to get first product detail
+const getFirstProductDetail = (productDetails: Array<Record<string, any>>) => {
+  if (productDetails.length === 0) return null;
+  return parseProductDetails(productDetails[0]);
+};
+
+const mapProductsWithDetails = (
+  productsWithoutDetails: Array<Record<string, any>>,
+  productDetails: Array<Record<string, any>>
+) => {
+  return productsWithoutDetails.map((product) => {
+    const key = Object.keys(product)[0];
+    const mappedProduct = productDetails.find((detail) =>
+      Object.keys(detail)[0] === `${key}_details`
+    );
+
+    if (!mappedProduct) return null;
+
+    const { options } = Object.values(mappedProduct)[0] as any;
+    if (!options) return null;
+
+    const productDetail = parseProductDetails(mappedProduct);
+    return {
+      ...productDetail,
+      product_retailer_id: productDetail.retailer_id,
+    };
+  }).filter(Boolean);
+};
+
+const createMpmButtonComponent = (
+  buttonComponent: any,
+  rawComponents: Array<Record<string, any>>,
+) => {
+  const mpmProductsWithoutDetails = extractProductFromRawComponents(rawComponents, false);
+  const mpmProductDetails = extractProductFromRawComponents(rawComponents, true);
+
+  const hasNotChosenProducts = mpmProductsWithoutDetails.every(obj =>
+    Object.values(obj)[0] === false
+  );
+
+  if (hasNotChosenProducts) {
+    throw new Error('Please select at least one product from the MPM products list.');
+  }
+
+  const firstProductDetail = getFirstProductDetail(mpmProductDetails);
+  if (!firstProductDetail) return null;
+
+  const productItems = mapProductsWithDetails(mpmProductsWithoutDetails, mpmProductDetails);
+
+  return {
+    type: 'buttons',
+    buttons: [{
+      type: 'mpm',
+      text: buttonComponent?.buttons?.[0].text || 'View items',
+      parameters: [{
+        type: 'action',
+        action: {
+          thumbnail_product_retailer_id: firstProductDetail.retailer_id,
+          thumbnail_product_image_url: firstProductDetail.image_url,
+          sections: [{ product_items: productItems }]
+        }
+      }]
+    }],
+  };
+};
+
+const createCatalogButtonComponent = (
+  buttonComponent: any,
+  rawComponents: Array<Record<string, any>>
+) => {
+  const catalogProductsWithoutDetails = extractProductFromRawComponents(rawComponents, false);
+  const catalogProductDetails = extractProductFromRawComponents(rawComponents, true);
+
+  const firstProductDetail = getFirstProductDetail(catalogProductDetails);
+  if (!firstProductDetail) return null;
+
+  const productItems = mapProductsWithDetails(catalogProductsWithoutDetails, catalogProductDetails);
+  return {
+    type: 'buttons',
+    buttons: [{
+      type: 'catalog',
+      text: buttonComponent?.buttons?.[0].text || 'View items',
+      parameters: [{
+        type: 'action',
+        action: {
+          thumbnail_product_retailer_id: firstProductDetail.retailer_id,
+          thumbnail_product_image_url: firstProductDetail.image_url,
+          sections: [{ product_items: productItems }]
+        }
+      }]
+    }]
+  };
+};
+
+const createProductButtonComponent = (
+  originalComponents: Array<WhatsappTemplateComponentField>,
+  rawComponents: Array<Record<string, any>>,
+) => {
+  const buttonComponent = originalComponents.find((item) =>
+    item.type === 'buttons' && item.buttons?.length
+  ) as { type: 'buttons', buttons: any[] } | undefined;
+
+  if (!buttonComponent) return null;
+
+  const buttonType = buttonComponent.buttons?.[0]?.type;
+
+  if (buttonType === 'mpm') {
+    return createMpmButtonComponent(buttonComponent, rawComponents);
+  }
+
+  if (buttonType === 'catalog') {
+    return createCatalogButtonComponent(buttonComponent, rawComponents);
+  }
+
+  return null;
+};
+
+const getFilenameFromUrl = (url: string, format: string): string => {
+  try {
+    const urlObj = new URL(url);
+    const pathname = urlObj.pathname;
+    const filename = pathname.split('/').pop();
+
+    if (filename && filename.includes('.')) {
+      return filename;
+    }
+
+    // Fallback filename based on format
+    const extensions = {
+      'video': 'mp4',
+      'image': 'jpg',
+      'document': 'pdf'
+    };
+    return `media.${extensions[format as keyof typeof extensions] || 'bin'}`;
+  } catch {
+    const extensions = {
+      'video': 'mp4',
+      'image': 'jpg',
+      'document': 'pdf'
+    };
+    return `media.${extensions[format as keyof typeof extensions] || 'bin'}`;
+  }
+};
+
+const createMediaComponents = (
+  originalComponents: Array<WhatsappTemplateComponentField>,
+  rawComponents: Array<Record<string, any>>,
+) => {
+  const mediaFormats = ['image', 'document', 'video'];
+  const mediaComponents = originalComponents.filter((item) => item.format && mediaFormats.includes(item.format))
+  const result = []
+
+  // Create a map from rawComponents for easier lookup
+  const inputMap: Record<string, string> = {};
+  for (const rawComponent of rawComponents) {
+    Object.assign(inputMap, rawComponent);
+  }
+
+  for (const component of mediaComponents) {
+    if (!component.format) continue;
+
+    const inputKey = `$input$_${component.format}`;
+    const mediaUrl = inputMap[inputKey];
+
+    let parameters: any[] = [];
+
+    if (mediaUrl) {
+      // Extract filename from URL (fallback to generic name if not extractable)
+
+      const filename = getFilenameFromUrl(mediaUrl, component.format);
+
+      if (component.format === 'video') {
+        parameters.push({
+          type: "video",
+          video: {
+            link: mediaUrl,
+            filename: filename,
+            caption: ""
+          }
+        });
+      } else if (component.format === 'image') {
+        parameters.push({
+          type: "image",
+          image: {
+            link: mediaUrl,
+            filename: filename,
+            caption: ""
+          }
+        });
+      } else if (component.format === 'document') {
+        parameters.push({
+          type: "document",
+          document: {
+            link: mediaUrl,
+            filename: filename,
+            caption: ""
+          }
+        });
+      }
+
+      result.push({
+        type: component.type,
+        format: component.format,
+        text: component.text || undefined,
+        example: component.example || undefined,
+        parameters: parameters,
+      })
     }
   }
 
   return result;
 }
 
-const getWhatsappTemplateMessage = (
-  inputData: Record<string, any>,
-  templateName: string,
-  templateLanguageCode: string,
-  messageType: string,
-  templateComponentsFields: string
-) => {
-  let templateComponentsFieldsParsed: Record<string, any> | null = null
+const getWhatsappTemplateMessage = (input: GetWhatsappTemplateMessageInput) => {
+  const {
+    messageType,
+    templateComponentsFields,
+    templateDetails,
+  } = input;
 
-  try {
-    templateComponentsFieldsParsed = JSON.parse(templateComponentsFields)
+  const originalComponents: Array<WhatsappTemplateComponentField> = typeof templateDetails.components === 'string' ?
+    JSON.parse(templateDetails.components) :
+    templateDetails.components;
 
-    for (const key in templateComponentsFieldsParsed) {
-      if (
-        templateComponentsFieldsParsed[key].includes(INPUT_IDENTIFIER) &&
-        inputData[key]
-      ) {
-        if (
-          templateComponentsFieldsParsed[key].includes(CATTALOG_PRODUCTS_KEY) &&
-          (
-            inputData[key].length < 1 ||
-            inputData[key].length > 30
-          )
-        ) {
-          const error = new Error('Can not select more than 30 products');
-          error.name = 'ValidationError'
-          throw error;
-        }
+  const buttonComponent = originalComponents.find((item) =>
+    item.type === 'buttons' && item.buttons?.length
+  ) as { type: 'buttons', buttons: any[] } | undefined;
 
-        templateComponentsFieldsParsed[key] = inputData[key]
-      } else if (
-        templateComponentsFieldsParsed[key].includes(
-          HIDDEN_INPUT_IDENTIFIER
-        ) &&
-        inputData[key]
-      ) {
-        templateComponentsFieldsParsed[key] = inputData[key];
-      }
+  const buttonType = buttonComponent?.buttons?.[0]?.type;
+
+  // Convert schema to components
+  const valuePresent = templateComponentsFields?.value &&
+    Object.keys(templateComponentsFields.value).length > 0;
+
+  const rawComponents = convertSchemaToDefaultComponent(
+    valuePresent,
+    templateComponentsFields.schema,
+    templateComponentsFields.value,
+    buttonType,
+  );
+
+  const nonButtonComponents: Array<WhatsappTemplateComponentField> = originalComponents.filter((item) => item.type !== 'buttons');
+
+  const inputMap = createInputMap(rawComponents);
+  const resultingComponents = createTextComponents(nonButtonComponents, inputMap);
+
+  const hasProducts = templateDetails.catalogProducts.length > 0;
+  if (hasProducts) {
+    const productButtonComponent = createProductButtonComponent(originalComponents, rawComponents);
+    if (productButtonComponent) {
+      resultingComponents.push(productButtonComponent);
     }
-  } catch (error) {
-    console.log('error: ', error);
-    if (error.name === 'ValidationError') {
-      throw error
-    }
-    templateComponentsFieldsParsed = null;
   }
 
-  return {
+  const mediaComponents = createMediaComponents(originalComponents, rawComponents);
+
+  resultingComponents.push(...mediaComponents)
+
+  const payload = {
     type: messageType,
     template: {
-      name: templateName,
-      languageCode: templateLanguageCode,
-      ...(templateComponentsFieldsParsed
-        ? unflatten(templateComponentsFieldsParsed) as Record<string, any>
-        : {}),
+      name: templateDetails.name,
+      languageCode: templateDetails.languageCode,
+      components: resultingComponents
     }
   }
+
+  return payload
 }
 
-type BaseRequestBody = {
+export type BaseRequestBody = {
   channelId?: number;
   message?:
   | { type: 'text'; text: string; messageTag?: string }
@@ -107,93 +425,137 @@ type BaseRequestBody = {
   | Record<string, any>;
 };
 
-// @ts-ignore
-const payloadFormatter = (
-  channelType: string,
-  channelId: number,
-  messageType: string,
-  text: string,
-  messageTag: string,
-  attachmentType: string,
-  attachmentUrl: string,
-  title: string,
-  replies: string,
-  subject: string,
-  payload: string,
-  cc: string,
-  bcc: string,
-  replyToMessageId: string,
-  attachments: string[],
-  templateName: string,
-  templateLanguageCode: string,
-  templateComponentsFields: string,
-  inputData: Record<string, any>
-) => {
+export interface SharedInputFields {
+  channelType: 'specificChannel' | 'lastInteractedChannel';
+  channelId?: number;
+}
+
+interface TextInputData {
+  messageType: SendMessageTypes.TEXT;
+  text: string;
+  messageTag?: string;
+}
+
+interface AttachmentInputData {
+  messageType: SendMessageTypes.ATTACHMENT;
+  attachmentType: 'image' | 'video' | 'audio' | 'file';
+  attachmentUrl: string;
+}
+
+interface CustomPayloadInputData {
+  messageType: SendMessageTypes.CUSTOM_PAYLOAD;
+  payload: string;
+}
+
+interface QuickReplyInputData {
+  messageType: SendMessageTypes.QUICK_REPLY;
+  title?: string;
+  replies?: string[];
+}
+
+interface EmailInputData {
+  messageType: SendMessageTypes.EMAIL;
+  text?: string;
+  subject?: string;
+  attachments?: unknown[];
+  cc?: string[];
+  bcc?: string[];
+  replyToMessageId?: string;
+}
+
+interface WhatsappTemplateInputData {
+  messageType: SendMessageTypes.WHATSAPP_TEMPLATE;
+  [key: string]: any;
+  templateComponentsFields: CustomFieldMapperReturnValue;
+  templateDetails: FetchWhatsappTemplateResponse['data'];
+}
+
+export type SendMessagePayloadFormatterInput =
+  | (TextInputData & SharedInputFields)
+  | (AttachmentInputData & SharedInputFields)
+  | (CustomPayloadInputData & SharedInputFields)
+  | (QuickReplyInputData & SharedInputFields)
+  | (EmailInputData & SharedInputFields)
+  | (WhatsappTemplateInputData & SharedInputFields);
+
+export const sendMessagePayloadFormatter = (input: SendMessagePayloadFormatterInput) => {
   const requestBody: BaseRequestBody = {};
+  const { messageType, channelType, channelId, ...rest } = input;
 
-  if (channelType === 'specificChannel') {
-    requestBody.channelId = channelId;
+  if (channelType === 'specificChannel') requestBody.channelId = channelId;
+
+  if (messageType === SendMessageTypes.TEXT) {
+    const { text, messageTag } = rest as TextInputData;
+    requestBody.message = {
+      type: messageType,
+      text,
+      ...(messageTag && { messageTag }),
+    };
   }
 
-  switch (messageType) {
-    case 'text':
-      requestBody.message = {
-        type: messageType,
-        text,
-        ...(messageTag && { messageTag }),
+  if (messageType === SendMessageTypes.ATTACHMENT) {
+    const { messageType, attachmentType, attachmentUrl } = rest as AttachmentInputData;
+    requestBody.message = {
+      type: messageType,
+      attachment: {
+        type: attachmentType,
+        url: attachmentUrl
       }
-      break;
-    case 'attachment':
-      requestBody.message = {
-        type: messageType,
-        attachment: {
-          type: attachmentType,
-          url: `https://${attachmentUrl}`
-        }
-      }
-      break;
-    case 'custom_payload':
-      try {
-        JSON.parse(payload)
-      } catch (error) {
-        throw new Error('Please provide a valid JSON payload and try again!')
-      }
-
-      requestBody.message = {
-        type: messageType,
-        payload: JSON.parse(payload)
-      }
-      break;
-    case 'quick_reply':
-      requestBody.message = {
-        type: messageType,
-        title,
-        replies
-      }
-      break;
-    case 'email':
-      if (!attachments) attachments = [];
-
-      requestBody.message = {
-        type: messageType,
-        ...(text && { message: text }),
-        ...(subject && { subject }),
-        ...(attachments && { attachments }),
-        ...(cc && { cc }),
-        ...(bcc && { bcc }),
-        ...(replyToMessageId && { replyToMessageId })
-      };
-      break;
-    case 'whatsapp_template':
-      requestBody.message = getWhatsappTemplateMessage(
-        inputData,
-        templateName,
-        templateLanguageCode,
-        messageType,
-        templateComponentsFields,
-      );
-      break;
+    };
   }
+
+  if (messageType === SendMessageTypes.CUSTOM_PAYLOAD) {
+    const { payload } = rest as CustomPayloadInputData;
+    try {
+      JSON.parse(payload);
+    } catch (e) {
+      throw new Error('Please provide a valid json payload and try again!');
+    }
+
+    requestBody.message = {
+      type: messageType,
+      payload: JSON.parse(payload)
+    };
+  }
+
+  if (messageType === SendMessageTypes.QUICK_REPLY) {
+    const { title, replies } = rest as QuickReplyInputData;
+    requestBody.message = {
+      type: messageType,
+      title,
+      replies
+    };
+  }
+
+  if (messageType === SendMessageTypes.EMAIL) {
+    let { attachments, text, subject, cc, bcc, replyToMessageId } = rest as EmailInputData;
+    if (!attachments) attachments = [];
+
+    requestBody.message = {
+      type: messageType,
+      ...(text && { message: text }),
+      ...(subject && { subject }),
+      ...(attachments && { attachments }),
+      ...(cc && { cc }),
+      ...(bcc && { bcc }),
+      ...(replyToMessageId && { replyToMessageId })
+    };
+  }
+
+  if (messageType === SendMessageTypes.WHATSAPP_TEMPLATE) {
+    const {
+      templateComponentsFields,
+      templateDetails,
+    } = rest as WhatsappTemplateInputData;
+
+    requestBody.message = getWhatsappTemplateMessage({
+      messageType,
+      templateComponentsFields,
+      templateDetails,
+    })
+  }
+
+  return requestBody
 }
 
 export default {
@@ -232,6 +594,7 @@ export default {
         name: 'channelType',
         type: 'options',
         options: [
+          { name: '', value: '' },
           { name: 'Specific Channel', value: 'specificChannel' },
           { name: 'Last Interacted Channel', value: 'lastInteractedChannel' },
         ],
@@ -261,8 +624,9 @@ export default {
         name: 'messageType',
         type: 'options',
         options: [
+          { name: '', value: '' },
           { name: 'Text', value: 'text' },
-          { name: 'Attachments', value: 'attachments' },
+          { name: 'Attachments', value: 'attachment' },
           { name: 'Quick Reply', value: 'quick_reply' },
           { name: 'Custom Payload', value: 'custom_payload' },
           { name: 'WhatsApp Template', value: 'whatsapp_template' },

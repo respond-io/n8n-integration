@@ -145,11 +145,18 @@ const ACTION_SETTINGS = {
   >
 >;
 
-
 const PLATFORM_API_URLS = {
-  staging: 'https://api-staging.respond.io/v2',
-  production: 'https://app.respond.io',
-  test: 'https://a8b4597fcf19.ngrok-free.app'
+  staging: {
+    developerApi: 'https://api-staging.respond.io',
+    integrationApi: 'https://staging.respond.io'
+  },
+  production: {
+    developerApi: 'https://api.respond.io',
+    integrationApi: 'https://app.respond.io'
+  },
 }
+
+export const INPUT_IDENTIFIER = '$input$';
+export const HIDDEN_INPUT_IDENTIFIER = '$hidden$';
 
 export { TRIGGER_SETTINGS, TRIGGER_SETTINGS_EVENT_SOURCES, PLATFORM_API_URLS, ACTION_SETTINGS, ACTION_NAMES };

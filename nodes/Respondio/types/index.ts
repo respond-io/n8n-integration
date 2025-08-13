@@ -1,4 +1,4 @@
-export type getContactResponse = {
+export type GetContactResponse = {
   id: string | null;
   firstName: string | null;
   lastName: string | null;
@@ -11,7 +11,7 @@ export type getContactResponse = {
   status: 'open' | 'closed' | 'done' | 'snoozed' | 'unsnoozed' | null;
   isBlocked: boolean;
   custom_fields: Array<{ name: string; value: string | null }>;
-  tags: Array<{ id: string; name: string }>;
+  tags: Array<string>;
   assignee: {
     id: string | null;
     firstName: string | null;
@@ -97,13 +97,162 @@ export type GetWhatsAppTemplatesResponse = {
   };
 }
 
+export enum CustomFieldDataTypes {
+  TEXT = 'text',
+  LIST = 'list',
+  CHECKBOX = 'checkbox',
+  NUMBER = 'number',
+  EMAIL = 'email',
+  URL = 'url',
+  DATE = 'date',
+  TIME = 'time'
+}
+
 export type CustomField = {
-  id: string;
+  id: number;
   name: string;
   title: string;
   description: string | null;
-  dataType: string;
+  slug: string | null;
+  dataType: CustomFieldDataTypes;
   created_at: number;
   bundle?: string | null;
-  allowedValues?: string[] | null;
+  allowedValues?: {
+    listValues?: string[]
+  }
+}
+
+export type CreateCommentResponse = {
+  contactId: number;
+  text: string;
+  created_at: number;
+}
+
+export type CreateSpaceTagResponse = {
+  code: number;
+  message: {
+    id: number;
+    name: string;
+    createdAt: number;
+    colorCode: string;
+    emoji: string;
+    description: string;
+  }
+}
+
+export type DeleteSpaceTagResponse = {
+  message: string;
+}
+
+export type DeleteManyTagsResponse = {
+  contactId: number;
+}
+
+export type FindContactChannelsItem = {
+  id: string;
+  name: string;
+  source: string;
+  contactChannelId: number;
+  meta: any | null;
+  lastMessageTime: number;
+  lastIncomingMessageTime: number;
+  created_at: number;
+}
+
+export type GetManyContactsResponse = {
+  items: Array<GetContactResponse>;
+  pagination: {
+    next?: string;
+    previous?: string;
+  };
+}
+
+export type CreateContactResponse = {
+  code: number;
+  message: string;
+}
+
+export type GetUserResponseItem = {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  team: {
+    id: number;
+    name: string;
+  },
+  restrictions: string[];
+}
+
+export type GetAllUsersResponse = {
+  items: Array<GetUserResponseItem>;
+  pagination: {
+    next?: string;
+    previous?: string;
+  };
+}
+
+export type GetMessageResponseStatusItem = {
+  value: string;
+  timestamp: number;
+  message: string;
+}
+
+export type GetMessageResponse = {
+  messageId: number;
+  channelMessageId: string;
+  contactId: number;
+  channelId: number;
+  traffic: string;
+  message: {
+    type: string;
+    text: string;
+    messageTag: string;
+    subType?: string;
+    title?: string;
+    replies?: string[];
+  },
+  status: Array<GetMessageResponseStatusItem>;
+}
+
+export type CustomFieldMapperReturnValue = {
+  mappingMode: 'defineBelow',
+  value: Record<string, string | number | boolean | Date>,
+  matchingColumns: string[],
+  schema: Array<Record<string, any>>,
+  attemptToConvertTypes: boolean,
+  convertFieldsToString: boolean
+}
+
+export enum SendMessageTypes {
+  TEXT = 'text',
+  ATTACHMENT = 'attachment',
+  CUSTOM_PAYLOAD = 'custom_payload',
+  QUICK_REPLY = 'quick_reply',
+  EMAIL = 'email',
+  WHATSAPP_TEMPLATE = 'whatsapp_template',
+}
+
+export type FetchWhatsappTemplateResponse = {
+  status: string;
+  message: string;
+  data: Omit<WhatsAppTemplate, 'components'> & {
+    components: Record<string, any>[] | string; // JSON string of components
+    bundle: Record<string, any>;
+    channel: Record<string, any>;
+    catalogProducts: Record<string, any>[];
+  }
+}
+
+export type SendMessageResponse = {
+  messageId: number;
+}
+
+export type WhatsappTemplateComponentField = {
+  type: 'text' | 'header' | 'buttons' | 'image' | 'video' | 'document' | 'audio';
+  format?: 'text' | 'date' | 'time' | 'video' | 'image' | 'document';
+  text?: string;
+  example: Record<string, any> | string;
+  buttons?: any[] | null;
 }

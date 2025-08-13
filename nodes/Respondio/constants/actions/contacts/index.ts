@@ -2,6 +2,18 @@ import { INodeProperties } from "n8n-workflow";
 import { generateContactIdentifierInputFields, generateContactInputFields, IContactIdentifiers } from "../../../utils";
 import ACTION_NAMES from "../action_names";
 
+const colorCodeOptions = [
+  { name: '', value: '' },
+  { name: 'Gray', value: 'tag-grey' },
+  { name: 'Red', value: 'tag-red' },
+  { name: 'Orange', value: 'tag-orange' },
+  { name: 'Yellow', value: 'tag-yellow' },
+  { name: 'Green', value: 'tag-green' },
+  { name: 'Blue', value: 'tag-blue' },
+  { name: 'Indigo', value: 'tag-indigo' },
+  { name: 'Purple', value: 'tag-purple' },
+]
+
 export default {
   [ACTION_NAMES.ADD_SPACE_TAG]: {
     name: 'Add a Space Tag',
@@ -26,16 +38,7 @@ export default {
         displayName: 'Color Code',
         name: 'colorCode',
         type: 'options',
-        options: [
-          { name: 'Gray', value: 'tag-grey' },
-          { name: 'Red', value: 'tag-red' },
-          { name: 'Orange', value: 'tag-orange' },
-          { name: 'Yellow', value: 'tag-yellow' },
-          { name: 'Green', value: 'tag-green' },
-          { name: 'Blue', value: 'tag-blue' },
-          { name: 'Indigo', value: 'tag-indigo' },
-          { name: 'Purple', value: 'tag-purpole' },
-        ],
+        options: colorCodeOptions,
         required: false,
         description: 'Color code of space tag'
       },
@@ -92,16 +95,7 @@ export default {
         displayName: 'Color Code',
         name: 'colorCode',
         type: 'options',
-        options: [
-          { name: 'Gray', value: 'tag-grey' },
-          { name: 'Red', value: 'tag-red' },
-          { name: 'Orange', value: 'tag-orange' },
-          { name: 'Yellow', value: 'tag-yellow' },
-          { name: 'Green', value: 'tag-green' },
-          { name: 'Blue', value: 'tag-blue' },
-          { name: 'Indigo', value: 'tag-indigo' },
-          { name: 'Purple', value: 'tag-purpole' },
-        ],
+        options: colorCodeOptions,
         required: false,
         description: 'Color code of space tag'
       },
@@ -125,15 +119,15 @@ export default {
         IContactIdentifiers.phone,
       ]),
       {
-        displayName: 'Select a Tag to Delete',
-        name: 'tagId',
-        type: 'options',
+        displayName: 'Select tag(s) to delete',
+        name: 'tagIds',
+        type: 'multiOptions',
         typeOptions: {
           loadOptionsMethod: 'getTagsForContact',
           loadOptionsDependsOn: ['identifierType', 'contactId', 'contactIdentifier'],
         },
         required: true,
-        description: 'Choose the tag to delete from this contact',
+        description: 'Choose the tag(s) to delete from this contact',
       },
     ] as unknown as INodeProperties[]
   },
@@ -230,6 +224,7 @@ export default {
       ]),
       ...generateContactInputFields(false),
     ] as unknown as INodeProperties[]
+    // missing custom fields list
   },
   [ACTION_NAMES.CREATE_OR_UPDATE_CONTACT]: {
     name: 'Create or Update a Contact',
@@ -243,6 +238,7 @@ export default {
       ]),
       ...generateContactInputFields(false),
     ] as unknown as INodeProperties[]
+    // missing custom fields list
   },
   [ACTION_NAMES.CREATE_CONTACT]: {
     name: 'Create a Contact',
@@ -255,5 +251,6 @@ export default {
       ]),
       ...generateContactInputFields(true),
     ] as unknown as INodeProperties[]
+    // missing custom fields list
   }
 }

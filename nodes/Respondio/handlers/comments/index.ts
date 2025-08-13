@@ -1,6 +1,7 @@
 import { IExecuteFunctions, INodeExecutionData, NodeExecutionWithMetadata, NodeOperationError } from "n8n-workflow";
 import { ACTION_NAMES } from "../../constants/actions/action_names";
 import { callDeveloperApi, constructIdentifier } from "../../utils";
+import { CreateCommentResponse } from "../../types";
 
 const execute = async (
   action: ACTION_NAMES,
@@ -22,7 +23,7 @@ const execute = async (
     }]];
   }
 
-  const response = await callDeveloperApi(executionContext, {
+  const response = await callDeveloperApi<CreateCommentResponse>(executionContext, {
     method: 'POST',
     path: `/contact/${identifier}/comment`,
     body: { text: commentContent },
