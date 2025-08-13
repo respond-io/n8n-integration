@@ -93,33 +93,45 @@ const createInputMap = (rawComponents: Array<Record<string, any>>) => {
   return Object.assign({}, ...inputValues);
 };
 
-const replaceTextPlaceholders = (text: string, componentType: string, inputMap: Record<string, string>) => {
-  return text.replace(/\{\{(\d+)\}\}/g, (_, idx) => {
-    const key = `${INPUT_IDENTIFIER}_${componentType}_${idx}`;
-    return inputMap[key] ?? '';
-  });
-};
-
 const createTextComponents = (
   nonButtonComponents: Array<WhatsappTemplateComponentField>,
-  inputMap: Record<string, string>
+  inputMap: Record<string, string>,
 ) => {
   const components: any[] = [];
-
   for (const component of nonButtonComponents) {
     if (!component.text) continue;
 
-    const parameterIncluded = /\{\{\d+\}\}/.test(component.text)
-    const componentText = replaceTextPlaceholders(component.text, component.type, inputMap);
+    const parameterIncluded = /\{\{\d+\}\}/.test(component.text);
+
+    let parameters: any[] = [];
+
+    if (parameterIncluded) {
+      // Extract all placeholder indices from the text
+      const placeholderMatches = component.text.match(/\{\{(\d+)\}\}/g);
+      if (placeholderMatches) {
+        // Get unique placeholder indices and sort them
+        const uniqueIndices = [...new Set(placeholderMatches.map(match => {
+          const indexMatch = match.match(/\{\{(\d+)\}\}/);
+          return indexMatch ? indexMatch[1] : null;
+        }).filter(Boolean))].sort();
+
+        // Create a parameter for each placeholder
+        parameters = uniqueIndices.map(idx => {
+          const key = `${INPUT_IDENTIFIER}_${component.type}_${idx}`;
+          const replacementValue = inputMap[key] ?? '';
+          return {
+            type: "text",
+            text: replacementValue
+          };
+        });
+      }
+    }
 
     components.push({
       type: component.type,
       format: component.format || undefined,
       text: component.text || undefined,
-      parameters: parameterIncluded ? [{
-        type: "text",
-        text: componentText
-      }] : [],
+      parameters: parameters,
     });
   }
 
@@ -249,6 +261,102 @@ const createProductButtonComponent = (
   return null;
 };
 
+const getFilenameFromUrl = (url: string, format: string): string => {
+  try {
+    const urlObj = new URL(url);
+    const pathname = urlObj.pathname;
+    const filename = pathname.split('/').pop();
+
+    if (filename && filename.includes('.')) {
+      return filename;
+    }
+
+    // Fallback filename based on format
+    const extensions = {
+      'video': 'mp4',
+      'image': 'jpg',
+      'document': 'pdf'
+    };
+    return `media.${extensions[format as keyof typeof extensions] || 'bin'}`;
+  } catch {
+    const extensions = {
+      'video': 'mp4',
+      'image': 'jpg',
+      'document': 'pdf'
+    };
+    return `media.${extensions[format as keyof typeof extensions] || 'bin'}`;
+  }
+};
+
+const createMediaComponents = (
+  originalComponents: Array<WhatsappTemplateComponentField>,
+  rawComponents: Array<Record<string, any>>,
+) => {
+  const mediaFormats = ['image', 'document', 'video'];
+  const mediaComponents = originalComponents.filter((item) => item.format && mediaFormats.includes(item.format))
+  const result = []
+
+  // Create a map from rawComponents for easier lookup
+  const inputMap: Record<string, string> = {};
+  for (const rawComponent of rawComponents) {
+    Object.assign(inputMap, rawComponent);
+  }
+
+  for (const component of mediaComponents) {
+    if (!component.format) continue;
+
+    const inputKey = `$input$_${component.format}`;
+    const mediaUrl = inputMap[inputKey];
+
+    let parameters: any[] = [];
+
+    if (mediaUrl) {
+      // Extract filename from URL (fallback to generic name if not extractable)
+
+      const filename = getFilenameFromUrl(mediaUrl, component.format);
+
+      if (component.format === 'video') {
+        parameters.push({
+          type: "video",
+          video: {
+            link: mediaUrl,
+            filename: filename,
+            caption: ""
+          }
+        });
+      } else if (component.format === 'image') {
+        parameters.push({
+          type: "image",
+          image: {
+            link: mediaUrl,
+            filename: filename,
+            caption: ""
+          }
+        });
+      } else if (component.format === 'document') {
+        parameters.push({
+          type: "document",
+          document: {
+            link: mediaUrl,
+            filename: filename,
+            caption: ""
+          }
+        });
+      }
+
+      result.push({
+        type: component.type,
+        format: component.format,
+        text: component.text || undefined,
+        example: component.example || undefined,
+        parameters: parameters,
+      })
+    }
+  }
+
+  return result;
+}
+
 const getWhatsappTemplateMessage = (input: GetWhatsappTemplateMessageInput) => {
   const {
     messageType,
@@ -289,6 +397,10 @@ const getWhatsappTemplateMessage = (input: GetWhatsappTemplateMessageInput) => {
       resultingComponents.push(productButtonComponent);
     }
   }
+
+  const mediaComponents = createMediaComponents(originalComponents, rawComponents);
+
+  resultingComponents.push(...mediaComponents)
 
   const payload = {
     type: messageType,

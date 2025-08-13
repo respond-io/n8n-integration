@@ -251,7 +251,7 @@ export type SendMessageResponse = {
 
 export type WhatsappTemplateComponentField = {
   type: 'text' | 'header' | 'buttons' | 'image' | 'video' | 'document' | 'audio';
-  format?: 'text' | 'date' | 'time';
+  format?: 'text' | 'date' | 'time' | 'video' | 'image' | 'document';
   text?: string;
   example: Record<string, any> | string;
   buttons?: any[] | null;
