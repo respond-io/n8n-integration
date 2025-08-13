@@ -112,7 +112,7 @@ export class RespondioV1 implements INodeType {
     };
   }
 
-  methods = { loadOptions, resourceMapping };
+  methods = { loadOptions, resourceMapping }
 
   async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][] | NodeExecutionWithMetadata[][] | null> {
     const operation = this.getNodeParameter(RespondioV1.resourceTypeName, 0) as string;
