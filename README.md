@@ -100,7 +100,7 @@ The Respond.io Trigger node can listen for the following events:
 To use this node, you need to authenticate with Respond.io. You'll need:
 
 1. **API Key** - Your Respond.io API key
-2. **Environment** - Choose between:
+2. **API Url** - Choose between:
    - **Live** (Production)
    - **Staging**
 
