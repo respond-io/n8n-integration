@@ -494,7 +494,7 @@ export const sendMessagePayloadFormatter = (input: SendMessagePayloadFormatterIn
   }
 
   if (messageType === SendMessageTypes.ATTACHMENT) {
-    const { messageType, attachmentType, attachmentUrl } = rest as AttachmentInputData;
+    const { attachmentType, attachmentUrl } = rest as AttachmentInputData;
     requestBody.message = {
       type: messageType,
       attachment: {

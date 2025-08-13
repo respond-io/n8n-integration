@@ -100,6 +100,7 @@ export default {
       default: [],
       displayOptions: {
         show: {
+          messageType: ['whatsapp_template'],
           templateId: [{ _cnd: { exists: true } }],
         }
       },
