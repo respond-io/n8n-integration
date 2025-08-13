@@ -54,7 +54,7 @@ export class RespondIoApi implements ICredentialType {
   test: ICredentialTestRequest = {
     request: {
       baseURL: '={{ $credentials.domain }}',
-      url: '/v2/space/user',
+      url: '/v2/space/user?limit=1',
       method: 'GET',
       headers: { Authorization: '={{ "Bearer " + $credentials.apiKey }}' },
       timeout: 10000,
