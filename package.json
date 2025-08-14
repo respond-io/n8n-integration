@@ -22,7 +22,7 @@
   "scripts": {
     "build": "npx rimraf dist && tsc && gulp build:icons",
     "dev": "tsc --watch",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"No tests specified\" && exit 0",
     "release:dev": "npm run build && (cd dist && npm publish --tag next) || echo 'Release failed'",
     "release": "npm run build && (cd dist && npm publish --access public) || echo 'Release failed'",
     "format": "prettier nodes credentials --write",
