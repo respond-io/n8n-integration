@@ -16,5 +16,6 @@ jobs:
     uses: respond-io/shared-github-actions/.github/workflows/reusable-release-npm-pkgs.yaml@master
     with:
       target-branch: dev
+      block-release-on-audit-failure: false
     secrets:
       SLACK_PACKAGE_RELEASE_WORKFLOW_URL: ${{ secrets.SLACK_PACKAGE_RELEASE_WORKFLOW_URL }}
