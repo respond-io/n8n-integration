@@ -3,7 +3,7 @@ import { setTimeout as waitFor } from 'timers/promises';
 
 import languagesJSON from './languages.json'
 import countriesJSON from './countries.json'
-import { PLATFORM_API_URLS } from "../constants";
+import { DEVELOPER_API_BASE_URL } from "../constants";
 import { CustomFieldMapperReturnValue, WhatsAppTemplate } from "../types";
 
 export enum IContactIdentifiers {
@@ -265,7 +265,7 @@ export async function fetchPaginatedOptions<TItem, TResult>(
   }
 ): Promise<{ transformed: TResult[]; raw: TItem[] }> {
   const credentials = await context.getCredentials(credentialsName);
-  const platformUrl = credentials.domain || PLATFORM_API_URLS.staging.developerApi;
+  const platformUrl = DEVELOPER_API_BASE_URL
   // remove preceding slash if exists
   const safePath = path.startsWith('/') ? path.slice(1) : path
   const fullPath = `${platformUrl}/v2/${safePath}`;
@@ -327,7 +327,7 @@ export async function callDeveloperApi<T>(
   }
 ): Promise<T> {
   const credentials = await executionContext.getCredentials('respondIoApi');
-  const platformUrl = credentials.domain || PLATFORM_API_URLS.staging.developerApi;
+  const platformUrl = DEVELOPER_API_BASE_URL
   // remove preceding slash if exists
   const safePath = path.startsWith('/') ? path.slice(1) : path
 

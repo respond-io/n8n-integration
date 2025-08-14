@@ -4,7 +4,7 @@ import {
   ICredentialType,
   INodeProperties,
 } from 'n8n-workflow';
-import { PLATFORM_API_URLS } from '../nodes/Respondio/constants';
+import { DEVELOPER_API_BASE_URL } from '../nodes/Respondio/constants';
 
 export class RespondIoApi implements ICredentialType {
   name = 'respondIoApi';
@@ -21,24 +21,7 @@ export class RespondIoApi implements ICredentialType {
       },
       default: '',
       description: 'Your Respond.io API key',
-    },
-    {
-      displayName: 'API Url',
-      name: 'domain',
-      type: 'options',
-      options: [
-        {
-          name: 'Live',
-          value: PLATFORM_API_URLS.production.developerApi,
-        },
-        {
-          name: 'Staging',
-          value: PLATFORM_API_URLS.staging.developerApi
-        }
-      ],
-      default: PLATFORM_API_URLS.production.developerApi,
-      description: 'Choose the Respond.io API URL to connect to.',
-    },
+    }
   ];
 
   authenticate: IAuthenticateGeneric = {
@@ -53,7 +36,7 @@ export class RespondIoApi implements ICredentialType {
 
   test: ICredentialTestRequest = {
     request: {
-      baseURL: '={{ $credentials.domain }}',
+      baseURL: DEVELOPER_API_BASE_URL,
       url: '/v2/space/user?limit=1',
       method: 'GET',
       headers: { Authorization: '={{ "Bearer " + $credentials.apiKey }}' },

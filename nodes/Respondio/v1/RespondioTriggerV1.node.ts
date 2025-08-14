@@ -10,7 +10,7 @@ import {
   IWorkflowMetadata,
   INodeTypeBaseDescription,
 } from 'n8n-workflow';
-import { PLATFORM_API_URLS, TRIGGER_SETTINGS, TRIGGER_SETTINGS_EVENT_SOURCES } from '../constants';
+import { INTEGRATION_API_BASE_URL, TRIGGER_SETTINGS, TRIGGER_SETTINGS_EVENT_SOURCES } from '../constants';
 
 export class RespondioTriggerV1 implements INodeType {
   description: INodeTypeDescription;
@@ -99,10 +99,7 @@ export class RespondioTriggerV1 implements INodeType {
           ) as string;
           const eventSources = this.getNodeParameter(RespondioTriggerV1.eventSourceTypeName, []) as string[];
 
-          const domain = (credentials?.domain || PLATFORM_API_URLS.production.integrationApi) as string;
-          const platformUrl = domain.includes('staging') ?
-            PLATFORM_API_URLS.staging.integrationApi :
-            PLATFORM_API_URLS.production.integrationApi;
+          const platformUrl = INTEGRATION_API_BASE_URL;
           const bundle: { sources?: string[]; workflowDetails?: IWorkflowMetadata } = {}
 
           if (eventSources?.length) bundle.sources = eventSources
@@ -138,10 +135,7 @@ export class RespondioTriggerV1 implements INodeType {
 
           if (!webhookId) return true;
 
-          const domain = (credentials?.domain || PLATFORM_API_URLS.production.integrationApi) as string;
-          const platformUrl = domain.includes('staging') ?
-            PLATFORM_API_URLS.staging.integrationApi :
-            PLATFORM_API_URLS.production.integrationApi;
+          const platformUrl = INTEGRATION_API_BASE_URL;
 
           try {
             const response = await this.helpers.request({
