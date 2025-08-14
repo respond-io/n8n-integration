@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.1](https://github.com/respond-io/n8n-integration/compare/v0.5.0...v0.5.1) (2025-08-14)
+
+
+### Bug Fixes
+
+* add newline at end of release-dev workflow file ([c993383](https://github.com/respond-io/n8n-integration/commit/c99338307428e1cf2deefb9b69170f9597c03d34))
+* add newline at end of release-dev workflow file ([c25d892](https://github.com/respond-io/n8n-integration/commit/c25d892a5b1d3886f99f2a0962759703c9e55954))
+
 ## [0.5.0](https://github.com/respond-io/n8n-integration/compare/v0.4.0...v0.5.0) (2025-08-14)
 
 
