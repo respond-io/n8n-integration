@@ -1,0 +1,8 @@
+#!/bin/bash
+set -euo pipefail
+
+aws ssm send-command \
+    --instance-ids "i-07da830e2ad5993a1" \
+    --document-name "AWS-RunShellScript" \
+    --parameters 'commands=["/home/ubuntu/n8n/update_n8n.sh"]' \
+    --comment "Running n8n updater script"
