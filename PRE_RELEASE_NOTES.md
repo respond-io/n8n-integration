@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.12.0](https://github.com/respond-io/n8n-integration/compare/v0.11.0...v0.12.0) (2025-08-15)
+
+
+### Features
+
+* fix contactFieldType definition ([1d24961](https://github.com/respond-io/n8n-integration/commit/1d24961a636853f0d99fc9df6eb6ed3871d3c0cf))
+* fix contactFieldType definition ([809e0ce](https://github.com/respond-io/n8n-integration/commit/809e0ce25117995d2557fba91f909cd668f9625c))
+
 ## [0.11.0](https://github.com/respond-io/n8n-integration/compare/v0.10.0...v0.11.0) (2025-08-15)
 
 
