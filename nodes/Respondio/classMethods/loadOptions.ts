@@ -158,9 +158,9 @@ export async function getTemplatePreviewOptions(this: ILoadOptionsFunctions): Pr
 }
 
 export async function getContactFields(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-  const fieldType = this.getNodeParameter('contactFieldType', 'standardField') as 'standardField' | 'customField';
+  const fieldType = this.getNodeParameter('contactFieldType', 'standardField') as 'standard_field' | 'custom_field';
 
-  if (fieldType === 'standardField') {
+  if (fieldType === 'standard_field') {
     const standardFields = {
       firstName: 'First Name',
       lastName: 'Last Name',
