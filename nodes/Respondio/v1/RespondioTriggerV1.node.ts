@@ -141,8 +141,8 @@ export class RespondioTriggerV1 implements INodeType {
           required: true,
           options: [
             { name: '', value: '' },
-            { name: 'Contact Standard Field', value: 'standardField' },
-            { name: 'Contact Custom Field', value: 'customField' },
+            { name: 'Contact Standard Field', value: 'standard_field' },
+            { name: 'Contact Custom Field', value: 'custom_field' },
           ],
           displayOptions: {
             show: {
@@ -185,11 +185,11 @@ export class RespondioTriggerV1 implements INodeType {
           ) as string;
           const eventSources = this.getNodeParameter(RespondioTriggerV1.eventSourceTypeName, []) as string[];
           const messageType = this.getNodeParameter(RespondioTriggerV1.messageTypeName, []) as string[];
-          const contactFieldType = this.getNodeParameter(RespondioTriggerV1.contactFieldTypeName, '') as 'standardField' | 'customField' | '';
+          const contactFieldType = this.getNodeParameter(RespondioTriggerV1.contactFieldTypeName, '') as 'standard_field' | 'custom_field' | '';
           const fields = contactFieldType?.length ? this.getNodeParameter(RespondioTriggerV1.contactFieldsName, []) as string[] : [];
 
           const platformUrl = INTEGRATION_API_BASE_URL;
-          const bundle: { source?: string[]; workflowDetails?: IWorkflowMetadata, messageType?: string[]; fields?: string[]; contactFieldType?: 'standardField' | 'customField' } = {}
+          const bundle: { source?: string[]; workflowDetails?: IWorkflowMetadata, messageType?: string[]; fields?: string[]; contactFieldType?: 'standard_field' | 'custom_field' } = {}
 
           if (!webhookUrl) throw new NodeOperationError(this.getNode(), 'Webhook URL is not defined. Please set the webhook URL in the node settings.');
 
