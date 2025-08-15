@@ -203,7 +203,7 @@ export class RespondioTriggerV1 implements INodeType {
           }
 
           try {
-            await this.helpers.request({
+            const result = await this.helpers.request({
               method: 'POST',
               url: `${platformUrl}/integration/n8n-api/subscribe`,
               headers: {
@@ -218,6 +218,9 @@ export class RespondioTriggerV1 implements INodeType {
               },
               json: true,
             });
+            // store the webhook ID in the workflow static data for delete later on
+            const workflowData = this.getWorkflowStaticData('global');
+            workflowData.respondWebhookId = result.subscriberId;
           } catch (error) {
             this.logger.info(`Error: ${JSON.stringify(error)}`);
             throw new NodeOperationError(this.getNode(), `Failed to create webhook subscription: ${error.message}`);
@@ -228,10 +231,16 @@ export class RespondioTriggerV1 implements INodeType {
 
         async delete(this: IHookFunctions): Promise<boolean> {
           const credentials = await this.getCredentials('respondIoApi');
-          const currentNode = this.getNode();
-          const webhookId = currentNode.webhookId;
 
-          if (!webhookId) return true;
+          const workflowData = this.getWorkflowStaticData('global');
+          const webhookId = workflowData.respondWebhookId;
+
+          if (!webhookId) {
+            throw new NodeOperationError(
+              this.getNode(),
+              'Webhook ID is not defined. Please contact Respond.io Customer Service to check on webhook deletion.',
+            );
+          }
 
           const platformUrl = INTEGRATION_API_BASE_URL;
 
