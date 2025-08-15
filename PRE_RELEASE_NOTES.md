@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.9.0](https://github.com/respond-io/n8n-integration/compare/v0.8.0...v0.9.0) (2025-08-15)
+
+
+### Features
+
+* add n8n options to TRIGGER_SETTINGS_EVENT_SOURCES ([98fb126](https://github.com/respond-io/n8n-integration/commit/98fb126ffcbfe8e176d485cbcef985037ed9b248))
+* add trigger extra params in bundle ([149cae0](https://github.com/respond-io/n8n-integration/commit/149cae0a86681888cf3feb6bc0e2fa85fa227259))
+* add trigger extra params in bundle ([343a45d](https://github.com/respond-io/n8n-integration/commit/343a45dff3561b27c48ed645d3f15648366e619f))
+* remove useless duplicate line ([cd4a635](https://github.com/respond-io/n8n-integration/commit/cd4a635355f03016c1edc6da6357b9d1904a2293))
+* rename to `source`, refer to main repo: ([9cbc4f2](https://github.com/respond-io/n8n-integration/commit/9cbc4f2294ef6bcee8dd87b17b7dd4be720c29fc))
+
 ## [0.8.0](https://github.com/respond-io/n8n-integration/compare/v0.7.0...v0.8.0) (2025-08-15)
 
 
