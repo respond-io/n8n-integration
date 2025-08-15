@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.10.0](https://github.com/respond-io/n8n-integration/compare/v0.9.0...v0.10.0) (2025-08-15)
+
+
+### Features
+
+* fix the webhook deletion logic ([75fd62a](https://github.com/respond-io/n8n-integration/commit/75fd62a27d3b106e0c8419e00fd6c2bbe1df2adf))
+* fix the webhook deletion logic ([8b2f80c](https://github.com/respond-io/n8n-integration/commit/8b2f80ca6bbe1231163716b4887520feb68422a8))
+
 ## [0.9.0](https://github.com/respond-io/n8n-integration/compare/v0.8.0...v0.9.0) (2025-08-15)
 
 
