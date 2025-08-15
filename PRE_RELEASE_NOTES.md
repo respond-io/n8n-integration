@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.7.0](https://github.com/respond-io/n8n-integration/compare/v0.6.0...v0.7.0) (2025-08-15)
+
+
+### Features
+
+* add webHookName and update error return ([c2330fc](https://github.com/respond-io/n8n-integration/commit/c2330fc82b42badd6d76c7b0c1776e065dfc9be2))
+* add webHookName and update error return ([1645116](https://github.com/respond-io/n8n-integration/commit/16451166d4a559dd2fd773a35a63db8ed88ae529))
+
 ## [0.6.0](https://github.com/respond-io/n8n-integration/compare/v0.5.0...v0.6.0) (2025-08-15)
 
 
