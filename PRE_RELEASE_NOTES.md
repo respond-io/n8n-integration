@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.6.0](https://github.com/respond-io/n8n-integration/compare/v0.5.0...v0.6.0) (2025-08-15)
+
+
+### Features
+
+* fix integration service subscribe / unsubscribe paths ([6b064a4](https://github.com/respond-io/n8n-integration/commit/6b064a477cf61e33144cfabd4fbe0a8dce9028a7))
+* fix integration service subscribe / unsubscribe paths ([1f626c8](https://github.com/respond-io/n8n-integration/commit/1f626c88e460f3e7e93099f2b1e9d4c28201d096))
+
+
+### Bug Fixes
+
+* add newline at end of release-dev workflow file ([c993383](https://github.com/respond-io/n8n-integration/commit/c99338307428e1cf2deefb9b69170f9597c03d34))
+* add newline at end of release-dev workflow file ([c25d892](https://github.com/respond-io/n8n-integration/commit/c25d892a5b1d3886f99f2a0962759703c9e55954))
+
 ## [0.5.0](https://github.com/respond-io/n8n-integration/compare/v0.4.0...v0.5.0) (2025-08-14)
 
 
