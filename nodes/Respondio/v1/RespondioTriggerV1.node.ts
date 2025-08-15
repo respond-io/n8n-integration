@@ -92,7 +92,6 @@ export class RespondioTriggerV1 implements INodeType {
           const currentNode = this.getNode();
           const workflow = this.getWorkflow();
 
-
           const eventType = this.getNodeParameter(
             RespondioTriggerV1.triggerEventTypeName,
             RespondioTriggerV1.triggerDefaultValue,
@@ -113,6 +112,7 @@ export class RespondioTriggerV1 implements INodeType {
                 Authorization: `Bearer ${credentials.apiKey}`,
               },
               body: {
+                webHookName: `${this.getWebhookName()} - ${currentNode.name}`,
                 type: eventType,
                 url: webhookUrl,
                 hookId: currentNode.webhookId,
@@ -149,7 +149,7 @@ export class RespondioTriggerV1 implements INodeType {
             this.logger.info(`Delete response: ${JSON.stringify(response)}`);
           } catch (error) {
             this.logger.info(`Error: ${JSON.stringify(error)}`);
-            throw new NodeOperationError(this.getNode(), `Failed to create webhook subscription: ${error.message}`);
+            throw new NodeOperationError(this.getNode(), `Failed to delete webhook subscription: ${error.message}`);
           }
 
           return true;
