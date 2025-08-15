@@ -235,12 +235,7 @@ export class RespondioTriggerV1 implements INodeType {
           const workflowData = this.getWorkflowStaticData('global');
           const webhookId = workflowData.respondWebhookId;
 
-          if (!webhookId) {
-            throw new NodeOperationError(
-              this.getNode(),
-              'Webhook ID is not defined. Please contact Respond.io Customer Service to check on webhook deletion.',
-            );
-          }
+          if (!webhookId) return true
 
           const platformUrl = INTEGRATION_API_BASE_URL;
 
