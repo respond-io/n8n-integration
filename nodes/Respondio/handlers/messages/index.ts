@@ -46,7 +46,7 @@ const execute = async (
     const channelId = executionContext.getNodeParameter('channelId', 0, '') as number;
     const messageType = executionContext.getNodeParameter('messageType', 0, '') as SendMessageTypes;
 
-    if (!channelId) throw new Error('Channel ID is required to send a message');
+    if (!channelId && channelType === 'specificChannel') throw new Error('Channel ID is required to send a message');
 
     const sendMessagePath = `/contact/${identifier}/message`;
     let payload: BaseRequestBody = {};
