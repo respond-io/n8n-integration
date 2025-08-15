@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.13.0](https://github.com/respond-io/n8n-integration/compare/v0.12.0...v0.13.0) (2025-08-15)
+
+
+### Features
+
+* fix loadOptions for getContactFields ([3db8a8b](https://github.com/respond-io/n8n-integration/commit/3db8a8bc3585f703d95b7575f8baabbfaa5d85d7))
+* fix loadOptions for getContactFields ([3673f7a](https://github.com/respond-io/n8n-integration/commit/3673f7ad4bb83cb20cde2d8510be01c478423239))
+
 ## [0.12.0](https://github.com/respond-io/n8n-integration/compare/v0.11.0...v0.12.0) (2025-08-15)
 
 
