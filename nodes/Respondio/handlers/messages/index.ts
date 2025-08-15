@@ -61,6 +61,7 @@ const execute = async (
         text,
         messageTag
       })
+
     }
 
     if (messageType === SendMessageTypes.EMAIL) {
