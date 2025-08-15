@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.0](https://github.com/respond-io/n8n-integration/compare/v0.7.0...v0.8.0) (2025-08-15)
+
+
+### Features
+
+* add check for channelType when sending message ([cb48b5e](https://github.com/respond-io/n8n-integration/commit/cb48b5e4ac6a7d04ebe4a1476e14f669bdf03b9b))
+* add check for channelType when sending message ([b63bacc](https://github.com/respond-io/n8n-integration/commit/b63baccf0af515ddc5be653db4234cc23325b831))
+
 ## [0.7.0](https://github.com/respond-io/n8n-integration/compare/v0.6.0...v0.7.0) (2025-08-15)
 
 
