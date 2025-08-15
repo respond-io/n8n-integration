@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.11.0](https://github.com/respond-io/n8n-integration/compare/v0.10.0...v0.11.0) (2025-08-15)
+
+
+### Features
+
+* no need to throw error, just return true directly ([467a8a2](https://github.com/respond-io/n8n-integration/commit/467a8a287e9f9680f9ba0928f7133f939b7a077d))
+* no need to throw error, just return true directly ([06a538d](https://github.com/respond-io/n8n-integration/commit/06a538dbe110eaab05133e6d6c37057023eaf714))
+
 ## [0.10.0](https://github.com/respond-io/n8n-integration/compare/v0.9.0...v0.10.0) (2025-08-15)
 
 
