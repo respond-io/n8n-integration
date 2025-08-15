@@ -189,7 +189,6 @@ export class RespondioTriggerV1 implements INodeType {
           const fields = contactFieldType?.length ? this.getNodeParameter(RespondioTriggerV1.contactFieldsName, []) as string[] : [];
 
           const platformUrl = INTEGRATION_API_BASE_URL;
-          const bundle: { sources?: string[]; workflowDetails?: IWorkflowMetadata } = {}
           const bundle: { sources?: string[]; workflowDetails?: IWorkflowMetadata, messageType?: string[]; fields?: string[]; contactFieldType?: 'standardField' | 'customField' } = {}
 
           if (!webhookUrl) throw new NodeOperationError(this.getNode(), 'Webhook URL is not defined. Please set the webhook URL in the node settings.');
