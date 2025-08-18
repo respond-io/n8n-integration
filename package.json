@@ -1,5 +1,5 @@
 {
-  "name": "n8n-nodes-respondio",
+  "name": "@respond-io/n8n-nodes-respond-io",
   "version": "0.1.0",
   "description": "n8n nodes for Respond.io integration",
   "keywords": [
