@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.15.0](https://github.com/respond-io/n8n-integration/compare/v0.14.0...v0.15.0) (2025-08-18)
+
+
+### Features
+
+* add capitalizeFirstLetter for body / header, etc ([153bcb1](https://github.com/respond-io/n8n-integration/commit/153bcb1fba1f06bea0e736ba5cee11b12f955f48))
+* add capitalizeFirstLetter for body / header, etc ([e2951f4](https://github.com/respond-io/n8n-integration/commit/e2951f486e69320fe2097ba3afaded374b2d6587))
+
 ## [0.14.0](https://github.com/respond-io/n8n-integration/compare/v0.13.0...v0.14.0) (2025-08-18)
 
 
