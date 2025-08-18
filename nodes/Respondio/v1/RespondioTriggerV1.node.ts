@@ -164,6 +164,7 @@ export class RespondioTriggerV1 implements INodeType {
           },
           displayOptions: {
             show: {
+              [RespondioTriggerV1.triggerEventTypeName]: [TRIGGER_SETTINGS.CONTACT_UPDATED.value],
               [RespondioTriggerV1.contactFieldTypeName]: [{ _cnd: { exists: true } }]
             }
           },
