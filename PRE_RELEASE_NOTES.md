@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.14.0](https://github.com/respond-io/n8n-integration/compare/v0.13.0...v0.14.0) (2025-08-18)
+
+
+### Features
+
+* add extra show on contactFieldsName ([03dc7df](https://github.com/respond-io/n8n-integration/commit/03dc7df5fd43393f65e69480badb28a685314712))
+* add extra show on contactFieldsName ([7135435](https://github.com/respond-io/n8n-integration/commit/71354357d2250b6493b9e11de63231da1fa01518))
+
 ## [0.13.0](https://github.com/respond-io/n8n-integration/compare/v0.12.0...v0.13.0) (2025-08-15)
 
 
