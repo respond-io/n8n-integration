@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/respond-io/n8n-integration/compare/v0.2.0...v0.2.1) (2025-08-19)
+
+
+### Bug Fixes
+
+* update linting scripts in package.json for prepublish checks ([65c835c](https://github.com/respond-io/n8n-integration/commit/65c835c3916c2c59ba69161e31d0001518bfe9b1))
+
 ## [0.2.0](https://github.com/respond-io/n8n-integration/compare/v0.1.0...v0.2.0) (2025-08-19)
 
 
