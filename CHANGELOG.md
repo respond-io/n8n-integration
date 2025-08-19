@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.6](https://github.com/respond-io/n8n-integration/compare/v0.2.5...v0.2.6) (2025-08-19)
+
+
+### Bug Fixes
+
+* correct syntax in release script for npm publish ([3ea3705](https://github.com/respond-io/n8n-integration/commit/3ea3705f011fa26d7afc9d099ee7a942356de771))
+
 ## [0.2.5](https://github.com/respond-io/n8n-integration/compare/v0.2.4...v0.2.5) (2025-08-19)
 
 
