@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.7](https://github.com/respond-io/n8n-integration/compare/v0.2.6...v0.2.7) (2025-08-19)
+
+
+### Bug Fixes
+
+* update build and release scripts to include README and LICENSE in dist, and adjust files list in package.json ([6d74edf](https://github.com/respond-io/n8n-integration/commit/6d74edf5e5eb306c4c9152c12acf0ef37166d543))
+
 ## [0.2.6](https://github.com/respond-io/n8n-integration/compare/v0.2.5...v0.2.6) (2025-08-19)
 
 
