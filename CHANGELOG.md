@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.4](https://github.com/respond-io/n8n-integration/compare/v0.2.3...v0.2.4) (2025-08-19)
+
+
+### Bug Fixes
+
+* update package.json to rename npm registry ([3ebd54f](https://github.com/respond-io/n8n-integration/commit/3ebd54f85fb112ecc77b3be246d474ea15416868))
+
 ## [0.2.3](https://github.com/respond-io/n8n-integration/compare/v0.2.2...v0.2.3) (2025-08-19)
 
 
