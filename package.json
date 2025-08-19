@@ -1,6 +1,6 @@
 {
   "name": "@respond-io/n8n-nodes-respond-io",
-  "version": "0.2.4",
+  "version": "0.1.0",
   "description": "n8n nodes for Respond.io integration",
   "keywords": [
     "n8n-community-node-package"
@@ -23,8 +23,8 @@
     "build": "npx rimraf dist && tsc && gulp build:icons",
     "dev": "tsc --watch",
     "test": "echo \"No tests specified\" && exit 0",
-    "release:dev": "npm run lint && npm run build && (cd dist && npm publish --tag next) || (echo 'Release failed' && exit 1)",
-    "release": "npm run lint && npm run build && (cd dist && npm publish --registry https://registry.npmjs.org/ --access public) || (echo 'Release failed' && exit 1)",
+    "release:dev": "npm run lint && npm run build && npm publish --tag next) || (echo 'Release failed' && exit 1)",
+    "release": "npm run lint && npm run build && npm publish --registry https://registry.npmjs.org/ --access public) || (echo 'Release failed' && exit 1)",
     "format": "prettier nodes credentials --write",
     "lint": "eslint --config eslintrc.js nodes/**/*.ts credentials/**/*.ts package.json",
     "lintfix": "eslint --config eslintrc.js nodes/**/*.ts credentials/**/*.ts package.json --fix",
