@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.2.5](https://github.com/respond-io/n8n-integration/compare/v0.2.4...v0.2.5) (2025-08-19)
+
+
+### Bug Fixes
+
+* correct syntax in release script for npm publish ([ba3258b](https://github.com/respond-io/n8n-integration/commit/ba3258b248bc23cac6b6a1ebbf32c3de11ae89b3))
+* update version to 0.1.0 and adjust changelog for initial release of n8n Respond.io integration ([3cd9977](https://github.com/respond-io/n8n-integration/commit/3cd99770bd53542399ee43ac44213092a91b5ecf))
+
+## [0.2.4](https://github.com/respond-io/n8n-integration/compare/v0.2.3...v0.2.4) (2025-08-19)
+
+
+### Bug Fixes
+
+* update package.json to rename npm registry ([3ebd54f](https://github.com/respond-io/n8n-integration/commit/3ebd54f85fb112ecc77b3be246d474ea15416868))
+
+## [0.2.3](https://github.com/respond-io/n8n-integration/compare/v0.2.2...v0.2.3) (2025-08-19)
+
+
+### Bug Fixes
+
+* update package.json to rename package and enhance release scripts with linting ([12344e4](https://github.com/respond-io/n8n-integration/commit/12344e49bf7fd3938edc211b62cdd7621e4eaed9))
+
 ## [0.2.2](https://github.com/respond-io/n8n-integration/compare/v0.2.1...v0.2.2) (2025-08-19)
 
 

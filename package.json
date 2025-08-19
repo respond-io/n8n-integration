@@ -13,25 +13,27 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/respond-io/n8n-integration.git"
+    "url": "git+https://github.com/respond-io/n8n-integration.git"
   },
   "engines": {
     "node": ">=18.0.0"
   },
   "main": "index.js",
   "scripts": {
-    "build": "npx rimraf dist && tsc && gulp build:icons",
+    "build": "npx rimraf dist && tsc && gulp build:icons && cp README.md dist/ && cp LICENSE.md dist/",
     "dev": "tsc --watch",
     "test": "echo \"No tests specified\" && exit 0",
     "release:dev": "npm run lint && npm run build && (cd dist && npm publish --tag next) || (echo 'Release failed' && exit 1)",
-    "release": "npm run lint && npm run build && (cd dist && npm publish --access public) || (echo 'Release failed' && exit 1)",
+    "release": "npm run lint && npm run build && (cd dist && npm publish --registry https://registry.npmjs.org/ --access public) || (echo 'Release failed' && exit 1)",
     "format": "prettier nodes credentials --write",
     "lint": "eslint --config eslintrc.js nodes/**/*.ts credentials/**/*.ts package.json",
     "lintfix": "eslint --config eslintrc.js nodes/**/*.ts credentials/**/*.ts package.json --fix",
     "prepublishOnly": "echo 'Build already completed with linting'"
   },
   "files": [
-    "dist"
+    "credentials",
+    "nodes", 
+    "*.md"
   ],
   "n8n": {
     "n8nNodesApiVersion": 1,
