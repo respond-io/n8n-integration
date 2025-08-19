@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.3](https://github.com/respond-io/n8n-integration/compare/v0.2.2...v0.2.3) (2025-08-19)
+
+
+### Bug Fixes
+
+* update package.json to rename package and enhance release scripts with linting ([12344e4](https://github.com/respond-io/n8n-integration/commit/12344e49bf7fd3938edc211b62cdd7621e4eaed9))
+
 ## [0.2.2](https://github.com/respond-io/n8n-integration/compare/v0.2.1...v0.2.2) (2025-08-19)
 
 
