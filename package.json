@@ -1,5 +1,5 @@
 {
-  "name": "n8n-nodes-respondio",
+  "name": "@respond-io/n8n-nodes-respondio",
   "version": "0.1.0",
   "description": "n8n nodes for Respond.io integration",
   "keywords": [
@@ -23,13 +23,12 @@
     "build": "npx rimraf dist && tsc && gulp build:icons",
     "dev": "tsc --watch",
     "test": "echo \"No tests specified\" && exit 0",
-    "release:dev": "npm run build && (cd dist && npm publish --tag next) || echo 'Release failed' && exit 1)",
-    "release": "npm run build && (cd dist && npm publish --access public) || (echo 'Release failed' && exit 1)",
+    "release:dev": "npm run lint && npm run build && (cd dist && npm publish --tag next) || (echo 'Release failed' && exit 1)",
+    "release": "npm run lint && npm run build && (cd dist && npm publish --access public) || (echo 'Release failed' && exit 1)",
     "format": "prettier nodes credentials --write",
     "lint": "eslint --config eslintrc.js nodes/**/*.ts credentials/**/*.ts package.json",
-    "lint:prepublish": "eslint --config eslintrc.prepublish.js nodes/**/*.ts credentials/**/*.ts package.json",
     "lintfix": "eslint --config eslintrc.js nodes/**/*.ts credentials/**/*.ts package.json --fix",
-    "prepublishOnly": "npm run build && npm run lint:prepublish"
+    "prepublishOnly": "echo 'Build already completed with linting'"
   },
   "files": [
     "dist"
