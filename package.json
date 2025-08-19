@@ -24,7 +24,7 @@
     "dev": "tsc --watch",
     "test": "echo \"No tests specified\" && exit 0",
     "release:dev": "npm run lint && npm run build && (cd dist && npm publish --tag next) || (echo 'Release failed' && exit 1)",
-    "release": "npm run lint && npm run build && (cd dist && npm publish --registry https://registry.npmjs.org/ --access public) || (echo 'Release failed' && exit 1)",
+    "release": "npm run lint && npm run build && npm publish --registry https://registry.npmjs.org/ --access public) || (echo 'Release failed' && exit 1)",
     "format": "prettier nodes credentials --write",
     "lint": "eslint --config eslintrc.js nodes/**/*.ts credentials/**/*.ts package.json",
     "lintfix": "eslint --config eslintrc.js nodes/**/*.ts credentials/**/*.ts package.json --fix",
