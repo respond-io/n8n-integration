@@ -1,6 +1,6 @@
 {
-  "name": "@respond-io/n8n-nodes-respondio",
-  "version": "0.1.0",
+  "name": "@respond-io/n8n-nodes-respond-io",
+  "version": "0.15.0",
   "description": "n8n nodes for Respond.io integration",
   "keywords": [
     "n8n-community-node-package"
@@ -54,5 +54,8 @@
   },
   "peerDependencies": {
     "n8n-workflow": "*"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
