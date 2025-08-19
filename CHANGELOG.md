@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/respond-io/n8n-integration/compare/v0.2.1...v0.2.2) (2025-08-19)
+
+
+### Bug Fixes
+
+* correct paths in ESLint configuration references in package.json and eslintrc.prepublish.js ([06942dc](https://github.com/respond-io/n8n-integration/commit/06942dc0f872e40f735d782430f2b955887521ca))
+
 ## [0.2.1](https://github.com/respond-io/n8n-integration/compare/v0.2.0...v0.2.1) (2025-08-19)
 
 
