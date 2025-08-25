@@ -203,20 +203,8 @@ export class RespondioTriggerV1 implements INodeType {
             bundle.contactFieldType = contactFieldType;
           }
 
-          const temp = {
-            type: eventType,
-            url: webhookUrl,
-            hookId: currentNode.webhookId,
-            bundle,
-          }
-          this.logger.info(`Creating subscription with: ${JSON.stringify(temp)}, to: ${platformUrl}/integration/n8n-api/subscribe`);
-
-          const newWebhookUrl = webhookUrl?.length ? new URL(webhookUrl) : new URL('');
-          newWebhookUrl.host = '74a4b9a203d2.ngrok-free.app'
-          newWebhookUrl.protocol = 'https'
-          newWebhookUrl.port = ''
           try {
-            const result = await this.helpers.request({
+            await this.helpers.request({
               method: 'POST',
               url: `${platformUrl}/integration/n8n-api/subscribe`,
               headers: {
@@ -225,15 +213,12 @@ export class RespondioTriggerV1 implements INodeType {
               body: {
                 webHookName: `${this.getWebhookName()} - ${currentNode.name}`,
                 type: eventType,
-                url: newWebhookUrl,
+                url: webhookUrl,
                 hookId: currentNode.webhookId,
                 bundle,
               },
               json: true,
             });
-            // store the webhook ID in the workflow static data for delete later on
-            const workflowData = this.getWorkflowStaticData('global');
-            workflowData.respondWebhookId = result.subscriberId;
           } catch (error) {
             this.logger.info(`Error: ${JSON.stringify(error)}`);
             throw new NodeOperationError(this.getNode(), `Failed to create webhook subscription: ${error.message}`);
@@ -244,14 +229,12 @@ export class RespondioTriggerV1 implements INodeType {
 
         async delete(this: IHookFunctions): Promise<boolean> {
           const credentials = await this.getCredentials('respondIoApi');
-
-          const workflowData = this.getWorkflowStaticData('global');
-          const webhookId = workflowData.respondWebhookId;
+          const currentNode = this.getNode();
+          const webhookId = currentNode.webhookId;
 
           if (!webhookId) return true
 
           const platformUrl = INTEGRATION_API_BASE_URL;
-
           try {
             const response = await this.helpers.request({
               method: 'DELETE',
@@ -290,7 +273,6 @@ export class RespondioTriggerV1 implements INodeType {
             });
 
             if (response === '<h3 align=\"center\">404 not Found!</h3>') {
-              this.logger.info('checkExists: webhook not found!!!');
               return false;
             }
 
