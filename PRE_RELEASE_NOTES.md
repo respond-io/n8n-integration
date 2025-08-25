@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.16.0](https://github.com/respond-io/n8n-integration/compare/v0.15.0...v0.16.0) (2025-08-25)
+
+
+### Features
+
+* add checkExists usage ([e819df0](https://github.com/respond-io/n8n-integration/commit/e819df0ed254391582d0c0d389b231c17a386e55))
+* add checkExists usage ([ec197ff](https://github.com/respond-io/n8n-integration/commit/ec197ff4ef6b6331d2a54ce7728e8b076fdb5265))
+* add publishConfig in package.json ([53edb0f](https://github.com/respond-io/n8n-integration/commit/53edb0fc97c1973f4b24a14063f3c674c476336b))
+* add some debugging ([d530d7d](https://github.com/respond-io/n8n-integration/commit/d530d7d5f94bcbe3e76a54312320e2d37ff3d6a3))
+* commit new package-lock.json ([4705668](https://github.com/respond-io/n8n-integration/commit/4705668390cae6695445f5fd83712fe402340bf0))
+* make sure the custom node is scoped ([4845493](https://github.com/respond-io/n8n-integration/commit/4845493ea400ff7dc676ac467c9ccb668c097d81))
+* make sure the custom node is scoped ([5b6ddf9](https://github.com/respond-io/n8n-integration/commit/5b6ddf958f0998f86eff832e713be87192a0f28c))
+* update version to 1.0.0 ([e120bec](https://github.com/respond-io/n8n-integration/commit/e120bec7729582924489f0f4ef8e123e3e04ccf0))
+* use of actual webhookId instead of global static data ([94811a0](https://github.com/respond-io/n8n-integration/commit/94811a022d4c1a7092ba48a080cb1c71bd42bb12))
+
+
+### Bug Fixes
+
+* add missing newline at end of release-live workflow file ([1dad7de](https://github.com/respond-io/n8n-integration/commit/1dad7debccca00c060563bc84c453bc588ced192))
+* add release configuration files and update release workflows ([9a36dd3](https://github.com/respond-io/n8n-integration/commit/9a36dd34206a61a163f4a8d35f3f9f96d7c5bd73))
+* add release configuration files and update release workflows ([a092df5](https://github.com/respond-io/n8n-integration/commit/a092df514e358eb8d2440868f69b7c7a80562ce1))
+* correct paths in ESLint configuration references in package.json ([f66a073](https://github.com/respond-io/n8n-integration/commit/f66a073a4599334aef061adf224c007dbdccc67d))
+* correct paths in ESLint configuration references in package.json and eslintrc.prepublish.js ([06942dc](https://github.com/respond-io/n8n-integration/commit/06942dc0f872e40f735d782430f2b955887521ca))
+* correct syntax in release script for npm publish ([3ea3705](https://github.com/respond-io/n8n-integration/commit/3ea3705f011fa26d7afc9d099ee7a942356de771))
+* correct syntax in release script for npm publish ([ba3258b](https://github.com/respond-io/n8n-integration/commit/ba3258b248bc23cac6b6a1ebbf32c3de11ae89b3))
+* update build and release scripts to include README and LICENSE in dist, and adjust files list in package.json ([6d74edf](https://github.com/respond-io/n8n-integration/commit/6d74edf5e5eb306c4c9152c12acf0ef37166d543))
+* update linting scripts in package.json for prepublish checks ([65c835c](https://github.com/respond-io/n8n-integration/commit/65c835c3916c2c59ba69161e31d0001518bfe9b1))
+* update package.json to rename npm registry ([3ebd54f](https://github.com/respond-io/n8n-integration/commit/3ebd54f85fb112ecc77b3be246d474ea15416868))
+* update package.json to rename package and enhance release scripts with linting ([12344e4](https://github.com/respond-io/n8n-integration/commit/12344e49bf7fd3938edc211b62cdd7621e4eaed9))
+* update version to 0.1.0 and adjust changelog for initial release of n8n Respond.io integration ([3cd9977](https://github.com/respond-io/n8n-integration/commit/3cd99770bd53542399ee43ac44213092a91b5ecf))
+
 ## [0.15.0](https://github.com/respond-io/n8n-integration/compare/v0.14.0...v0.15.0) (2025-08-18)
 
 
