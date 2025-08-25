@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.17.0](https://github.com/respond-io/n8n-integration/compare/v0.16.0...v0.17.0) (2025-08-25)
+
+
+### Features
+
+* include hookUrl in DELETE ([d997e77](https://github.com/respond-io/n8n-integration/commit/d997e770a44f039fd84ae0815a48d37609654b9f))
+
 ## [0.16.0](https://github.com/respond-io/n8n-integration/compare/v0.15.0...v0.16.0) (2025-08-25)
 
 
