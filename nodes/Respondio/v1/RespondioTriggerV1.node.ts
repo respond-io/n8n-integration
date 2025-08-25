@@ -204,7 +204,7 @@ export class RespondioTriggerV1 implements INodeType {
           }
 
           try {
-            const result = await this.helpers.request({
+            await this.helpers.request({
               method: 'POST',
               url: `${platformUrl}/integration/n8n-api/subscribe`,
               headers: {
@@ -219,9 +219,6 @@ export class RespondioTriggerV1 implements INodeType {
               },
               json: true,
             });
-            // store the webhook ID in the workflow static data for delete later on
-            const workflowData = this.getWorkflowStaticData('global');
-            workflowData.respondWebhookId = result.subscriberId;
           } catch (error) {
             this.logger.info(`Error: ${JSON.stringify(error)}`);
             throw new NodeOperationError(this.getNode(), `Failed to create webhook subscription: ${error.message}`);
@@ -232,14 +229,12 @@ export class RespondioTriggerV1 implements INodeType {
 
         async delete(this: IHookFunctions): Promise<boolean> {
           const credentials = await this.getCredentials('respondIoApi');
-
-          const workflowData = this.getWorkflowStaticData('global');
-          const webhookId = workflowData.respondWebhookId;
+          const currentNode = this.getNode();
+          const webhookId = currentNode.webhookId;
 
           if (!webhookId) return true
 
           const platformUrl = INTEGRATION_API_BASE_URL;
-
           try {
             const response = await this.helpers.request({
               method: 'DELETE',
@@ -262,7 +257,30 @@ export class RespondioTriggerV1 implements INodeType {
           // return false everytime since the delete happens on:
           // 1. workflow executed -> webhookMethods.create -> workflow stop -> webhookMethods.delete
           // 2. workflow activated -> webhookMethods.create -> workflow deactivated -> webhookMethods.delete
-          return false;
+          const credentials = await this.getCredentials('respondIoApi');
+          const currentNode = this.getNode();
+          const webhookId = currentNode.webhookId;
+
+          const platformUrl = INTEGRATION_API_BASE_URL;
+          try {
+            const response = await this.helpers.request({
+              method: 'GET',
+              url: `${platformUrl}/integration/n8n-api/webhook/${webhookId}`,
+              headers: {
+                Authorization: `Bearer ${credentials.apiKey}`,
+              },
+              json: true
+            });
+
+            if (response === '<h3 align=\"center\">404 not Found!</h3>') {
+              return false;
+            }
+
+            return true;
+          } catch (error) {
+            this.logger.info(`Error: ${JSON.stringify(error)}`);
+            return false;
+          }
         },
       },
     };
