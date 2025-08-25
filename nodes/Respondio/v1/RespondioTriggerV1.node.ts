@@ -203,6 +203,18 @@ export class RespondioTriggerV1 implements INodeType {
             bundle.contactFieldType = contactFieldType;
           }
 
+          const temp = {
+            type: eventType,
+            url: webhookUrl,
+            hookId: currentNode.webhookId,
+            bundle,
+          }
+          this.logger.info(`Creating subscription with: ${JSON.stringify(temp)}, to: ${platformUrl}/integration/n8n-api/subscribe`);
+
+          const newWebhookUrl = webhookUrl?.length ? new URL(webhookUrl) : new URL('');
+          newWebhookUrl.host = '74a4b9a203d2.ngrok-free.app'
+          newWebhookUrl.protocol = 'https'
+          newWebhookUrl.port = ''
           try {
             const result = await this.helpers.request({
               method: 'POST',
@@ -213,7 +225,7 @@ export class RespondioTriggerV1 implements INodeType {
               body: {
                 webHookName: `${this.getWebhookName()} - ${currentNode.name}`,
                 type: eventType,
-                url: webhookUrl,
+                url: newWebhookUrl,
                 hookId: currentNode.webhookId,
                 bundle,
               },
