@@ -231,6 +231,7 @@ export class RespondioTriggerV1 implements INodeType {
           const credentials = await this.getCredentials('respondIoApi');
           const currentNode = this.getNode();
           const webhookId = currentNode.webhookId;
+          const webhookUrl = this.getNodeWebhookUrl('default');
 
           if (!webhookId) return true
 
@@ -238,7 +239,7 @@ export class RespondioTriggerV1 implements INodeType {
           try {
             const response = await this.helpers.request({
               method: 'DELETE',
-              url: `${platformUrl}/integration/n8n-api/unsubscribe/${webhookId}`,
+              url: `${platformUrl}/integration/n8n-api/unsubscribe/${webhookId}?hookUrl=${webhookUrl}`,
               headers: {
                 Authorization: `Bearer ${credentials.apiKey}`,
               },
