@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.20.0](https://github.com/respond-io/n8n-integration/compare/v0.19.0...v0.20.0) (2025-08-27)
+
+
+### Features
+
+* update CREATE_CONTACT handler to push to /contact/${identifier} path ([49f0506](https://github.com/respond-io/n8n-integration/commit/49f050672ce1fd4bd7d721ee429f2be0cb6ceb53))
+* update CREATE_CONTACT handler to push to /contact/${identifier}… ([9d858f5](https://github.com/respond-io/n8n-integration/commit/9d858f56a23cdda3618e87f09b4a8a2b52eb924d))
+
 ## [0.19.0](https://github.com/respond-io/n8n-integration/compare/v0.18.0...v0.19.0) (2025-08-27)
 
 
