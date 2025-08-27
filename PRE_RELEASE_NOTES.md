@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.19.0](https://github.com/respond-io/n8n-integration/compare/v0.18.0...v0.19.0) (2025-08-27)
+
+
+### Features
+
+* add defaultIdentifierType to be more dynamic ([46c3518](https://github.com/respond-io/n8n-integration/commit/46c35185e6f9f8d4883c469b56f6a861c47d24df))
+* add defaultIdentifierType to be more dynamic ([746b3e8](https://github.com/respond-io/n8n-integration/commit/746b3e8418a0a0faedebef47f25dd2e408bb9843))
+
 ## [0.18.0](https://github.com/respond-io/n8n-integration/compare/v0.17.0...v0.18.0) (2025-08-27)
 
 
