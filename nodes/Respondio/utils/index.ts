@@ -86,7 +86,7 @@ export const generateContactInputFields = (isCreateContact: boolean = false): IN
       name: 'firstName',
       type: 'string',
       description: 'First name of the contact',
-      default: '',
+      default: ''
     },
     {
       displayName: 'Contact\'s Last Name',
@@ -94,7 +94,7 @@ export const generateContactInputFields = (isCreateContact: boolean = false): IN
       name: 'lastName',
       type: 'string',
       description: 'Last name of the contact',
-      default: '',
+      default: ''
     },
     {
       displayName: 'Contact\'s Preferred Language',
@@ -106,7 +106,7 @@ export const generateContactInputFields = (isCreateContact: boolean = false): IN
         value: language.alpha2,
       })),
       description: 'Preferred language of the contact',
-      default: 'en',
+      default: 'en'
     },
     {
       displayName: 'Contact\'s Profile Picture URL',
@@ -114,7 +114,7 @@ export const generateContactInputFields = (isCreateContact: boolean = false): IN
       name: 'profilePic',
       type: 'string',
       description: 'Profile picture URL of the contact',
-      default: '',
+      default: ''
     },
     {
       displayName: 'Contact\'s Country',
@@ -126,7 +126,7 @@ export const generateContactInputFields = (isCreateContact: boolean = false): IN
         value: country.Code,
       })),
       description: 'Country of the contact',
-      default: 'US',
+      default: 'US'
     },
   ];
 
@@ -142,6 +142,11 @@ export const generateContactInputFields = (isCreateContact: boolean = false): IN
         type: 'string' as const,
         description: 'Email address of the contact',
         default: '',
+        displayOptions: {
+          show: {
+            identifierType: [IContactIdentifiers.phone],
+          }
+        }
       },
       {
         displayName: 'Contact\'s Phone Number',
@@ -150,6 +155,11 @@ export const generateContactInputFields = (isCreateContact: boolean = false): IN
         type: 'string' as const,
         description: 'Phone number of the contact',
         default: '',
+        displayOptions: {
+          show: {
+            identifierType: [IContactIdentifiers.email],
+          }
+        }
       }
     )
   }
@@ -171,12 +181,8 @@ export const generateContactInputFields = (isCreateContact: boolean = false): IN
         addAllFields: true,
         multiKeyMatch: true,
         supportAutoMap: false,
-      }
-    },
-    displayOptions: {
-      show: {
-        firstName: [{ _cnd: { exists: true } }]
-      }
+      },
+      loadOptionsDependsOn: ['identifierType'],
     }
   })
 
