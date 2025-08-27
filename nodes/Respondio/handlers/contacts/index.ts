@@ -2,6 +2,7 @@ import { IExecuteFunctions, INodeExecutionData, INodePropertyOptions, NodeExecut
 import { ACTION_NAMES } from "../../constants/actions/action_names";
 import { callDeveloperApi, constructCustomFieldFromResourceMapper, constructIdentifier, fetchPaginatedOptions } from "../../utils";
 import {
+  CreateContactPayload,
   CreateContactResponse,
   CreateSpaceTagResponse,
   CustomFieldMapperReturnValue,
@@ -248,16 +249,18 @@ const execute = async (
 
     const customFields = constructCustomFieldFromResourceMapper(customFieldMapper);
 
-    const payload = {
+    const payload: CreateContactPayload = {
       firstName,
       lastName,
       language,
       profilePic,
       countryCode,
-      email,
-      phone,
       ...(customFields.length && { custom_fields: customFields }),
     }
+    if (email.length) payload.email = email
+    if (phone.length) payload.phone = phone
+
+    executionContext.logger.info(`Creating contact with identifier: ${identifier}. Payload: ${JSON.stringify(payload)}`);
 
     const response = await callDeveloperApi<CreateContactResponse>(executionContext, {
       method: 'POST',
