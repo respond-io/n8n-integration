@@ -142,6 +142,11 @@ export const generateContactInputFields = (isCreateContact: boolean = false): IN
         type: 'string' as const,
         description: 'Email address of the contact',
         default: '',
+        displayOptions: {
+          show: {
+            identifierType: [IContactIdentifiers.phone],
+          }
+        }
       },
       {
         displayName: 'Contact\'s Phone Number',
@@ -150,6 +155,11 @@ export const generateContactInputFields = (isCreateContact: boolean = false): IN
         type: 'string' as const,
         description: 'Phone number of the contact',
         default: '',
+        displayOptions: {
+          show: {
+            identifierType: [IContactIdentifiers.email],
+          }
+        }
       }
     )
   }
