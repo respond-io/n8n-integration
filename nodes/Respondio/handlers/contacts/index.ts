@@ -261,7 +261,7 @@ const execute = async (
 
     const response = await callDeveloperApi<CreateContactResponse>(executionContext, {
       method: 'POST',
-      path: `/contact/create_or_update/${identifier}`,
+      path: `/contact/${identifier}`,
       body: payload,
     })
 
