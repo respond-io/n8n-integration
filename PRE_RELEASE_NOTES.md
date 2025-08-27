@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.21.0](https://github.com/respond-io/n8n-integration/compare/v0.20.0...v0.21.0) (2025-08-27)
+
+
+### Features
+
+* add type and optional email and phone ([e7c7f17](https://github.com/respond-io/n8n-integration/commit/e7c7f1753473b8e38b50c60e988de8927c59ccdc))
+* add type and optional email and phone ([4d64c5b](https://github.com/respond-io/n8n-integration/commit/4d64c5bd5cb1cb0675a0c8606cbb0303b7b7b41d))
+* remove useless logger ([1366c65](https://github.com/respond-io/n8n-integration/commit/1366c659fc5c0242169834b409c0f0559cfee22e))
+
 ## [0.20.0](https://github.com/respond-io/n8n-integration/compare/v0.19.0...v0.20.0) (2025-08-27)
 
 
