@@ -20,6 +20,9 @@ export enum IContactIdentifierNames {
 export const generateContactIdentifierInputFields = (
   fields: IContactIdentifiers[] = [],
 ): INodeProperties[] => {
+  const defaultIdentifierType = fields.includes(IContactIdentifiers.id) ?
+    IContactIdentifiers.id :
+    IContactIdentifiers.email;
   return [
     {
       displayName: 'Identifier Type',
@@ -31,7 +34,7 @@ export const generateContactIdentifierInputFields = (
       })),
       required: true,
       description: 'How would you like to identify the contact?',
-      default: IContactIdentifiers.id,
+      default: defaultIdentifierType
     },
     {
       displayName: 'Contact ID',
