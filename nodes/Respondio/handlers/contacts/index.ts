@@ -260,8 +260,6 @@ const execute = async (
     if (email.length) payload.email = email
     if (phone.length) payload.phone = phone
 
-    executionContext.logger.info(`Creating contact with identifier: ${identifier}. Payload: ${JSON.stringify(payload)}`);
-
     const response = await callDeveloperApi<CreateContactResponse>(executionContext, {
       method: 'POST',
       path: `/contact/${identifier}`,
