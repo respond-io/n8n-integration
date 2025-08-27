@@ -224,7 +224,6 @@ export default {
       ]),
       ...generateContactInputFields(false),
     ] as unknown as INodeProperties[]
-    // missing custom fields list
   },
   [ACTION_NAMES.CREATE_OR_UPDATE_CONTACT]: {
     name: 'Create or Update a Contact',
@@ -238,7 +237,6 @@ export default {
       ]),
       ...generateContactInputFields(false),
     ] as unknown as INodeProperties[]
-    // missing custom fields list
   },
   [ACTION_NAMES.CREATE_CONTACT]: {
     name: 'Create a Contact',
@@ -251,6 +249,5 @@ export default {
       ]),
       ...generateContactInputFields(true),
     ] as unknown as INodeProperties[]
-    // missing custom fields list
   }
 }
