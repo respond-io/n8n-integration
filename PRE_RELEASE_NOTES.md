@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.18.0](https://github.com/respond-io/n8n-integration/compare/v0.17.0...v0.18.0) (2025-08-27)
+
+
+### Features
+
+* add show for the create / update contact fields ([0ac2bd4](https://github.com/respond-io/n8n-integration/commit/0ac2bd47e7a71680bf88f89b6377fb173d7533c5))
+* add show for the create / update contact fields ([f6cd1ba](https://github.com/respond-io/n8n-integration/commit/f6cd1bac52f0aecc3fc68e8764751cf519e17ebb))
+* allow Custom Fields to always appear and remove useless comments ([69a2ff9](https://github.com/respond-io/n8n-integration/commit/69a2ff9328e7ae07971c416575c773bd2236d2f8))
+
 ## [0.17.0](https://github.com/respond-io/n8n-integration/compare/v0.16.0...v0.17.0) (2025-08-25)
 
 
