@@ -201,16 +201,17 @@ export async function getEventSources(this: ILoadOptionsFunctions) {
     TRIGGER_SETTINGS.NEW_INCOMING_MESSAGE.value,
   ) as string;
 
+  let result = [{ name: '', value: '' }];
+
   if (eventType === TRIGGER_SETTINGS.CONVERSATION_CLOSED.value) {
-    return TRIGGER_SETTINGS_EVENT_SOURCES.CONVERSATION_CLOSED;
+    result.push(...TRIGGER_SETTINGS_EVENT_SOURCES.CONVERSATION_CLOSED);
   }
   if (eventType === TRIGGER_SETTINGS.CONVERSATION_OPENED.value) {
-    return TRIGGER_SETTINGS_EVENT_SOURCES.CONVERSATION_OPENED;
+    result.push(...TRIGGER_SETTINGS_EVENT_SOURCES.CONVERSATION_OPENED);
   }
   if (eventType === TRIGGER_SETTINGS.NEW_OUTGOING_MESSAGE.value) {
-    return TRIGGER_SETTINGS_EVENT_SOURCES.NEW_OUTGOING_MESSAGE;
+    result.push(...TRIGGER_SETTINGS_EVENT_SOURCES.NEW_OUTGOING_MESSAGE);
   }
 
-  // default: no options
-  return [];
+  return result
 }

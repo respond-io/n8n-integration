@@ -12,7 +12,7 @@ import {
 import { INTEGRATION_API_BASE_URL, TRIGGER_SETTINGS, TRIGGER_SETTINGS_EVENT_SOURCES } from '../constants';
 import { loadOptions } from '../classMethods';
 
-const messageTypeOptions = [
+const outgoingMessageTypeOptions = [
   { name: 'Text', value: 'text' },
   { name: 'Attachment', value: 'attachment' },
   { name: 'Quick Reply', value: 'quick_reply' },
@@ -23,6 +23,17 @@ const messageTypeOptions = [
   { name: 'Card', value: 'card' },
   { name: 'Rating', value: 'rating' },
   { name: 'Product Message', value: 'whatsapp_interactive' },
+]
+
+const incomingMessageTypeOptions = [
+  { name: 'Text', value: 'text' },
+  { name: 'Attachment', value: 'attachment' },
+  { name: 'Story Reply', value: 'story_reply' },
+  { name: 'Location', value: 'location' },
+  { name: 'Email', value: 'email' },
+  { name: 'Un Supported', value: 'unsupported' },
+  { name: 'Product Message', value: 'whatsapp_interactive' },
+  { name: 'Tiktok Post', value: 'post' }
 ]
 
 export class RespondioTriggerV1 implements INodeType {
@@ -83,6 +94,7 @@ export class RespondioTriggerV1 implements INodeType {
           displayName: 'Event Source',
           name: RespondioTriggerV1.eventSourceTypeName,
           type: 'multiOptions',
+          required: false,
           displayOptions: {
             show: {
               [RespondioTriggerV1.triggerEventTypeName]: [
@@ -96,22 +108,14 @@ export class RespondioTriggerV1 implements INodeType {
             loadOptionsMethod: 'getEventSources',
             loadOptionsDependsOn: [RespondioTriggerV1.triggerEventTypeName],
           },
-          default: undefined
+          default: ''
         },
         {
           displayName: 'Message Type',
           name: RespondioTriggerV1.messageTypeName,
           default: [],
           type: 'multiOptions',
-          options: [
-            { name: 'Text', value: 'text' },
-            { name: 'Attachment', value: 'attachment' },
-            { name: 'Story Reply', value: 'story_reply' },
-            { name: 'Location', value: 'location' },
-            { name: 'Email', value: 'email' },
-            { name: 'Un Supported', value: 'unsupported' },
-            { name: 'Product Message', value: 'whatsapp_interactive' }
-          ],
+          options: incomingMessageTypeOptions,
           displayOptions: {
             show: {
               [RespondioTriggerV1.triggerEventTypeName]: [
@@ -119,14 +123,15 @@ export class RespondioTriggerV1 implements INodeType {
               ]
             }
           },
+          required: false
         },
         {
           displayName: 'Message Type',
           name: RespondioTriggerV1.messageTypeName,
           default: [],
-          required: true,
+          required: false,
           type: 'multiOptions',
-          options: messageTypeOptions,
+          options: outgoingMessageTypeOptions,
           displayOptions: {
             show: {
               [RespondioTriggerV1.triggerEventTypeName]: [
@@ -207,7 +212,9 @@ export class RespondioTriggerV1 implements INodeType {
             TRIGGER_SETTINGS.NEW_OUTGOING_MESSAGE.value
           ] as const;
           if (messageHookEvents.includes(eventType as typeof messageHookEvents[number]) && (!messageType || !messageType.length)) {
-            messageType = messageTypeOptions.map(({ value }) => value);
+            messageType = eventType === TRIGGER_SETTINGS.NEW_INCOMING_MESSAGE.value
+              ? incomingMessageTypeOptions.map(({ value }) => value)
+              : outgoingMessageTypeOptions.map(({ value }) => value);
           }
 
           if (eventSources?.length) bundle.source = eventSources
