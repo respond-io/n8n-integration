@@ -75,7 +75,7 @@ const TRIGGER_SETTINGS_EVENT_SOURCES = {
     { name: 'Zapier', value: 'zapier' },
     { name: 'Bot', value: 'bot' },
     { name: 'Make', value: 'make' },
-    { name: 'N8N', value: 'n8n' },
+    { name: 'n8n', value: 'n8n' },
   ],
   CONVERSATION_OPENED: [
     { name: 'User', value: 'user' },
@@ -94,7 +94,7 @@ const TRIGGER_SETTINGS_EVENT_SOURCES = {
     { name: 'Bot', value: 'bot' },
     { name: 'Echo', value: 'echo' },
     { name: 'Make', value: 'make' },
-    { name: 'N8N', value: 'n8n' },
+    { name: 'n8n', value: 'n8n' },
   ]
 }
 
