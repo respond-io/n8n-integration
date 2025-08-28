@@ -18,51 +18,61 @@ const TRIGGER_SETTINGS = {
     name: 'Contact Assignee Updated',
     value: 'contactAssigneeUpdated',
     description: 'Trigger on contact assignee being updated',
+    action: 'On Contact Assignee updated'
   },
   CONTACT_TAG_UPDATED: {
     name: 'Contact Tag Updated',
     value: 'contactTagUpdated',
     description: 'Trigger on contact tag being updated',
+    action: 'On Contact Tag updated'
   },
   CONTACT_UPDATED: {
     name: 'Contact Updated',
     value: 'contactUpdated',
     description: 'Trigger on contact being updated',
+    action: 'On Contact updated'
   },
   CONVERSATION_CLOSED: {
     name: 'Conversation Closed',
     value: 'conversationClosed',
     description: 'Trigger on conversation being closed',
+    action: 'On Conversation closed'
   },
   CONVERSATION_OPENED: {
     name: 'Conversation Opened',
     value: 'conversationOpened',
     description: 'Trigger on conversation being opened',
+    action: 'On Conversation opened'
   },
   NEW_COMMENT: {
     name: 'New Comment',
     value: 'newComment',
     description: 'Trigger on new comment being added to a conversation',
+    action: 'On Comment added'
   },
   NEW_CONTACT: {
     name: 'New Contact',
     value: 'newContact',
     description: 'Trigger on new contact being created',
+    action: 'On Contact created'
   },
   NEW_INCOMING_MESSAGE: {
     name: 'New Incoming Message',
     value: 'newIncomingMessage',
     description: 'Trigger on new incoming message',
+    action: 'On Message received'
   },
   NEW_OUTGOING_MESSAGE: {
     name: 'New Outgoing Message',
     value: 'newOutgoingMessage',
     description: 'Trigger on new outgoing message',
+    action: 'On Message sent'
   },
   CONTACT_LIFECYCLE_UPDATED: {
     name: 'Contact Lifecycle Updated',
     value: 'lifecycleUpdated',
     description: 'Trigger on contact lifecycle being updated',
+    action: 'On Contact Lifecycle updated'
   },
 } as const satisfies Record<string, INodePropertyOptions>;
 
