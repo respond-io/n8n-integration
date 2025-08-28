@@ -8,6 +8,7 @@ import conversationsHandler from './conversations'
 import lifecycleHandler from './lifecycles'
 import usersHandler from './users'
 import messagesHandler from './messages'
+import tagsHandler from './tags'
 
 export default {
   [OPERATION_NAMES.CHANNELS]: channelHandler,
@@ -19,4 +20,5 @@ export default {
   [OPERATION_NAMES.LIFECYCLE]: lifecycleHandler,
   [OPERATION_NAMES.USER]: usersHandler,
   [OPERATION_NAMES.MESSAGES]: messagesHandler,
+  [OPERATION_NAMES.TAGS]: tagsHandler,
 }
