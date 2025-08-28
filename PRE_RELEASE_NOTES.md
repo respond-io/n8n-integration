@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.22.0](https://github.com/respond-io/n8n-integration/compare/v0.21.0...v0.22.0) (2025-08-28)
+
+
+### Features
+
+* add action to the options of operations ([5a7f7f6](https://github.com/respond-io/n8n-integration/commit/5a7f7f630ec571effeb4e010f4cc54f5f4277e60))
+* add new defaults to NEW_INCOMING_MESSAGE and NEW_OUTGOING_MESSAGE ([37dd57c](https://github.com/respond-io/n8n-integration/commit/37dd57c18c9c817643174a8d3fa520f526bce93d))
+* add tiktok post and add empty value for event source ([e1b9908](https://github.com/respond-io/n8n-integration/commit/e1b9908493d1321485f888e9931fad70f35808b0))
+* move tag operations to its own category ([bb570bb](https://github.com/respond-io/n8n-integration/commit/bb570bbc956611497a9a93538f16f7239aeafc5a))
+* rename N8N to n8n for label on source ([eec912b](https://github.com/respond-io/n8n-integration/commit/eec912b48d9bb86104a4880cd9d80136fd77c8bb))
+* rename N8N to n8n for label on source ([cce3303](https://github.com/respond-io/n8n-integration/commit/cce3303fcb8e6d238d71fd3c9a197a5f1fbbf755))
+
 ## [0.21.0](https://github.com/respond-io/n8n-integration/compare/v0.20.0...v0.21.0) (2025-08-27)
 
 
