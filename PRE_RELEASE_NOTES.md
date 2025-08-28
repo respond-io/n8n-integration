@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.23.0](https://github.com/respond-io/n8n-integration/compare/v0.22.0...v0.23.0) (2025-08-28)
+
+
+### Features
+
+* add action to trigger_settings options ([110d8b0](https://github.com/respond-io/n8n-integration/commit/110d8b0f8ec404469e162727ebaad9344a62bad0))
+* add action to trigger_settings options ([87f3773](https://github.com/respond-io/n8n-integration/commit/87f377363e1006dd62fd7830c29d6ba735be0fc7))
+
 ## [0.22.0](https://github.com/respond-io/n8n-integration/compare/v0.21.0...v0.22.0) (2025-08-28)
 
 
