@@ -9,8 +9,32 @@ import {
   IWorkflowMetadata,
   INodeTypeBaseDescription,
 } from 'n8n-workflow';
-import { INTEGRATION_API_BASE_URL, TRIGGER_SETTINGS } from '../constants';
+import { INTEGRATION_API_BASE_URL, TRIGGER_SETTINGS, TRIGGER_SETTINGS_EVENT_SOURCES } from '../constants';
 import { loadOptions } from '../classMethods';
+
+const outgoingMessageTypeOptions = [
+  { name: 'Text', value: 'text' },
+  { name: 'Attachment', value: 'attachment' },
+  { name: 'Quick Reply', value: 'quick_reply' },
+  { name: 'Custom Payload', value: 'custom_payload' },
+  { name: 'WhatsApp Template', value: 'whatsapp_template' },
+  { name: 'Location', value: 'location' },
+  { name: 'Email', value: 'email' },
+  { name: 'Card', value: 'card' },
+  { name: 'Rating', value: 'rating' },
+  { name: 'Product Message', value: 'whatsapp_interactive' },
+]
+
+const incomingMessageTypeOptions = [
+  { name: 'Text', value: 'text' },
+  { name: 'Attachment', value: 'attachment' },
+  { name: 'Story Reply', value: 'story_reply' },
+  { name: 'Location', value: 'location' },
+  { name: 'Email', value: 'email' },
+  { name: 'Un Supported', value: 'unsupported' },
+  { name: 'Product Message', value: 'whatsapp_interactive' },
+  { name: 'Tiktok Post', value: 'post' }
+]
 
 export class RespondioTriggerV1 implements INodeType {
   description: INodeTypeDescription;
@@ -70,6 +94,7 @@ export class RespondioTriggerV1 implements INodeType {
           displayName: 'Event Source',
           name: RespondioTriggerV1.eventSourceTypeName,
           type: 'multiOptions',
+          required: false,
           displayOptions: {
             show: {
               [RespondioTriggerV1.triggerEventTypeName]: [
@@ -83,22 +108,14 @@ export class RespondioTriggerV1 implements INodeType {
             loadOptionsMethod: 'getEventSources',
             loadOptionsDependsOn: [RespondioTriggerV1.triggerEventTypeName],
           },
-          default: undefined
+          default: ''
         },
         {
           displayName: 'Message Type',
           name: RespondioTriggerV1.messageTypeName,
           default: [],
           type: 'multiOptions',
-          options: [
-            { name: 'Text', value: 'text' },
-            { name: 'Attachment', value: 'attachment' },
-            { name: 'Story Reply', value: 'story_reply' },
-            { name: 'Location', value: 'location' },
-            { name: 'Email', value: 'email' },
-            { name: 'Un Supported', value: 'unsupported' },
-            { name: 'Product Message', value: 'whatsapp_interactive' }
-          ],
+          options: incomingMessageTypeOptions,
           displayOptions: {
             show: {
               [RespondioTriggerV1.triggerEventTypeName]: [
@@ -106,25 +123,15 @@ export class RespondioTriggerV1 implements INodeType {
               ]
             }
           },
+          required: false
         },
         {
           displayName: 'Message Type',
           name: RespondioTriggerV1.messageTypeName,
           default: [],
-          required: true,
+          required: false,
           type: 'multiOptions',
-          options: [
-            { name: 'Text', value: 'text' },
-            { name: 'Attachment', value: 'attachment' },
-            { name: 'Quick Reply', value: 'quick_reply' },
-            { name: 'Custom Payload', value: 'custom_payload' },
-            { name: 'WhatsApp Template', value: 'whatsapp_template' },
-            { name: 'Location', value: 'location' },
-            { name: 'Email', value: 'email' },
-            { name: 'Card', value: 'card' },
-            { name: 'Rating', value: 'rating' },
-            { name: 'Product Message', value: 'whatsapp_interactive' },
-          ],
+          options: outgoingMessageTypeOptions,
           displayOptions: {
             show: {
               [RespondioTriggerV1.triggerEventTypeName]: [
@@ -183,9 +190,9 @@ export class RespondioTriggerV1 implements INodeType {
           const eventType = this.getNodeParameter(
             RespondioTriggerV1.triggerEventTypeName,
             RespondioTriggerV1.triggerDefaultValue,
-          ) as string;
-          const eventSources = this.getNodeParameter(RespondioTriggerV1.eventSourceTypeName, []) as string[];
-          const messageType = this.getNodeParameter(RespondioTriggerV1.messageTypeName, []) as string[];
+          ) as typeof TRIGGER_SETTINGS[keyof typeof TRIGGER_SETTINGS]['value'];
+          let eventSources = this.getNodeParameter(RespondioTriggerV1.eventSourceTypeName, []) as string[];
+          let messageType = this.getNodeParameter(RespondioTriggerV1.messageTypeName, []) as string[];
           const contactFieldType = this.getNodeParameter(RespondioTriggerV1.contactFieldTypeName, '') as 'standard_field' | 'custom_field' | '';
           const fields = contactFieldType?.length ? this.getNodeParameter(RespondioTriggerV1.contactFieldsName, []) as string[] : [];
 
@@ -193,6 +200,22 @@ export class RespondioTriggerV1 implements INodeType {
           const bundle: { source?: string[]; workflowDetails?: IWorkflowMetadata, messageType?: string[]; fields?: string[]; contactFieldType?: 'standard_field' | 'custom_field' } = {}
 
           if (!webhookUrl) throw new NodeOperationError(this.getNode(), 'Webhook URL is not defined. Please set the webhook URL in the node settings.');
+
+          // set default event sources if none selected for NEW_OUTGOING_MESSAGE event types
+          if (eventType === TRIGGER_SETTINGS.NEW_OUTGOING_MESSAGE.value && (!eventSources || !eventSources.length)) {
+            eventSources = TRIGGER_SETTINGS_EVENT_SOURCES.NEW_OUTGOING_MESSAGE.map(({ value }) => value);
+          }
+
+          // set default message types if none selected for NEW_OUTGOING_MESSAGE & NEW_INCOMING_MESSAGE event types
+          const messageHookEvents = [
+            TRIGGER_SETTINGS.NEW_INCOMING_MESSAGE.value,
+            TRIGGER_SETTINGS.NEW_OUTGOING_MESSAGE.value
+          ] as const;
+          if (messageHookEvents.includes(eventType as typeof messageHookEvents[number]) && (!messageType || !messageType.length)) {
+            messageType = eventType === TRIGGER_SETTINGS.NEW_INCOMING_MESSAGE.value
+              ? incomingMessageTypeOptions.map(({ value }) => value)
+              : outgoingMessageTypeOptions.map(({ value }) => value);
+          }
 
           if (eventSources?.length) bundle.source = eventSources
           if (workflow) bundle.workflowDetails = workflow

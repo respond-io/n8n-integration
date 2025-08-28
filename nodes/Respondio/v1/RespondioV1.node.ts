@@ -50,6 +50,7 @@ function buildDynamicProperties(resourceTypeName: string, resourceTypeDefault: s
         name: action.name,
         value: action.value,
         description: action.description,
+        action: action.name,
       })),
       default: Object.values(actions)[0]?.value || '',
       required: true,
