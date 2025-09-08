@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.0](https://github.com/respond-io/n8n-integration/compare/v0.3.0...v0.4.0) (2025-09-08)
+
+
+### Features
+
+* add ts-ignore to process.env usage in constants ([5219b91](https://github.com/respond-io/n8n-integration/commit/5219b9147edeb96cd14216a4f74f88724440c269))
+* remove timers/promises import ([cce439b](https://github.com/respond-io/n8n-integration/commit/cce439b99464be9ff69fcaf263c9e833e58223f6))
+
 ## [0.3.0](https://github.com/respond-io/n8n-integration/compare/v0.2.7...v0.3.0) (2025-09-08)
 
 
