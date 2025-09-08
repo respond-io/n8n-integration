@@ -256,3 +256,14 @@ export type WhatsappTemplateComponentField = {
   example: Record<string, any> | string;
   buttons?: any[] | null;
 }
+
+export type CreateContactPayload = {
+  firstName: string;
+  lastName: string;
+  language: string;
+  profilePic: string;
+  countryCode: string;
+  custom_fields?: { name: string; value: string | number | boolean | Date }[];
+  email?: string;
+  phone?: string;
+}

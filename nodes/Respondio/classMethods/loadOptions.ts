@@ -3,10 +3,12 @@ import { callDeveloperApi, capitalizeFirstLetter, constructIdentifier, fetchPagi
 import {
   Channel,
   ClosingNote,
+  CustomField,
   FetchWhatsappTemplateResponse,
   GetContactResponse,
   SpaceUser,
 } from "../types";
+import { TRIGGER_SETTINGS, TRIGGER_SETTINGS_EVENT_SOURCES } from "../constants";
 
 const abortControllers: Record<string, AbortController> = {};
 
@@ -153,4 +155,63 @@ export async function getTemplatePreviewOptions(this: ILoadOptionsFunctions): Pr
   }
 
   return options;
+}
+
+export async function getContactFields(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+  const fieldType = this.getNodeParameter('contactFieldType', 'standardField') as 'standard_field' | 'custom_field';
+
+  if (fieldType === 'standard_field') {
+    const standardFields = {
+      firstName: 'First Name',
+      lastName: 'Last Name',
+      email: 'Email',
+      phone: 'Phone',
+      lang: 'Language',
+      profilePic: 'Profile Picture',
+      countryCode: 'Country Code',
+    }
+    return Object.entries(standardFields).map(([value, name]) => ({
+      name,
+      value
+    }))
+  }
+
+  const { transformed: results } = await fetchPaginatedOptions<CustomField, INodePropertyOptions>(
+    this,
+    'respondIoApi',
+    '/space/custom_field',
+    (item) => ({
+      name: item.name,
+      value: item.id,
+      description: item.description || '',
+    }),
+    {
+      includeRaw: false,
+      limit: 100,
+      includeTransformed: true
+    }
+  )
+
+  return results;
+}
+
+export async function getEventSources(this: ILoadOptionsFunctions) {
+  const eventType = this.getNodeParameter(
+    'triggerEventType',
+    TRIGGER_SETTINGS.NEW_INCOMING_MESSAGE.value,
+  ) as string;
+
+  let result = [{ name: '', value: '' }];
+
+  if (eventType === TRIGGER_SETTINGS.CONVERSATION_CLOSED.value) {
+    result.push(...TRIGGER_SETTINGS_EVENT_SOURCES.CONVERSATION_CLOSED);
+  }
+  if (eventType === TRIGGER_SETTINGS.CONVERSATION_OPENED.value) {
+    result.push(...TRIGGER_SETTINGS_EVENT_SOURCES.CONVERSATION_OPENED);
+  }
+  if (eventType === TRIGGER_SETTINGS.NEW_OUTGOING_MESSAGE.value) {
+    result.push(...TRIGGER_SETTINGS_EVENT_SOURCES.NEW_OUTGOING_MESSAGE);
+  }
+
+  return result
 }

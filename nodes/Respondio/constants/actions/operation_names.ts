@@ -8,6 +8,7 @@ export enum OPERATION_NAMES {
   LIFECYCLE = 'LIFECYCLE',
   MESSAGES = 'MESSAGES',
   USER = 'USER',
+  TAGS = 'TAGS',
 }
 
 export default OPERATION_NAMES;

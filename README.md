@@ -6,14 +6,14 @@ Respond.io is a customer conversation management platform that helps businesses 
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
-[Installation](#installation)
-[Operations](#operations)
-[Triggers](#triggers)
-[Credentials](#credentials)
-[Compatibility](#compatibility)
-[Usage](#usage)
-[Resources](#resources)
-[Version history](#version-history)
+- [Installation](#installation)
+- [Operations](#operations)
+- [Triggers](#triggers)
+- [Credentials](#credentials)
+- [Compatibility](#compatibility)
+- [Usage](#usage)
+- [Resources](#resources)
+- [Version history](#version-history)
 
 ## Installation
 

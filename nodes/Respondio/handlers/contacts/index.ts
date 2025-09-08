@@ -2,11 +2,10 @@ import { IExecuteFunctions, INodeExecutionData, INodePropertyOptions, NodeExecut
 import { ACTION_NAMES } from "../../constants/actions/action_names";
 import { callDeveloperApi, constructCustomFieldFromResourceMapper, constructIdentifier, fetchPaginatedOptions } from "../../utils";
 import {
+  CreateContactPayload,
   CreateContactResponse,
-  CreateSpaceTagResponse,
   CustomFieldMapperReturnValue,
   DeleteManyTagsResponse,
-  DeleteSpaceTagResponse,
   FindContactChannelsItem,
   GetContactResponse,
   GetManyContactsResponse,
@@ -32,64 +31,6 @@ const execute = async (
     ACTION_NAMES.CREATE_CONTACT,
   ]
   if (!allowedActions.includes(action)) return []
-
-  if (action === ACTION_NAMES.ADD_SPACE_TAG) {
-    const name = executionContext.getNodeParameter('name', 0, '') as string;
-    const description = executionContext.getNodeParameter('description', 0, '') as string;
-    const colorCode = executionContext.getNodeParameter('colorCode', 0, '') as string;
-    const emoji = executionContext.getNodeParameter('emoji', 0, '') as string;
-
-    const payload = {
-      name,
-      description,
-      colorCode,
-      emoji
-    }
-
-    const response = await callDeveloperApi<CreateSpaceTagResponse>(executionContext, {
-      method: 'POST',
-      path: '/space/tag',
-      body: payload,
-    })
-
-    return [[{ json: response.message }]];
-  }
-
-  if (action === ACTION_NAMES.DELETE_SPACE_TAG) {
-    const name = executionContext.getNodeParameter('name', 0, '') as string;
-
-    const response = await callDeveloperApi<DeleteSpaceTagResponse>(executionContext, {
-      method: 'DELETE',
-      path: '/space/tag',
-      body: { name },
-    })
-
-    return [[{ json: response }]]
-  }
-
-  if (action === ACTION_NAMES.UPDATE_SPACE_TAG) {
-    const currentName = executionContext.getNodeParameter('currentName', 0, '') as string;
-    const name = executionContext.getNodeParameter('name', 0, '') as string;
-    const description = executionContext.getNodeParameter('description', 0, '') as string;
-    const colorCode = executionContext.getNodeParameter('colorCode', 0, '') as string;
-    const emoji = executionContext.getNodeParameter('emoji', 0, '') as string;
-
-    const payload = {
-      currentName,
-      name,
-      description,
-      colorCode,
-      emoji
-    }
-
-    const response = await callDeveloperApi<CreateSpaceTagResponse>(executionContext, {
-      method: 'PUT',
-      path: '/space/tag',
-      body: payload,
-    })
-
-    return [[{ json: response }]]
-  }
 
   if (action === ACTION_NAMES.REMOVE_TAGS) {
     const identifier = constructIdentifier(executionContext);
@@ -248,20 +189,20 @@ const execute = async (
 
     const customFields = constructCustomFieldFromResourceMapper(customFieldMapper);
 
-    const payload = {
+    const payload: CreateContactPayload = {
       firstName,
       lastName,
       language,
       profilePic,
       countryCode,
-      email,
-      phone,
       ...(customFields.length && { custom_fields: customFields }),
     }
+    if (email.length) payload.email = email
+    if (phone.length) payload.phone = phone
 
     const response = await callDeveloperApi<CreateContactResponse>(executionContext, {
       method: 'POST',
-      path: `/contact/create_or_update/${identifier}`,
+      path: `/contact/${identifier}`,
       body: payload,
     })
 
