@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.24.0](https://github.com/respond-io/n8n-integration/compare/v0.23.0...v0.24.0) (2025-09-08)
+
+
+### Features
+
+* fix license content ([e0570db](https://github.com/respond-io/n8n-integration/commit/e0570dbc0547a6387fe9ae55c2b44d278c5238c2))
+* fix license content ([11d0eff](https://github.com/respond-io/n8n-integration/commit/11d0effcaef2ed8ecb8cbcc2e3da2d15e7111a59))
+
 ## [0.23.0](https://github.com/respond-io/n8n-integration/compare/v0.22.0...v0.23.0) (2025-08-28)
 
 
