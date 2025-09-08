@@ -1,5 +1,4 @@
 import { IExecuteFunctions, IHttpRequestOptions, ILoadOptionsFunctions, INodeProperties, INodePropertyOptions, IRequestOptions } from "n8n-workflow"
-import { setTimeout as waitFor } from 'timers/promises';
 
 import languagesJSON from './languages.json'
 import countriesJSON from './countries.json'
@@ -249,7 +248,8 @@ export async function paginateWithCursor<TItem, TResult>(
     }
 
     cursor = nextCursor;
-    await waitFor(delayMs);
+    // @ts-ignore
+    await new Promise(resolve => setTimeout(resolve, delayMs));
   } while (true);
   return { transformed, raw };
 }
