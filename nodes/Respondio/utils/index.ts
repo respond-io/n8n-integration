@@ -1,20 +1,20 @@
-import { IExecuteFunctions, IHttpRequestOptions, ILoadOptionsFunctions, INodeProperties, INodePropertyOptions, IRequestOptions, sleep } from "n8n-workflow"
+import { IExecuteFunctions, IHttpRequestOptions, ILoadOptionsFunctions, INodeProperties, INodePropertyOptions, IRequestOptions, sleep } from 'n8n-workflow';
 
-import languagesJSON from './languages.json'
-import countriesJSON from './countries.json'
-import { DEVELOPER_API_BASE_URL } from "../constants";
-import { CustomFieldMapperReturnValue, WhatsAppTemplate } from "../types";
+import languagesJSON from './languages.json';
+import countriesJSON from './countries.json';
+import { DEVELOPER_API_BASE_URL } from '../constants';
+import { CustomFieldMapperReturnValue, WhatsAppTemplate } from '../types';
 
 export enum IContactIdentifiers {
   id = 'id',
   email = 'email',
   phone = 'phone',
-}
+};
 
 export enum IContactIdentifierNames {
   contactId = 'contactId',
   contactIdentifier = 'contactIdentifier',
-}
+};
 
 export const generateContactIdentifierInputFields = (
   fields: IContactIdentifiers[] = [],
