@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.27.0](https://github.com/respond-io/n8n-integration/compare/v0.26.0...v0.27.0) (2025-09-09)
+
+
+### Features
+
+* remove process.env usage in constants ([5c60bfa](https://github.com/respond-io/n8n-integration/commit/5c60bfaa1a1ea7bca6a46e68fa64ab4d7e313d2b))
+* remove process.env usage in constants ([65de363](https://github.com/respond-io/n8n-integration/commit/65de363cc5c9c0e3b8398601314c6b12b9e529c5))
+* use of sleep from n8n-workflow instead of setTimeout ([772afdc](https://github.com/respond-io/n8n-integration/commit/772afdc3c7ce30df20f058503d6bf7a46413b832))
+
 ## [0.26.0](https://github.com/respond-io/n8n-integration/compare/v0.25.0...v0.26.0) (2025-09-08)
 
 
