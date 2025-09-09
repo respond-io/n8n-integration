@@ -1,17 +1,17 @@
-import { INodeProperties, INodePropertyOptions } from "n8n-workflow";
+import { INodeProperties, INodePropertyOptions } from 'n8n-workflow';
 
-import ACTION_NAMES from "./actions/action_names";
-import channelActions from './actions/channels'
-import closingNotesActions from './actions/closing_notes'
-import commentsActions from './actions/comments'
-import contactActions from './actions/contacts'
-import contactFieldActions from './actions/contact_fields'
-import conversationsActions from './actions/conversations'
-import lifecycleActions from './actions/lifecycle'
-import messagesActions from './actions/messages'
+import ACTION_NAMES from './actions/action_names';
+import channelActions from './actions/channels';
+import closingNotesActions from './actions/closing_notes';
+import commentsActions from './actions/comments';
+import contactActions from './actions/contacts';
+import contactFieldActions from './actions/contact_fields';
+import conversationsActions from './actions/conversations';
+import lifecycleActions from './actions/lifecycle';
+import messagesActions from './actions/messages';
 import usersActions from './actions/users';
 import tagsActions from './actions/tags';
-import OPERATION_NAMES from "./actions/operation_names";
+import OPERATION_NAMES from './actions/operation_names';
 
 const TRIGGER_SETTINGS = {
   CONTACT_ASSIGNEE_UPDATED: {
@@ -107,7 +107,7 @@ const TRIGGER_SETTINGS_EVENT_SOURCES = {
     { name: 'Make', value: 'make' },
     { name: 'n8n', value: 'n8n' },
   ]
-}
+};
 
 const ACTION_SETTINGS = {
   [OPERATION_NAMES.CHANNELS]: { [ACTION_NAMES.GET_ALL_CHANNELS]: channelActions.GET_ALL_CHANNELS },
