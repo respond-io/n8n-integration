@@ -160,10 +160,8 @@ const ACTION_SETTINGS = {
   >
 >;
 
-// @ts-ignore
-const DEVELOPER_API_BASE_URL = process.env.DEVELOPER_API_BASE_URL || 'https://api.respond.io'
-// @ts-ignore
-const INTEGRATION_API_BASE_URL = process.env.INTEGRATION_API_BASE_URL || 'https://app.respond.io';
+const DEVELOPER_API_BASE_URL = 'https://api.respond.io';
+const INTEGRATION_API_BASE_URL = 'https://app.respond.io';
 
 export const INPUT_IDENTIFIER = '$input$';
 export const HIDDEN_INPUT_IDENTIFIER = '$hidden$';
