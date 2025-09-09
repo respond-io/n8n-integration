@@ -1,4 +1,4 @@
-import { IExecuteFunctions, IHttpRequestOptions, ILoadOptionsFunctions, INodeProperties, INodePropertyOptions, IRequestOptions } from "n8n-workflow"
+import { IExecuteFunctions, IHttpRequestOptions, ILoadOptionsFunctions, INodeProperties, INodePropertyOptions, IRequestOptions, sleep } from "n8n-workflow"
 
 import languagesJSON from './languages.json'
 import countriesJSON from './countries.json'
@@ -248,8 +248,7 @@ export async function paginateWithCursor<TItem, TResult>(
     }
 
     cursor = nextCursor;
-    // @ts-ignore
-    await new Promise(resolve => setTimeout(resolve, delayMs));
+    sleep(delayMs);
   } while (true);
   return { transformed, raw };
 }
