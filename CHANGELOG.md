@@ -1,5 +1,39 @@
 # Changelog
 
+## [0.4.0](https://github.com/respond-io/n8n-integration/compare/v0.3.0...v0.4.0) (2025-09-08)
+
+
+### Features
+
+* add ts-ignore to process.env usage in constants ([5219b91](https://github.com/respond-io/n8n-integration/commit/5219b9147edeb96cd14216a4f74f88724440c269))
+* remove timers/promises import ([cce439b](https://github.com/respond-io/n8n-integration/commit/cce439b99464be9ff69fcaf263c9e833e58223f6))
+
+## [0.3.0](https://github.com/respond-io/n8n-integration/compare/v0.2.7...v0.3.0) (2025-09-08)
+
+
+### Features
+
+* add action to the options of operations ([5a7f7f6](https://github.com/respond-io/n8n-integration/commit/5a7f7f630ec571effeb4e010f4cc54f5f4277e60))
+* add action to trigger_settings options ([87f3773](https://github.com/respond-io/n8n-integration/commit/87f377363e1006dd62fd7830c29d6ba735be0fc7))
+* add checkExists usage ([ec197ff](https://github.com/respond-io/n8n-integration/commit/ec197ff4ef6b6331d2a54ce7728e8b076fdb5265))
+* add defaultIdentifierType to be more dynamic ([746b3e8](https://github.com/respond-io/n8n-integration/commit/746b3e8418a0a0faedebef47f25dd2e408bb9843))
+* add list elements for headers ([8758390](https://github.com/respond-io/n8n-integration/commit/8758390edac34fb7f903d6b0d563092ce595fa76))
+* add new defaults to NEW_INCOMING_MESSAGE and NEW_OUTGOING_MESSAGE ([37dd57c](https://github.com/respond-io/n8n-integration/commit/37dd57c18c9c817643174a8d3fa520f526bce93d))
+* add show for the create / update contact fields ([f6cd1ba](https://github.com/respond-io/n8n-integration/commit/f6cd1bac52f0aecc3fc68e8764751cf519e17ebb))
+* add some debugging ([d530d7d](https://github.com/respond-io/n8n-integration/commit/d530d7d5f94bcbe3e76a54312320e2d37ff3d6a3))
+* add tiktok post and add empty value for event source ([e1b9908](https://github.com/respond-io/n8n-integration/commit/e1b9908493d1321485f888e9931fad70f35808b0))
+* add type and optional email and phone ([4d64c5b](https://github.com/respond-io/n8n-integration/commit/4d64c5bd5cb1cb0675a0c8606cbb0303b7b7b41d))
+* add webHookName and update error return ([9c697cb](https://github.com/respond-io/n8n-integration/commit/9c697cb8e35a260f4c09b52a213ee41b51b7d35e))
+* allow Custom Fields to always appear and remove useless comments ([69a2ff9](https://github.com/respond-io/n8n-integration/commit/69a2ff9328e7ae07971c416575c773bd2236d2f8))
+* commit new package-lock.json ([4705668](https://github.com/respond-io/n8n-integration/commit/4705668390cae6695445f5fd83712fe402340bf0))
+* fix license content ([11d0eff](https://github.com/respond-io/n8n-integration/commit/11d0effcaef2ed8ecb8cbcc2e3da2d15e7111a59))
+* include hookUrl in DELETE ([d997e77](https://github.com/respond-io/n8n-integration/commit/d997e770a44f039fd84ae0815a48d37609654b9f))
+* move tag operations to its own category ([bb570bb](https://github.com/respond-io/n8n-integration/commit/bb570bbc956611497a9a93538f16f7239aeafc5a))
+* remove useless logger ([1366c65](https://github.com/respond-io/n8n-integration/commit/1366c659fc5c0242169834b409c0f0559cfee22e))
+* rename N8N to n8n for label on source ([cce3303](https://github.com/respond-io/n8n-integration/commit/cce3303fcb8e6d238d71fd3c9a197a5f1fbbf755))
+* update CREATE_CONTACT handler to push to /contact/${identifier} path ([49f0506](https://github.com/respond-io/n8n-integration/commit/49f050672ce1fd4bd7d721ee429f2be0cb6ceb53))
+* use of actual webhookId instead of global static data ([94811a0](https://github.com/respond-io/n8n-integration/commit/94811a022d4c1a7092ba48a080cb1c71bd42bb12))
+
 ## [0.2.7](https://github.com/respond-io/n8n-integration/compare/v0.2.6...v0.2.7) (2025-08-19)
 
 
