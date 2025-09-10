@@ -1,0 +1,19 @@
+name: Auto Pull Request on Branch Push
+
+on:
+  push:
+    branches:
+      - "fix/**"
+      - "chore/**"
+      - "hotfix/**"
+      - "flight/**"
+      - "feat/**"
+jobs:
+  auto-pr:
+    uses: respond-io/shared-github-actions/.github/workflows/auto-pull-request-reusable.yaml@master
+    with:
+      target_branch: 'dev'
+      branch_patterns: 'fix,chore,hotfix,flight,feat'
+    secrets:
+      pr_token: ${{ secrets.GITHUB_TOKEN }}
+      
