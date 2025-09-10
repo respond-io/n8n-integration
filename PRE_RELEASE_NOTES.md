@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.29.0](https://github.com/respond-io/n8n-integration/compare/v0.28.1...v0.29.0) (2025-09-10)
+
+
+### Features
+
+* add new messageType for specific / last channel ([e96d309](https://github.com/respond-io/n8n-integration/commit/e96d309bc2ab6822c7d39bc52a75d3c99df5115e))
+* add new messageType for specific / last channel ([f2db3fb](https://github.com/respond-io/n8n-integration/commit/f2db3fb5275383be801ca9b121ed0e0730c60eb5))
+
 ## [0.28.1](https://github.com/respond-io/n8n-integration/compare/v0.28.0...v0.28.1) (2025-09-10)
 
 

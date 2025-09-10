@@ -1,6 +1,6 @@
 {
   "name": "@respond-io/n8n-nodes-respond-io",
-  "version": "0.28.1",
+  "version": "0.29.0",
   "description": "n8n nodes for Respond.io integration",
   "keywords": [
     "n8n-community-node-package"
