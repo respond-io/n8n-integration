@@ -634,7 +634,32 @@ export default {
         ],
         required: true,
         description: 'Select the channel type to send the message',
-        default: 'text'
+        default: 'text',
+        displayOptions: {
+          show: {
+            channelType: ['specificChannel']
+          }
+        }
+      },
+      {
+        displayName: 'Message Type',
+        name: 'messageType',
+        type: 'options',
+        options: [
+          { name: '', value: '' },
+          { name: 'Text', value: 'text' },
+          { name: 'Attachments', value: 'attachment' },
+          { name: 'Quick Reply', value: 'quick_reply' },
+          { name: 'Email', value: 'email' },
+        ],
+        required: true,
+        description: 'Select the channel type to send the message',
+        default: 'text',
+        displayOptions: {
+          show: {
+            channelType: ['lastInteractedChannel']
+          }
+        }
       },
       ...email.generateFields(),
       ...attachments.generateFields(),
