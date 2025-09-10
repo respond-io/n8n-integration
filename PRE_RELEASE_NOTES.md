@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.28.0](https://github.com/respond-io/n8n-integration/compare/v0.27.0...v0.28.0) (2025-09-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* convert double quote to single and add semicolon in utils
+
+### Features
+
+* change double quote to single + add semicolon in constants ([7802b2b](https://github.com/respond-io/n8n-integration/commit/7802b2b1ce05310d22843bc0320ca94b5b8212ae))
+* change double quote to single + add semicolon in constants ([e01d9ac](https://github.com/respond-io/n8n-integration/commit/e01d9ac8af02eb8fa5c7c305605884f96a693642))
+* convert double quote to single and add semicolon in utils ([c309ff2](https://github.com/respond-io/n8n-integration/commit/c309ff2b8938ad7507da8900133a6b484b436b1f))
+
+
+### Bug Fixes
+
+* add new param to RespondioV1 node ([08dca87](https://github.com/respond-io/n8n-integration/commit/08dca8784a80736ba8feb4403ffe5a5ed076673c))
+
 ## [0.27.0](https://github.com/respond-io/n8n-integration/compare/v0.26.0...v0.27.0) (2025-09-09)
 
 
