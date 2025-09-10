@@ -109,7 +109,8 @@ export class RespondioV1 implements INodeType {
         },
       ],
       properties: buildDynamicProperties(RespondioV1.resourceTypeName, RespondioV1.resourceTypeDefault),
-      version: 1
+      version: 1,
+      usableAsTool: true
     };
   }
 
