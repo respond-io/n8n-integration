@@ -103,12 +103,15 @@ export const generateContactInputFields = (isCreateContact: boolean = false): IN
       required: false,
       name: 'language',
       type: 'options',
-      options: languagesJSON.map((language) => ({
-        name: language.English,
-        value: language.alpha2,
-      })),
+      options: [
+        { name: '', value: '' },
+        ...languagesJSON.map((language) => ({
+          name: language.English,
+          value: language.alpha2,
+        }))
+      ],
       description: 'Preferred language of the contact',
-      default: 'en'
+      default: ''
     },
     {
       displayName: 'Contact\'s Profile Picture URL',
@@ -123,12 +126,15 @@ export const generateContactInputFields = (isCreateContact: boolean = false): IN
       required: false,
       name: 'countryCode',
       type: 'options',
-      options: countriesJSON.map((country) => ({
-        name: country.Name,
-        value: country.Code,
-      })),
+      options: [
+        { name: '', value: '' },
+        ...countriesJSON.map((country) => ({
+          name: country.Name,
+          value: country.Code,
+        }))
+      ],
       description: 'Country of the contact',
-      default: 'US'
+      default: ''
     },
   ];
 
