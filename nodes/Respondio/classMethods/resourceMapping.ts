@@ -51,7 +51,6 @@ export async function getCustomFields(this: ILoadOptionsFunctions): Promise<Reso
 
     return { fields }
   } catch (error) {
-    console.error('Error fetching custom fields:', error);
     return {
       fields: [],
     };

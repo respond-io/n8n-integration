@@ -10,34 +10,13 @@ import {
 } from "../types";
 import { TRIGGER_SETTINGS, TRIGGER_SETTINGS_EVENT_SOURCES } from "../constants";
 
-const abortControllers: Record<string, AbortController> = {};
-
-function toGenericAbortSignal(signal: AbortSignal) {
-  return {
-    aborted: signal.aborted,
-    onabort: signal.onabort,
-    addEventListener: signal.addEventListener.bind(signal),
-    removeEventListener: signal.removeEventListener.bind(signal),
-  };
-}
-
 export async function getTagsForContact(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-  const nodeId = this.getNode().id;
-  // Abort previous request for this node
-  if (abortControllers[nodeId]) {
-    abortControllers[nodeId].abort();
-  }
-
-  const abortController = new AbortController();
-  abortControllers[nodeId] = abortController;
-
   const identifier = constructIdentifier(this);
 
   try {
     const response = await callDeveloperApi<GetContactResponse>(this, {
       method: 'GET',
       path: `/contact/${identifier}`,
-      abortSignal: toGenericAbortSignal(abortController.signal),
       useHttpRequestHelper: true
     })
 

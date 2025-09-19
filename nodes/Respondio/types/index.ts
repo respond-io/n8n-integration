@@ -258,11 +258,11 @@ export type WhatsappTemplateComponentField = {
 }
 
 export type CreateContactPayload = {
-  firstName: string;
-  lastName: string;
-  language: string;
-  profilePic: string;
-  countryCode: string;
+  firstName?: string;
+  lastName?: string;
+  language?: string;
+  profilePic?: string;
+  countryCode?: string;
   custom_fields?: { name: string; value: string | number | boolean | Date }[];
   email?: string;
   phone?: string;
