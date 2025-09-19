@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.1.0](https://github.com/respond-io/n8n-integration/compare/v1.0.1...v1.1.0) (2025-09-10)
+
+
+### Features
+
+* add new messageType for specific / last channel ([f2db3fb](https://github.com/respond-io/n8n-integration/commit/f2db3fb5275383be801ca9b121ed0e0730c60eb5))
+
+## [1.0.1](https://github.com/respond-io/n8n-integration/compare/v1.0.0...v1.0.1) (2025-09-10)
+
+
+### Bug Fixes
+
+* add GitHub Actions workflow for automatic pull requests on specific branch pushes ([dfd8ab7](https://github.com/respond-io/n8n-integration/commit/dfd8ab743bf7d1883bbad048561f8b552f260de5))
+* remove auto pull request workflow from GitHub Actions ([ea475db](https://github.com/respond-io/n8n-integration/commit/ea475dbc92084753d52835a2cfc975ce041c2bdf))
+* update package.json scripts and files for improved release process ([a0b39c2](https://github.com/respond-io/n8n-integration/commit/a0b39c22455a15fc95158c548b7791d58b05858a))
+
 ## [1.0.0](https://github.com/respond-io/n8n-integration/compare/v0.7.0...v1.0.0) (2025-09-09)
 
 
