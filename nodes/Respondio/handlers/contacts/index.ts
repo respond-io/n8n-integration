@@ -130,11 +130,11 @@ const execute = async (
     const customFields = constructCustomFieldFromResourceMapper(customFieldMapper);
 
     const payload = {
-      firstName,
-      lastName,
-      language,
-      profilePic,
-      countryCode,
+      ...(firstName && { firstName }),
+      ...(lastName && { lastName }),
+      ...(language && { language }),
+      ...(profilePic && { profilePic }),
+      ...(countryCode && { countryCode }),
       ...(customFields.length && { custom_fields: customFields }),
     }
 
@@ -159,11 +159,11 @@ const execute = async (
     const customFields = constructCustomFieldFromResourceMapper(customFieldMapper);
 
     const payload = {
-      firstName,
-      lastName,
-      language,
-      profilePic,
-      countryCode,
+      ...(firstName && { firstName }),
+      ...(lastName && { lastName }),
+      ...(language && { language }),
+      ...(profilePic && { profilePic }),
+      ...(countryCode && { countryCode }),
       ...(customFields.length && { custom_fields: customFields }),
     }
 
@@ -190,11 +190,11 @@ const execute = async (
     const customFields = constructCustomFieldFromResourceMapper(customFieldMapper);
 
     const payload: CreateContactPayload = {
-      firstName,
-      lastName,
-      language,
-      profilePic,
-      countryCode,
+      ...(firstName && { firstName }),
+      ...(lastName && { lastName }),
+      ...(language && { language }),
+      ...(profilePic && { profilePic }),
+      ...(countryCode && { countryCode }),
       ...(customFields.length && { custom_fields: customFields }),
     }
     if (email.length) payload.email = email
