@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.0](https://github.com/respond-io/n8n-integration/compare/v1.1.0...v1.2.0) (2025-09-19)
+
+
+### Features
+
+* fix update contact and remove unneeded code ([edae89f](https://github.com/respond-io/n8n-integration/commit/edae89ff5571fd039033ce28cf0db7e6eaea793c))
+
+
+### Bug Fixes
+
+* add blank language and country ([cc8cdcb](https://github.com/respond-io/n8n-integration/commit/cc8cdcb58254056ef2b49a53dfd1fc67a3afd224))
+
 ## [1.1.0](https://github.com/respond-io/n8n-integration/compare/v1.0.1...v1.1.0) (2025-09-10)
 
 
