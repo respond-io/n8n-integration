@@ -238,6 +238,28 @@ const createCatalogButtonComponent = (
   };
 };
 
+const createLinkButtonComponent = (
+  buttonComponent: any,
+  rawComponents: Array<Record<string, any>>,
+) => {
+  const buttonComponents = rawComponents.filter((obj) => Object.keys(obj)[0].includes('$input$_buttons'));
+
+  if (!buttonComponents?.length) return null;
+
+  return {
+    type: 'buttons',
+    buttons: [{
+      type: 'url',
+      text: buttonComponent?.buttons?.[0]?.text || 'View items',
+      url: buttonComponent?.buttons?.[0]?.url || 'https://example.com',
+      parameters: buttonComponents.map((obj) => ({
+        type: 'text',
+        text: Object.values(obj)[0]
+      }))
+    }],
+  };
+};
+
 const createProductButtonComponent = (
   originalComponents: Array<WhatsappTemplateComponentField>,
   rawComponents: Array<Record<string, any>>,
@@ -256,6 +278,10 @@ const createProductButtonComponent = (
 
   if (buttonType === 'catalog') {
     return createCatalogButtonComponent(buttonComponent, rawComponents);
+  }
+
+  if (buttonType === 'url') {
+    return createLinkButtonComponent(buttonComponent, rawComponents);
   }
 
   return null;
@@ -390,8 +416,8 @@ const getWhatsappTemplateMessage = (input: GetWhatsappTemplateMessageInput) => {
   const inputMap = createInputMap(rawComponents);
   const resultingComponents = createTextComponents(nonButtonComponents, inputMap);
 
-  const hasProducts = templateDetails.catalogProducts.length > 0;
-  if (hasProducts) {
+  const hasProductsOrButton = templateDetails.catalogProducts.length > 0 || buttonComponent !== undefined;
+  if (hasProductsOrButton) {
     const productButtonComponent = createProductButtonComponent(originalComponents, rawComponents);
     if (productButtonComponent) {
       resultingComponents.push(productButtonComponent);
