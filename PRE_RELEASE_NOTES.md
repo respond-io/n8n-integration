@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.30.1](https://github.com/respond-io/n8n-integration/compare/v0.30.0...v0.30.1) (2025-10-09)
+
+
+### Bug Fixes
+
+* add createLinkButtonComponent for WhatsappTemplate ([a64fad2](https://github.com/respond-io/n8n-integration/commit/a64fad2f04f217be39f39cfdb86b9954c9d3655e))
+
 ## [0.30.0](https://github.com/respond-io/n8n-integration/compare/v0.29.0...v0.30.0) (2025-09-19)
 
 
