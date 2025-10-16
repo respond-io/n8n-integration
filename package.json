@@ -48,6 +48,7 @@
       "dist/nodes/Respondio/RespondioTrigger.node.js"
     ]
   },
+  "dependencies": {},
   "devDependencies": {
     "@types/node": "^24.1.0",
     "@typescript-eslint/parser": "~8.32.0",

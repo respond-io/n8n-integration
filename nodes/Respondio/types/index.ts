@@ -1,3 +1,6 @@
+import { IExecuteFunctions, INodeExecutionData, NodeExecutionWithMetadata } from "n8n-workflow";
+import { ACTION_NAMES } from "../constants";
+
 export type GetContactResponse = {
   id: string | null;
   firstName: string | null;
@@ -267,3 +270,7 @@ export type CreateContactPayload = {
   email?: string;
   phone?: string;
 }
+
+export type GenericActionHandler = {
+  execute: (action: ACTION_NAMES, ctx: IExecuteFunctions) => Promise<INodeExecutionData[][] | NodeExecutionWithMetadata[][] | null>;
+};

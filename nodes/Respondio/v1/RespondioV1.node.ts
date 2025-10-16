@@ -13,6 +13,7 @@ import ACTION_NAMES from './../constants/actions/action_names'
 import { ACTION_SETTINGS } from '../constants';
 import handlers from '../handlers';
 import { loadOptions, resourceMapping } from '../classMethods';
+import { GenericActionHandler } from '../types';
 
 function buildDynamicProperties(resourceTypeName: string, resourceTypeDefault: string): INodeProperties[] {
   const properties: INodeProperties[] = [];
@@ -125,7 +126,7 @@ export class RespondioV1 implements INodeType {
     if (!action) throw new Error('Action is required');
     if (!handler) throw new Error(`Operation [${operation}] not supported`)
 
-    const results = await handler.execute(action, this)
+    const results = await (handler as GenericActionHandler).execute(action, this);
     return results;
   }
 }
