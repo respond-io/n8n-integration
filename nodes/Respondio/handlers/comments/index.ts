@@ -3,33 +3,40 @@ import { ACTION_NAMES } from "../../constants/actions/action_names";
 import { callDeveloperApi, constructIdentifier } from "../../utils";
 import { CreateCommentResponse } from "../../types";
 
+const ALLOWED_COMMENT_ACTIONS = [
+  ACTION_NAMES.ADD_COMMENT,
+] as const;
+
+type VALID_COMMENT_ACTIONS = typeof ALLOWED_COMMENT_ACTIONS[number];
+
 const execute = async (
-  action: ACTION_NAMES,
+  action: VALID_COMMENT_ACTIONS,
   executionContext: IExecuteFunctions,
 ): Promise<INodeExecutionData[][] | NodeExecutionWithMetadata[][] | null> => {
-  // we only care about ADD_COMMENT for the COMMENTS operation
-  if (action !== ACTION_NAMES.ADD_COMMENT) return []
+  if (!ALLOWED_COMMENT_ACTIONS.includes(action)) return []
+  const items = executionContext.getInputData();
+  const results: INodeExecutionData[] = [];
 
-  const identifier = constructIdentifier(executionContext);
-  const commentContent = executionContext.getNodeParameter('comment', 0, '') as string;
+  for (let i = 0; i < items.length; i++) {
+    const identifier = constructIdentifier(executionContext, i);
+    const commentContent = executionContext.getNodeParameter('comment', i, '') as string;
 
-  if (!commentContent) {
-    const error = new NodeOperationError(executionContext.getNode(), 'Comment content is required');
+    if (!commentContent) {
+      const error = new NodeOperationError(executionContext.getNode(), 'Comment content is required');
 
-    return [[{
-      json: {},
-      error,
-      pairedItem: { item: 0 },
-    }]];
+      results.push({ json: {}, error, pairedItem: { item: i } });
+    }
+
+    const response = await callDeveloperApi<CreateCommentResponse>(executionContext, {
+      method: 'POST',
+      path: `/contact/${identifier}/comment`,
+      body: { text: commentContent },
+    })
+
+    results.push({ json: response, pairedItem: { item: i } });
   }
 
-  const response = await callDeveloperApi<CreateCommentResponse>(executionContext, {
-    method: 'POST',
-    path: `/contact/${identifier}/comment`,
-    body: { text: commentContent },
-  })
-
-  return [[{ json: response }]]
+  return [results];
 }
 
 export default { execute }
