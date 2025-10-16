@@ -6,23 +6,12 @@ import {
   DeleteSpaceTagResponse,
 } from "../../types";
 
-const execute = async (
-  action: ACTION_NAMES,
-  executionContext: IExecuteFunctions,
-): Promise<INodeExecutionData[][] | NodeExecutionWithMetadata[][] | null> => {
-  // we only care about ADD_SPACE_TAG, DELETE_SPACE_TAG & UPDATE_SPACE_TAG for the TAGS operation
-  const allowedActions = [
-    ACTION_NAMES.ADD_SPACE_TAG,
-    ACTION_NAMES.DELETE_SPACE_TAG,
-    ACTION_NAMES.UPDATE_SPACE_TAG,
-  ]
-  if (!allowedActions.includes(action)) return []
-
-  if (action === ACTION_NAMES.ADD_SPACE_TAG) {
-    const name = executionContext.getNodeParameter('name', 0, '') as string;
-    const description = executionContext.getNodeParameter('description', 0, '') as string;
-    const colorCode = executionContext.getNodeParameter('colorCode', 0, '') as string;
-    const emoji = executionContext.getNodeParameter('emoji', 0, '') as string;
+const actionHandlers = {
+  [ACTION_NAMES.ADD_SPACE_TAG]: async (executionContext: IExecuteFunctions, itemIndex: number) => {
+    const name = executionContext.getNodeParameter('name', itemIndex, '') as string;
+    const description = executionContext.getNodeParameter('description', itemIndex, '') as string;
+    const colorCode = executionContext.getNodeParameter('colorCode', itemIndex, '') as string;
+    const emoji = executionContext.getNodeParameter('emoji', itemIndex, '') as string;
 
     const payload = {
       name,
@@ -37,27 +26,23 @@ const execute = async (
       body: payload,
     })
 
-    return [[{ json: response.message }]];
-  }
+    return response;
+  },
+  [ACTION_NAMES.DELETE_SPACE_TAG]: async (executionContext: IExecuteFunctions, itemIndex: number) => {
+    const name = executionContext.getNodeParameter('name', itemIndex, '') as string;
 
-  if (action === ACTION_NAMES.DELETE_SPACE_TAG) {
-    const name = executionContext.getNodeParameter('name', 0, '') as string;
-
-    const response = await callDeveloperApi<DeleteSpaceTagResponse>(executionContext, {
+    return callDeveloperApi<DeleteSpaceTagResponse>(executionContext, {
       method: 'DELETE',
       path: '/space/tag',
       body: { name },
     })
-
-    return [[{ json: response }]]
-  }
-
-  if (action === ACTION_NAMES.UPDATE_SPACE_TAG) {
-    const currentName = executionContext.getNodeParameter('currentName', 0, '') as string;
-    const name = executionContext.getNodeParameter('name', 0, '') as string;
-    const description = executionContext.getNodeParameter('description', 0, '') as string;
-    const colorCode = executionContext.getNodeParameter('colorCode', 0, '') as string;
-    const emoji = executionContext.getNodeParameter('emoji', 0, '') as string;
+  },
+  [ACTION_NAMES.UPDATE_SPACE_TAG]: async (executionContext: IExecuteFunctions, itemIndex: number) => {
+    const currentName = executionContext.getNodeParameter('currentName', itemIndex, '') as string;
+    const name = executionContext.getNodeParameter('name', itemIndex, '') as string;
+    const description = executionContext.getNodeParameter('description', itemIndex, '') as string;
+    const colorCode = executionContext.getNodeParameter('colorCode', itemIndex, '') as string;
+    const emoji = executionContext.getNodeParameter('emoji', itemIndex, '') as string;
 
     const payload = {
       currentName,
@@ -67,16 +52,40 @@ const execute = async (
       emoji
     }
 
-    const response = await callDeveloperApi<CreateSpaceTagResponse>(executionContext, {
+    return callDeveloperApi<CreateSpaceTagResponse>(executionContext, {
       method: 'PUT',
       path: '/space/tag',
       body: payload,
     })
+  },
+}
 
-    return [[{ json: response }]]
+const ALLOWED_TAG_ACTIONS = [
+  ACTION_NAMES.ADD_SPACE_TAG,
+  ACTION_NAMES.DELETE_SPACE_TAG,
+  ACTION_NAMES.UPDATE_SPACE_TAG,
+] as const;
+
+type VALID_TAG_ACTIONS = typeof ALLOWED_TAG_ACTIONS[number];
+
+const execute = async (
+  action: VALID_TAG_ACTIONS,
+  executionContext: IExecuteFunctions,
+): Promise<INodeExecutionData[][] | NodeExecutionWithMetadata[][] | null> => {
+  if (!ALLOWED_TAG_ACTIONS.includes(action)) return []
+  const items = executionContext.getInputData();
+  const results: INodeExecutionData[] = [];
+  const handler = actionHandlers[action];
+
+  if (!handler) return [[{ json: { message: 'Action not handled' }, pairedItem: { item: 0 } }]]
+
+  for (let i = 0; i < items.length; i++) {
+    const data = await handler(executionContext, i);
+
+    results.push({ json: data, pairedItem: { item: i } });
   }
 
-  return [[]]
+  return [results];
 }
 
 export default { execute }
