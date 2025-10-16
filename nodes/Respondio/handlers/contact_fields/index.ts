@@ -4,7 +4,7 @@ import { callDeveloperApi, fetchPaginatedOptions } from "../../utils";
 import { CustomField } from "../../types";
 
 const actionHandlers = {
-  [ACTION_NAMES.GET_ALL_CUSTOM_FIELDS]: async (executionContext: IExecuteFunctions, itemIndex) => {
+  [ACTION_NAMES.GET_ALL_CUSTOM_FIELDS]: async (executionContext: IExecuteFunctions, itemIndex: number) => {
     const limit = executionContext.getNodeParameter('limit', itemIndex, 10) as number;
 
     const { raw } = await fetchPaginatedOptions<CustomField, INodePropertyOptions>(
