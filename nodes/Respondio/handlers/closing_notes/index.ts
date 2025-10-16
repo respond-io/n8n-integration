@@ -1,29 +1,41 @@
-import { IExecuteFunctions, INodePropertyOptions } from "n8n-workflow";
+import { IExecuteFunctions, INodeExecutionData, INodePropertyOptions } from "n8n-workflow";
 import { ACTION_NAMES } from "../../constants/actions/action_names";
 import { fetchPaginatedOptions } from "../../utils";
 import { ClosingNote } from "../../types";
 
-const execute = async (action: ACTION_NAMES, executionContext: IExecuteFunctions) => {
-  // we only care about GET_ALL_CLOSING_NOTES for the CLOSING_NOTES operation
-  if (action !== ACTION_NAMES.GET_ALL_CLOSING_NOTES) return []
+const ALLOWED_CLOSING_NOTE_ACTIONS = [
+  ACTION_NAMES.GET_ALL_CLOSING_NOTES,
+] as const;
 
-  const limit = executionContext.getNodeParameter('limit', 10) as number;
-  const { raw } = await fetchPaginatedOptions<ClosingNote, INodePropertyOptions>(
-    executionContext,
-    'respondIoApi',
-    '/space/closing_notes',
-    undefined,
-    {
-      maxResults: limit,
-      includeRaw: true,
-      limit: 20,
-      includeTransformed: false
+type VALID_CLOSING_NOTES_ACTIONS = typeof ALLOWED_CLOSING_NOTE_ACTIONS[number];
+
+const execute = async (action: VALID_CLOSING_NOTES_ACTIONS, executionContext: IExecuteFunctions) => {
+  if (!ALLOWED_CLOSING_NOTE_ACTIONS.includes(action)) return []
+  const items = executionContext.getInputData();
+  const results: INodeExecutionData[] = [];
+
+  for (let i = 0; i < items.length; i++) {
+    const limit = executionContext.getNodeParameter('limit', i, 10) as number;
+
+    const { raw } = await fetchPaginatedOptions<ClosingNote, INodePropertyOptions>(
+      executionContext,
+      'respondIoApi',
+      '/space/closing_notes',
+      undefined,
+      {
+        maxResults: limit,
+        includeRaw: true,
+        limit: 20,
+        includeTransformed: false
+      }
+    )
+
+    for (const d of raw) {
+      results.push({ json: d, pairedItem: { item: i } });
     }
-  )
+  }
 
-  // Map raw items into n8n output format
-  const returnData = raw.map((item) => ({ json: item }));
-  return [returnData]
+  return [results];
 }
 
 export default { execute }
