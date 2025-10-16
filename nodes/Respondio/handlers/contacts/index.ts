@@ -195,9 +195,12 @@ const execute = async (
     const data = await handler(executionContext, i);
 
     if (Array.isArray(data)) {
-      for (const d of data) {
-        results.push({ json: d, pairedItem: { item: i } });
-      }
+      results.push(
+        ...data.map(d => ({
+          json: d,
+          pairedItem: { item: i },
+        }))
+      );
     } else {
       results.push({ json: data, pairedItem: { item: i } });
     }

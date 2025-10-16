@@ -30,9 +30,12 @@ const execute = async (action: VALID_CLOSING_NOTES_ACTIONS, executionContext: IE
       }
     )
 
-    for (const d of raw) {
-      results.push({ json: d, pairedItem: { item: i } });
-    }
+    results.push(
+      ...raw.map(d => ({
+        json: d,
+        pairedItem: { item: i },
+      }))
+    );
   }
 
   return [results];
