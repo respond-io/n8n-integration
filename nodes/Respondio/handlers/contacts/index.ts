@@ -69,7 +69,7 @@ const actionHandlers = {
     const search = executionContext.getNodeParameter('search', itemIndex, '') as string;
     const limit = executionContext.getNodeParameter('limit', itemIndex, 10) as number;
 
-    return callDeveloperApi<GetManyContactsResponse>(executionContext, {
+    const response = await callDeveloperApi<GetManyContactsResponse>(executionContext, {
       method: 'POST',
       path: `/contact/list?limit=${limit}`,
       body: {
@@ -78,6 +78,9 @@ const actionHandlers = {
         filter: { $or: [] }
       }
     })
+
+    return response.items;
+
   },
   [ACTION_NAMES.UPDATE_CONTACT]: async (executionContext: IExecuteFunctions, itemIndex: number) => {
     const identifier = constructIdentifier(executionContext, itemIndex);
@@ -192,7 +195,6 @@ const execute = async (
     const data = await handler(executionContext, i);
 
     if (Array.isArray(data)) {
-      // e.g. FIND_CONTACT_CHANNELS returning multiple results
       for (const d of data) {
         results.push({ json: d, pairedItem: { item: i } });
       }
