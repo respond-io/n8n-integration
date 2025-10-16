@@ -12,8 +12,8 @@ const actionHandlers = {
       path: `/space/user/${userId}`,
     })
   },
-  [ACTION_NAMES.GET_ALL_USERS]: async (executionContext: IExecuteFunctions, itemIndex: number) => {
-    const limit = executionContext.getNodeParameter('limit', itemIndex, 100) as number;
+  [ACTION_NAMES.GET_ALL_USERS]: async (executionContext: IExecuteFunctions) => {
+    const limit = executionContext.getNodeParameter('limit', 0, 100) as number;
 
     const response = await callDeveloperApi<GetAllUsersResponse>(executionContext, {
       method: 'GET',
@@ -42,7 +42,9 @@ const execute = async (
 
   if (!handler) return [[{ json: { message: 'Action not handled' }, pairedItem: { item: 0 } }]]
 
+  const isSingularAction = action === ACTION_NAMES.GET_ALL_USERS;
   for (let i = 0; i < items.length; i++) {
+    if (isSingularAction && i > 0) continue;
     const data = await handler(executionContext, i);
 
     if (Array.isArray(data)) {

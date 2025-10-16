@@ -4,7 +4,7 @@ import { callDeveloperApi, fetchPaginatedOptions } from "../../utils";
 import { CustomField } from "../../types";
 
 const actionHandlers = {
-  [ACTION_NAMES.GET_ALL_CUSTOM_FIELDS]: async (executionContext: IExecuteFunctions, itemIndex: number) => {
+  [ACTION_NAMES.GET_ALL_CUSTOM_FIELDS]: async (executionContext: IExecuteFunctions, itemIndex) => {
     const limit = executionContext.getNodeParameter('limit', itemIndex, 10) as number;
 
     const { raw } = await fetchPaginatedOptions<CustomField, INodePropertyOptions>(
@@ -72,7 +72,9 @@ const execute = async (
 
   if (!handler) return [[{ json: { message: 'No action executed' }, pairedItem: 0 }]];
 
+  const isSingularAction = action === ACTION_NAMES.GET_ALL_CUSTOM_FIELDS;
   for (let i = 0; i < items.length; i++) {
+    if (isSingularAction && i > 0) continue;
     const data = await handler(executionContext, i);
 
     if (Array.isArray(data)) {
