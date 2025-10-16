@@ -10,35 +10,31 @@ const ALLOWED_CHANNEL_ACTIONS = [
 type VALID_CHANNEL_ACTIONS = typeof ALLOWED_CHANNEL_ACTIONS[number];
 
 const execute = async (action: VALID_CHANNEL_ACTIONS, executionContext: IExecuteFunctions) => {
-  // we only care about GET_ALL_CHANNELS for the CHANNEL operation
   if (!ALLOWED_CHANNEL_ACTIONS.includes(action)) return []
 
-  const items = executionContext.getInputData();
   const results: INodeExecutionData[] = [];
 
-  for (let i = 0; i < items.length; i++) {
-    const limit = executionContext.getNodeParameter('limit', i, 10) as number;
+  const limit = executionContext.getNodeParameter('limit', 0, 10) as number;
 
-    const { raw } = await fetchPaginatedOptions<Channel, INodePropertyOptions>(
-      executionContext,
-      'respondIoApi',
-      '/space/channel',
-      undefined,
-      {
-        maxResults: limit,
-        includeRaw: true,
-        limit: 20,
-        includeTransformed: false
-      }
-    )
+  const { raw } = await fetchPaginatedOptions<Channel, INodePropertyOptions>(
+    executionContext,
+    'respondIoApi',
+    '/space/channel',
+    undefined,
+    {
+      maxResults: limit,
+      includeRaw: true,
+      limit: 20,
+      includeTransformed: false
+    }
+  )
 
-    results.push(
-      ...raw.map(d => ({
-        json: d,
-        pairedItem: { item: i },
-      }))
-    );
-  }
+  results.push(
+    ...raw.map(d => ({
+      json: d,
+      pairedItem: { item: 0 },
+    }))
+  );
 
   return [results];
 }

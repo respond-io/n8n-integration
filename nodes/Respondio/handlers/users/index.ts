@@ -42,7 +42,9 @@ const execute = async (
 
   if (!handler) return [[{ json: { message: 'Action not handled' }, pairedItem: { item: 0 } }]]
 
+  const isSingularAction = action === ACTION_NAMES.GET_ALL_USERS;
   for (let i = 0; i < items.length; i++) {
+    if (isSingularAction && i > 0) continue;
     const data = await handler(executionContext, i);
 
     if (Array.isArray(data)) {

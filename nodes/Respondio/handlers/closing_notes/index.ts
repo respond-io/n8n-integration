@@ -11,32 +11,29 @@ type VALID_CLOSING_NOTES_ACTIONS = typeof ALLOWED_CLOSING_NOTE_ACTIONS[number];
 
 const execute = async (action: VALID_CLOSING_NOTES_ACTIONS, executionContext: IExecuteFunctions) => {
   if (!ALLOWED_CLOSING_NOTE_ACTIONS.includes(action)) return []
-  const items = executionContext.getInputData();
   const results: INodeExecutionData[] = [];
 
-  for (let i = 0; i < items.length; i++) {
-    const limit = executionContext.getNodeParameter('limit', i, 10) as number;
+  const limit = executionContext.getNodeParameter('limit', 0, 10) as number;
 
-    const { raw } = await fetchPaginatedOptions<ClosingNote, INodePropertyOptions>(
-      executionContext,
-      'respondIoApi',
-      '/space/closing_notes',
-      undefined,
-      {
-        maxResults: limit,
-        includeRaw: true,
-        limit: 20,
-        includeTransformed: false
-      }
-    )
+  const { raw } = await fetchPaginatedOptions<ClosingNote, INodePropertyOptions>(
+    executionContext,
+    'respondIoApi',
+    '/space/closing_notes',
+    undefined,
+    {
+      maxResults: limit,
+      includeRaw: true,
+      limit: 20,
+      includeTransformed: false
+    }
+  )
 
-    results.push(
-      ...raw.map(d => ({
-        json: d,
-        pairedItem: { item: i },
-      }))
-    );
-  }
+  results.push(
+    ...raw.map(d => ({
+      json: d,
+      pairedItem: { item: 0 },
+    }))
+  );
 
   return [results];
 }
