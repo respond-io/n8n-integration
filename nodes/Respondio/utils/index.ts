@@ -64,10 +64,10 @@ export const generateContactIdentifierInputFields = (
   ]
 }
 
-export const constructIdentifier = (executionContext: IExecuteFunctions | ILoadOptionsFunctions) => {
-  const identifierType = executionContext.getNodeParameter('identifierType', 0, 10) as IContactIdentifiers;
-  const contactId = executionContext.getNodeParameter('contactId', 0, 0) as string;
-  const contactIdentifier = executionContext.getNodeParameter('contactIdentifier', 0, 'email') as string;
+export const constructIdentifier = (executionContext: IExecuteFunctions | ILoadOptionsFunctions, itemIndex: number = 0) => {
+  const identifierType = executionContext.getNodeParameter('identifierType', itemIndex, 10) as IContactIdentifiers;
+  const contactId = executionContext.getNodeParameter('contactId', itemIndex, 0) as string;
+  const contactIdentifier = executionContext.getNodeParameter('contactIdentifier', itemIndex, 'email') as string;
 
   const identifierValue = identifierType === IContactIdentifiers.id ? contactId : contactIdentifier;
 
