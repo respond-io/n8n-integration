@@ -3,40 +3,58 @@ import { ACTION_NAMES } from "../../constants/actions/action_names";
 import { callDeveloperApi } from "../../utils";
 import { GetAllUsersResponse, GetUserResponseItem } from "../../types";
 
-const execute = async (
-  action: ACTION_NAMES,
-  executionContext: IExecuteFunctions,
-): Promise<INodeExecutionData[][] | NodeExecutionWithMetadata[][] | null> => {
-  // we only care about FIND_USER & GET_ALL_USERS for the USERS operation
-  const allowedActions = [
-    ACTION_NAMES.FIND_USER,
-    ACTION_NAMES.GET_ALL_USERS,
-  ]
-  if (!allowedActions.includes(action)) return []
+const actionHandlers = {
+  [ACTION_NAMES.FIND_USER]: async (executionContext: IExecuteFunctions, itemIndex: number) => {
+    const userId = executionContext.getNodeParameter('userId', itemIndex, '') as string;
 
-  if (action === ACTION_NAMES.FIND_USER) {
-    const userId = executionContext.getNodeParameter('userId', 0, '') as string;
-
-    const response = await callDeveloperApi<GetUserResponseItem>(executionContext, {
+    return callDeveloperApi<GetUserResponseItem>(executionContext, {
       method: 'GET',
       path: `/space/user/${userId}`,
     })
-
-    return [[{ json: response }]]
-  }
-
-  if (action === ACTION_NAMES.GET_ALL_USERS) {
-    const limit = executionContext.getNodeParameter('limit', 0, 100) as number;
+  },
+  [ACTION_NAMES.GET_ALL_USERS]: async (executionContext: IExecuteFunctions, itemIndex: number) => {
+    const limit = executionContext.getNodeParameter('limit', itemIndex, 100) as number;
 
     const response = await callDeveloperApi<GetAllUsersResponse>(executionContext, {
       method: 'GET',
       path: `/space/user?limit=${limit}`,
     })
 
-    return [response.items.map((user) => ({ json: user }))]
+    return response.items;
+  },
+}
+
+const ALLOWED_USER_ACTIONS = [
+  ACTION_NAMES.FIND_USER,
+  ACTION_NAMES.GET_ALL_USERS,
+] as const;
+
+type VALID_USER_ACTIONS = typeof ALLOWED_USER_ACTIONS[number];
+
+const execute = async (
+  action: VALID_USER_ACTIONS,
+  executionContext: IExecuteFunctions,
+): Promise<INodeExecutionData[][] | NodeExecutionWithMetadata[][] | null> => {
+  if (!ALLOWED_USER_ACTIONS.includes(action)) return []
+  const items = executionContext.getInputData();
+  const results: INodeExecutionData[] = [];
+  const handler = actionHandlers[action];
+
+  if (!handler) return [[{ json: { message: 'Action not handled' }, pairedItem: { item: 0 } }]]
+
+  for (let i = 0; i < items.length; i++) {
+    const data = await handler(executionContext, i);
+
+    if (Array.isArray(data)) {
+      for (const d of data) {
+        results.push({ json: d, pairedItem: { item: i } });
+      }
+    } else {
+      results.push({ json: data, pairedItem: { item: i } });
+    }
   }
 
-  return [[{ json: { message: 'Action not handled' } }]]
+  return [results];
 }
 
 export default { execute }
