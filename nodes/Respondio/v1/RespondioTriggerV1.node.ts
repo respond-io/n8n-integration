@@ -227,7 +227,7 @@ export class RespondioTriggerV1 implements INodeType {
           }
 
           try {
-            await this.helpers.request({
+            await this.helpers.httpRequest({
               method: 'POST',
               url: `${platformUrl}/integration/n8n-api/subscribe`,
               headers: {
@@ -260,7 +260,7 @@ export class RespondioTriggerV1 implements INodeType {
 
           const platformUrl = INTEGRATION_API_BASE_URL;
           try {
-            const response = await this.helpers.request({
+            const response = await this.helpers.httpRequest({
               method: 'DELETE',
               url: `${platformUrl}/integration/n8n-api/unsubscribe/${webhookId}?hookUrl=${webhookUrl}`,
               headers: {
@@ -287,7 +287,7 @@ export class RespondioTriggerV1 implements INodeType {
 
           const platformUrl = INTEGRATION_API_BASE_URL;
           try {
-            const response = await this.helpers.request({
+            const response = await this.helpers.httpRequest({
               method: 'GET',
               url: `${platformUrl}/integration/n8n-api/webhook/${webhookId}`,
               headers: {

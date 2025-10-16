@@ -294,7 +294,7 @@ export async function fetchPaginatedOptions<TItem, TResult>(
       urlObject.searchParams.set('limit', limit.toString());
       if (cursor) urlObject.searchParams.set('cursorId', cursor);
 
-      const response = await context.helpers.request({
+      const response = await context.helpers.httpRequest({
         url: urlObject.toString(),
         method: 'GET',
         headers: {
@@ -331,13 +331,11 @@ export async function callDeveloperApi<T>(
     path,
     body,
     abortSignal,
-    useHttpRequestHelper = false,
   }: {
     method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
     path: string;
     body?: any;
     abortSignal?: any;
-    useHttpRequestHelper?: boolean;
   }
 ): Promise<T> {
   const credentials = await executionContext.getCredentials('respondIoApi');
@@ -355,9 +353,7 @@ export async function callDeveloperApi<T>(
     timeout: 30000, // 30 seconds timeout
   };
 
-  const response = useHttpRequestHelper ?
-    executionContext.helpers.httpRequest(options) :
-    executionContext.helpers.request(options);
+  const response = executionContext.helpers.httpRequest(options)
 
   return response as T
 }
