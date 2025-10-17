@@ -7,11 +7,11 @@ import {
 } from "../../types";
 
 const actionHandlers = {
-  [ACTION_NAMES.ADD_SPACE_TAG]: async (executionContext: IExecuteFunctions, itemIndex: number) => {
-    const name = executionContext.getNodeParameter('name', itemIndex, '') as string;
-    const description = executionContext.getNodeParameter('description', itemIndex, '') as string;
-    const colorCode = executionContext.getNodeParameter('colorCode', itemIndex, '') as string;
-    const emoji = executionContext.getNodeParameter('emoji', itemIndex, '') as string;
+  [ACTION_NAMES.ADD_SPACE_TAG]: async (executionContext: IExecuteFunctions) => {
+    const name = executionContext.getNodeParameter('name', 0, '') as string;
+    const description = executionContext.getNodeParameter('description', 0, '') as string;
+    const colorCode = executionContext.getNodeParameter('colorCode', 0, '') as string;
+    const emoji = executionContext.getNodeParameter('emoji', 0, '') as string;
 
     const payload = {
       name,
@@ -28,8 +28,8 @@ const actionHandlers = {
 
     return response;
   },
-  [ACTION_NAMES.DELETE_SPACE_TAG]: async (executionContext: IExecuteFunctions, itemIndex: number) => {
-    const name = executionContext.getNodeParameter('name', itemIndex, '') as string;
+  [ACTION_NAMES.DELETE_SPACE_TAG]: async (executionContext: IExecuteFunctions) => {
+    const name = executionContext.getNodeParameter('name', 0, '') as string;
 
     return callDeveloperApi<DeleteSpaceTagResponse>(executionContext, {
       method: 'DELETE',
@@ -37,12 +37,12 @@ const actionHandlers = {
       body: { name },
     })
   },
-  [ACTION_NAMES.UPDATE_SPACE_TAG]: async (executionContext: IExecuteFunctions, itemIndex: number) => {
-    const currentName = executionContext.getNodeParameter('currentName', itemIndex, '') as string;
-    const name = executionContext.getNodeParameter('name', itemIndex, '') as string;
-    const description = executionContext.getNodeParameter('description', itemIndex, '') as string;
-    const colorCode = executionContext.getNodeParameter('colorCode', itemIndex, '') as string;
-    const emoji = executionContext.getNodeParameter('emoji', itemIndex, '') as string;
+  [ACTION_NAMES.UPDATE_SPACE_TAG]: async (executionContext: IExecuteFunctions) => {
+    const currentName = executionContext.getNodeParameter('currentName', 0, '') as string;
+    const name = executionContext.getNodeParameter('name', 0, '') as string;
+    const description = executionContext.getNodeParameter('description', 0, '') as string;
+    const colorCode = executionContext.getNodeParameter('colorCode', 0, '') as string;
+    const emoji = executionContext.getNodeParameter('emoji', 0, '') as string;
 
     const payload = {
       currentName,
@@ -73,17 +73,14 @@ const execute = async (
   executionContext: IExecuteFunctions,
 ): Promise<INodeExecutionData[][] | NodeExecutionWithMetadata[][] | null> => {
   if (!ALLOWED_TAG_ACTIONS.includes(action)) return []
-  const items = executionContext.getInputData();
-  const results: INodeExecutionData[] = [];
   const handler = actionHandlers[action];
+  const results: INodeExecutionData[] = [];
 
   if (!handler) return [[{ json: { message: 'Action not handled' }, pairedItem: { item: 0 } }]]
 
-  for (let i = 0; i < items.length; i++) {
-    const data = await handler(executionContext, i);
+  const data = await handler(executionContext);
 
-    results.push({ json: data, pairedItem: { item: i } });
-  }
+  results.push({ json: data, pairedItem: { item: 0 } });
 
   return [results];
 }
