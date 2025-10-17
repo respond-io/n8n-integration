@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.30.4](https://github.com/respond-io/n8n-integration/compare/v0.30.3...v0.30.4) (2025-10-17)
+
+
+### Bug Fixes
+
+* trigger release ([a4bb2a0](https://github.com/respond-io/n8n-integration/commit/a4bb2a00856849f8fcdf53fe97d94bf9151f8b63))
+* trigger release ([c6313d7](https://github.com/respond-io/n8n-integration/commit/c6313d732740399d0a7ea3a425df4df22cca6515))
+
 ## [0.30.3](https://github.com/respond-io/n8n-integration/compare/v0.30.2...v0.30.3) (2025-10-17)
 
 
