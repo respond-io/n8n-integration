@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.30.3](https://github.com/respond-io/n8n-integration/compare/v0.30.2...v0.30.3) (2025-10-17)
+
+
+### Bug Fixes
+
+* add back itemIndex for GET_ALL_USERS ([fc9889e](https://github.com/respond-io/n8n-integration/commit/fc9889e81124e3b52d4debf910c5c7dea6fb40a0))
+* add typedef to GET_ALL_CUSTOM_FIELDS params ([ea0134b](https://github.com/respond-io/n8n-integration/commit/ea0134b56cf7c370b551e9f83daee852cd96794a))
+* CREATE_CUSTOM_FIELD to only be considered as singular action ([cc70fe4](https://github.com/respond-io/n8n-integration/commit/cc70fe462feef2cf9ea10b8a3ced77e4c9a6789d))
+* CREATE_CUSTOM_FIELD to only be considered as singular action ([0159d0f](https://github.com/respond-io/n8n-integration/commit/0159d0fdbca83a3a1ead837474ed5480156ac716))
+* fix GET_ALL actions to not respect getInputData params ([975c570](https://github.com/respond-io/n8n-integration/commit/975c570f893213c5bd2c1e28e912137357447476))
+* fix GET_ALL actions to not respect getInputData params ([fd90ee7](https://github.com/respond-io/n8n-integration/commit/fd90ee74c80ab784c33f3ad2c3ae13606c12b5ae))
+
 ## [0.30.2](https://github.com/respond-io/n8n-integration/compare/v0.30.1...v0.30.2) (2025-10-16)
 
 
