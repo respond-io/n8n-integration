@@ -72,7 +72,10 @@ const execute = async (
 
   if (!handler) return [[{ json: { message: 'No action executed' }, pairedItem: 0 }]];
 
-  const isSingularAction = action === ACTION_NAMES.GET_ALL_CUSTOM_FIELDS;
+  const isSingularAction = [
+    ACTION_NAMES.GET_ALL_CUSTOM_FIELDS,
+    ACTION_NAMES.CREATE_CUSTOM_FIELD,
+  ].includes(action);
   for (let i = 0; i < items.length; i++) {
     if (isSingularAction && i > 0) continue;
     const data = await handler(executionContext, i);
