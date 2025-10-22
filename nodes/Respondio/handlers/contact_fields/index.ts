@@ -3,20 +3,9 @@ import { ACTION_NAMES } from "../../constants/actions/action_names";
 import { callDeveloperApi, fetchPaginatedOptions } from "../../utils";
 import { CustomField } from "../../types";
 
-const execute = async (
-  action: ACTION_NAMES,
-  executionContext: IExecuteFunctions,
-): Promise<INodeExecutionData[][] | NodeExecutionWithMetadata[][] | null> => {
-  // we only care about GET_ALL_CUSTOM_FIELDS, FIND_CUSTOM_FIELD, CREATE_CUSTOM_FIELD for the CUSTOM_FIELDS operation
-  const allowedActions = [
-    ACTION_NAMES.GET_ALL_CUSTOM_FIELDS,
-    ACTION_NAMES.FIND_CUSTOM_FIELD,
-    ACTION_NAMES.CREATE_CUSTOM_FIELD,
-  ]
-  if (!allowedActions.includes(action)) return []
-
-  if (action === ACTION_NAMES.GET_ALL_CUSTOM_FIELDS) {
-    const limit = executionContext.getNodeParameter('limit', 0, 10) as number;
+const actionHandlers = {
+  [ACTION_NAMES.GET_ALL_CUSTOM_FIELDS]: async (executionContext: IExecuteFunctions, itemIndex: number) => {
+    const limit = executionContext.getNodeParameter('limit', itemIndex, 10) as number;
 
     const { raw } = await fetchPaginatedOptions<CustomField, INodePropertyOptions>(
       executionContext,
@@ -31,42 +20,79 @@ const execute = async (
       }
     )
 
-    const returnData = raw.map((item) => ({ json: item }));
-    return [returnData]
-  }
+    return raw;
+  },
+  [ACTION_NAMES.FIND_CUSTOM_FIELD]: async (executionContext: IExecuteFunctions, itemIndex: number) => {
+    const customFieldId = executionContext.getNodeParameter('customFieldId', itemIndex, undefined) as number;
 
-  if (action === ACTION_NAMES.FIND_CUSTOM_FIELD) {
-    const customFieldId = executionContext.getNodeParameter('customFieldId', 0, undefined) as number;
-
-    const response = await callDeveloperApi<CustomField>(executionContext, {
+    return callDeveloperApi<CustomField>(executionContext, {
       method: 'GET',
       path: `/space/custom_field/${customFieldId}`,
     })
+  },
+  [ACTION_NAMES.CREATE_CUSTOM_FIELD]: async (executionContext: IExecuteFunctions, itemIndex: number) => {
+    const name = executionContext.getNodeParameter('name', itemIndex, '') as string;
+    const description = executionContext.getNodeParameter('description', itemIndex, '') as string;
+    const slug = executionContext.getNodeParameter('slug', itemIndex, '') as string;
+    const dataType = executionContext.getNodeParameter('dataType', itemIndex, 'text') as string;
+    const allowedValues = executionContext.getNodeParameter('allowedValues', itemIndex, []) as string[];
 
-    return [[{ json: response }]];
+    const payload = {
+      name,
+      description,
+      dataType,
+      allowedValues,
+      slug
+    }
+
+    return callDeveloperApi<CustomField>(executionContext, {
+      method: 'POST',
+      path: `/space/custom_field`,
+      body: payload
+    })
+  },
+}
+
+const ALLOWED_CONTACT_FIELD_ACTIONS = [
+  ACTION_NAMES.GET_ALL_CUSTOM_FIELDS,
+  ACTION_NAMES.FIND_CUSTOM_FIELD,
+  ACTION_NAMES.CREATE_CUSTOM_FIELD,
+] as const;
+
+type VALID_CONTACT_FIELD_ACTIONS = typeof ALLOWED_CONTACT_FIELD_ACTIONS[number];
+
+const execute = async (
+  action: VALID_CONTACT_FIELD_ACTIONS,
+  executionContext: IExecuteFunctions,
+): Promise<INodeExecutionData[][] | NodeExecutionWithMetadata[][] | null> => {
+  if (!ALLOWED_CONTACT_FIELD_ACTIONS.includes(action)) return []
+  const items = executionContext.getInputData();
+  const results: INodeExecutionData[] = [];
+  const handler = actionHandlers[action];
+
+  if (!handler) return [[{ json: { message: 'No action executed' }, pairedItem: 0 }]];
+
+  const isSingularAction = [
+    ACTION_NAMES.GET_ALL_CUSTOM_FIELDS,
+    ACTION_NAMES.CREATE_CUSTOM_FIELD,
+  ].includes(action);
+  for (let i = 0; i < items.length; i++) {
+    if (isSingularAction && i > 0) continue;
+    const data = await handler(executionContext, i);
+
+    if (Array.isArray(data)) {
+      results.push(
+        ...data.map(d => ({
+          json: d,
+          pairedItem: { item: i },
+        }))
+      );
+    } else {
+      results.push({ json: data, pairedItem: { item: i } });
+    }
   }
 
-  const name = executionContext.getNodeParameter('name', 0, '') as string;
-  const description = executionContext.getNodeParameter('description', 0, '') as string;
-  const slug = executionContext.getNodeParameter('slug', 0, '') as string;
-  const dataType = executionContext.getNodeParameter('dataType', 0, 'text') as string;
-  const allowedValues = executionContext.getNodeParameter('allowedValues', 0, []) as string[];
-
-  const payload = {
-    name,
-    description,
-    dataType,
-    allowedValues,
-    slug
-  }
-
-  const response = await callDeveloperApi<CustomField>(executionContext, {
-    method: 'POST',
-    path: `/space/custom_field`,
-    body: payload
-  })
-
-  return [[{ json: response }]]
+  return [results];
 }
 
 export default { execute }

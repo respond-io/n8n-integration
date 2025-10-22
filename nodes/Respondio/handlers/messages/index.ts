@@ -11,40 +11,21 @@ import {
 } from "../../types";
 import { BaseRequestBody, sendMessagePayloadFormatter, SharedInputFields } from "../../constants/actions/messages";
 
-const execute = async (
-  action: ACTION_NAMES,
-  executionContext: IExecuteFunctions,
-): Promise<INodeExecutionData[][] | NodeExecutionWithMetadata[][] | null> => {
-  // we only care about FIND_MESSAGE & SEND_MESSAGE for the MESSAGES operation
-  const allowedActions = [
-    ACTION_NAMES.FIND_MESSAGE,
-    ACTION_NAMES.SEND_MESSAGE,
-  ]
-  if (!allowedActions.includes(action)) return []
-
-  const identifierType = executionContext.getNodeParameter('identifierType', 0, '') as IContactIdentifiers;
-  const identifier = constructIdentifier(executionContext);
-
-  if (identifierType === IContactIdentifiers.id) {
-    const contactId = identifier.split(':')[1];
-    if (!contactId) throw new Error('Contact ID is required for this action');
-  }
-
-  if (action === ACTION_NAMES.FIND_MESSAGE) {
-    const messageId = executionContext.getNodeParameter('messageId', 0, '') as string;
+const actionHandlers = {
+  [ACTION_NAMES.FIND_MESSAGE]: async (executionContext: IExecuteFunctions, itemIndex: number, identifier: string) => {
+    const messageId = executionContext.getNodeParameter('messageId', itemIndex, '') as string;
 
     const response = await callDeveloperApi<GetMessageResponse>(executionContext, {
       method: 'GET',
       path: `/contact/${identifier}/message/${messageId}`,
     })
 
-    return [[{ json: response }]]
-  }
-
-  if (action === ACTION_NAMES.SEND_MESSAGE) {
-    const channelType = executionContext.getNodeParameter('channelType', 0, '') as SharedInputFields['channelType'];
-    const channelId = executionContext.getNodeParameter('channelId', 0, '') as number;
-    const messageType = executionContext.getNodeParameter('messageType', 0, '') as SendMessageTypes;
+    return response;
+  },
+  [ACTION_NAMES.SEND_MESSAGE]: async (executionContext: IExecuteFunctions, itemIndex: number, identifier: string) => {
+    const channelType = executionContext.getNodeParameter('channelType', itemIndex, '') as SharedInputFields['channelType'];
+    const channelId = executionContext.getNodeParameter('channelId', itemIndex, '') as number;
+    const messageType = executionContext.getNodeParameter('messageType', itemIndex, '') as SendMessageTypes;
 
     if (!channelId && channelType === 'specificChannel') throw new Error('Channel ID is required to send a message');
 
@@ -52,8 +33,8 @@ const execute = async (
     let payload: BaseRequestBody = {};
 
     if (messageType === SendMessageTypes.TEXT) {
-      const text = executionContext.getNodeParameter('text', 0, '') as string;
-      const messageTag = executionContext.getNodeParameter('messageTag', 0, '') as string;
+      const text = executionContext.getNodeParameter('text', itemIndex, '') as string;
+      const messageTag = executionContext.getNodeParameter('messageTag', itemIndex, '') as string;
       payload = sendMessagePayloadFormatter({
         messageType,
         channelId,
@@ -61,16 +42,15 @@ const execute = async (
         text,
         messageTag
       })
-
     }
 
     if (messageType === SendMessageTypes.EMAIL) {
-      const text = executionContext.getNodeParameter('text', 0, '') as string;
-      const subject = executionContext.getNodeParameter('subject', 0, '') as string;
-      const cc = executionContext.getNodeParameter('cc', 0, '') as string[];
-      const bcc = executionContext.getNodeParameter('bcc', 0, '') as string[];
-      const attachmentCollection = executionContext.getNodeParameter('attachmentCollection', 0, []) as { attachments: { type: 'image' | 'video' | 'audio' | 'file'; fileName: string; url: string; }[] };
-      const replyToMessageId = executionContext.getNodeParameter('replyToMessageId', 0, '') as string;
+      const text = executionContext.getNodeParameter('text', itemIndex, '') as string;
+      const subject = executionContext.getNodeParameter('subject', itemIndex, '') as string;
+      const cc = executionContext.getNodeParameter('cc', itemIndex, '') as string[];
+      const bcc = executionContext.getNodeParameter('bcc', itemIndex, '') as string[];
+      const attachmentCollection = executionContext.getNodeParameter('attachmentCollection', itemIndex, []) as { attachments: { type: 'image' | 'video' | 'audio' | 'file'; fileName: string; url: string; }[] };
+      const replyToMessageId = executionContext.getNodeParameter('replyToMessageId', itemIndex, '') as string;
 
       payload = sendMessagePayloadFormatter({
         messageType,
@@ -86,8 +66,8 @@ const execute = async (
     }
 
     if (messageType === SendMessageTypes.ATTACHMENT) {
-      const attachmentType = executionContext.getNodeParameter('attachmentType', 0, '') as 'file' | 'image' | 'video' | 'audio';
-      const attachmentUrl = executionContext.getNodeParameter('attachmentUrl', 0, '') as string;
+      const attachmentType = executionContext.getNodeParameter('attachmentType', itemIndex, '') as 'file' | 'image' | 'video' | 'audio';
+      const attachmentUrl = executionContext.getNodeParameter('attachmentUrl', itemIndex, '') as string;
 
       payload = sendMessagePayloadFormatter({
         messageType,
@@ -99,8 +79,8 @@ const execute = async (
     }
 
     if (messageType === SendMessageTypes.QUICK_REPLY) {
-      const title = executionContext.getNodeParameter('title', 0, '') as string;
-      const replies = executionContext.getNodeParameter('replies', 0, []) as string[];
+      const title = executionContext.getNodeParameter('title', itemIndex, '') as string;
+      const replies = executionContext.getNodeParameter('replies', itemIndex, []) as string[];
 
       payload = sendMessagePayloadFormatter({
         messageType,
@@ -112,7 +92,7 @@ const execute = async (
     }
 
     if (messageType === SendMessageTypes.CUSTOM_PAYLOAD) {
-      const payloadString = executionContext.getNodeParameter('payload', 0, '') as string;
+      const payloadString = executionContext.getNodeParameter('payload', itemIndex, '') as string;
 
       payload = sendMessagePayloadFormatter({
         messageType,
@@ -123,8 +103,8 @@ const execute = async (
     }
 
     if (messageType === SendMessageTypes.WHATSAPP_TEMPLATE) {
-      const templateId = executionContext.getNodeParameter('templateId', 0, '') as number;
-      const templateComponentsFields = executionContext.getNodeParameter('whatsappTemplateComponentFields', 0, {}) as CustomFieldMapperReturnValue;
+      const templateId = executionContext.getNodeParameter('templateId', itemIndex, '') as number;
+      const templateComponentsFields = executionContext.getNodeParameter('whatsappTemplateComponentFields', itemIndex, {}) as CustomFieldMapperReturnValue;
 
       const templateDetails = await callDeveloperApi<FetchWhatsappTemplateResponse>(executionContext, {
         method: 'GET',
@@ -146,10 +126,51 @@ const execute = async (
       body: payload
     })
 
-    return [[{ json: response }]]
+    return response;
+  },
+}
+
+const ALLOWED_MESSAGE_ACTIONS = [
+  ACTION_NAMES.FIND_MESSAGE,
+  ACTION_NAMES.SEND_MESSAGE,
+] as const;
+
+type VALID_MESSAGE_ACTIONS = typeof ALLOWED_MESSAGE_ACTIONS[number];
+
+const execute = async (
+  action: VALID_MESSAGE_ACTIONS,
+  executionContext: IExecuteFunctions,
+): Promise<INodeExecutionData[][] | NodeExecutionWithMetadata[][] | null> => {
+  if (!ALLOWED_MESSAGE_ACTIONS.includes(action)) return [];
+  const items = executionContext.getInputData();
+  const results: INodeExecutionData[] = [];
+  const handler = actionHandlers[action];
+
+  if (!handler) return [[{ json: { message: 'No action executed' }, pairedItem: 0 }]];
+
+  for (let i = 0; i < items.length; i++) {
+    const identifierType = executionContext.getNodeParameter('identifierType', i, '') as IContactIdentifiers;
+    const identifier = constructIdentifier(executionContext, i);
+
+    if (identifierType === IContactIdentifiers.id) {
+      const contactId = identifier.split(':')[1];
+      if (!contactId) throw new Error('Contact ID is required for this action');
+    }
+    const data = await handler(executionContext, i, identifier);
+
+    if (Array.isArray(data)) {
+      results.push(
+        ...data.map(d => ({
+          json: d,
+          pairedItem: { item: i },
+        }))
+      );
+    } else {
+      results.push({ json: data, pairedItem: { item: i } });
+    }
   }
 
-  return [[{ json: { message: 'Action not handled' } }]]
+  return [results];
 }
 
 export default { execute }

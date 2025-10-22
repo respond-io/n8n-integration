@@ -17,7 +17,6 @@ export async function getTagsForContact(this: ILoadOptionsFunctions): Promise<IN
     const response = await callDeveloperApi<GetContactResponse>(this, {
       method: 'GET',
       path: `/contact/${identifier}`,
-      useHttpRequestHelper: true
     })
 
     return response.tags.map((tag: any) => ({
