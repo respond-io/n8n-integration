@@ -138,8 +138,8 @@ export const generateContactInputFields = (isCreateContact: boolean = false): IN
     },
   ];
 
+  const lastNameIndex = 1;
   if (isCreateContact) {
-    const lastNameIndex = 1;
     result.splice(
       lastNameIndex + 1,
       0,
@@ -168,6 +168,27 @@ export const generateContactInputFields = (isCreateContact: boolean = false): IN
             identifierType: [IContactIdentifiers.email],
           }
         }
+      }
+    )
+  } else {
+    result.splice(
+      lastNameIndex + 1,
+      0,
+      {
+        displayName: 'Contact\'s Email Address',
+        required: false,
+        name: 'email',
+        type: 'string' as const,
+        description: 'Email address of the contact',
+        default: '',
+      },
+      {
+        displayName: 'Contact\'s Phone Number',
+        required: false,
+        name: 'phone',
+        type: 'string' as const,
+        description: 'Phone number of the contact',
+        default: '',
       }
     )
   }
