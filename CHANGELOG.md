@@ -1,5 +1,33 @@
 # Changelog
 
+## [1.2.2](https://github.com/respond-io/n8n-integration/compare/v1.2.1...v1.2.2) (2025-10-22)
+
+
+### Bug Fixes
+
+* add "dependencies" key to package.json ([5784d19](https://github.com/respond-io/n8n-integration/commit/5784d1984be8e3b0a7378dec9228a32bf38f0242))
+* add back itemIndex for GET_ALL_USERS ([fc9889e](https://github.com/respond-io/n8n-integration/commit/fc9889e81124e3b52d4debf910c5c7dea6fb40a0))
+* add typedef to GET_ALL_CUSTOM_FIELDS params ([ea0134b](https://github.com/respond-io/n8n-integration/commit/ea0134b56cf7c370b551e9f83daee852cd96794a))
+* CREATE_CUSTOM_FIELD to only be considered as singular action ([0159d0f](https://github.com/respond-io/n8n-integration/commit/0159d0fdbca83a3a1ead837474ed5480156ac716))
+* fix channel handler to include pairedItem ([750bb88](https://github.com/respond-io/n8n-integration/commit/750bb885ac4ad638e09ef58b7c72a6d13db1027c))
+* fix GET_ALL actions to not respect getInputData params ([fd90ee7](https://github.com/respond-io/n8n-integration/commit/fd90ee74c80ab784c33f3ad2c3ae13606c12b5ae))
+* fix GET_MANY_CONTACTS return ([225edcd](https://github.com/respond-io/n8n-integration/commit/225edcd4eb50c0cbef7faabbbb0945e295f2183c))
+* fix typedef for new handler execution code ([0f0e5f1](https://github.com/respond-io/n8n-integration/commit/0f0e5f16274210e317baa46857f47bed9dac3773))
+* migrate from helpers.request to helpers.httpRequest ([a57bbb1](https://github.com/respond-io/n8n-integration/commit/a57bbb187eb875a53a9ad45303d47a468f29e19e))
+* refactor contact_fields to include pairedItem ([6863e6a](https://github.com/respond-io/n8n-integration/commit/6863e6abe612f9e9ea680a19d696bda04a6f6cbd))
+* refactor conversations handler to add pairedItem ([5985093](https://github.com/respond-io/n8n-integration/commit/598509335aed96fee8dbe567aaac6f168fb2219c))
+* refactor lifecycles handler ([e599696](https://github.com/respond-io/n8n-integration/commit/e599696bb5f9f5af3c980d5ce677d8fc64b89e6e))
+* refactor tags handler to include pairedItem ([baee813](https://github.com/respond-io/n8n-integration/commit/baee813c0d36a43c431ff763a01a5ad37c93a0a6))
+* refactor user handler to include pairedItem ([e7e2d0c](https://github.com/respond-io/n8n-integration/commit/e7e2d0c7e1f1768551abc6dc9e47ff393e9cc0e3))
+* standardize inner for loop to use spread + map ([d430ecc](https://github.com/respond-io/n8n-integration/commit/d430ecc4bbc28c458638cd7fe8521dccc94b6069))
+* trigger release ([c6313d7](https://github.com/respond-io/n8n-integration/commit/c6313d732740399d0a7ea3a425df4df22cca6515))
+* update closing_notes to include pairedItem ([a6b3b12](https://github.com/respond-io/n8n-integration/commit/a6b3b12c94c2b08729039cbd06f1cea3ca221c93))
+* update comments to include pairedItem ([c830b4f](https://github.com/respond-io/n8n-integration/commit/c830b4f472d12b737f94f950100218ad099324d8))
+* update constructIdentifier function ([3346a32](https://github.com/respond-io/n8n-integration/commit/3346a32abbd9dbc868a94d5708b17717c5f31d4d))
+* update contact handler to handle input items index ([65144ab](https://github.com/respond-io/n8n-integration/commit/65144abed80d72faff724a47c2c340b73343b27b))
+* update messages handler to return pairedItem ([faa7033](https://github.com/respond-io/n8n-integration/commit/faa7033dbee72c4fda89eef05934c24a857fc0b7))
+* update tag handler to only do single operation ([a7d44e4](https://github.com/respond-io/n8n-integration/commit/a7d44e427c08115e824cae98b613b2283e348dad))
+
 ## [1.2.1](https://github.com/respond-io/n8n-integration/compare/v1.2.0...v1.2.1) (2025-10-10)
 
 
