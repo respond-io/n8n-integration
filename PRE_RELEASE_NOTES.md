@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.30.5](https://github.com/respond-io/n8n-integration/compare/v0.30.4...v0.30.5) (2025-11-25)
+
+
+### Bug Fixes
+
+* enable email / phone number during create/update a contact ([e15ef3d](https://github.com/respond-io/n8n-integration/commit/e15ef3dc0f8668abaf6e9e3f2b20fe478048c819))
+
 ## [0.30.4](https://github.com/respond-io/n8n-integration/compare/v0.30.3...v0.30.4) (2025-10-17)
 
 
