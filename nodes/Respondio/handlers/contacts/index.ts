@@ -90,10 +90,12 @@ const actionHandlers = {
     const profilePic = executionContext.getNodeParameter('profilePic', itemIndex, '') as string;
     const countryCode = executionContext.getNodeParameter('countryCode', itemIndex, '') as string;
     const customFieldMapper = executionContext.getNodeParameter('customFields', itemIndex, []) as CustomFieldMapperReturnValue;
+    const email = executionContext.getNodeParameter('email', itemIndex, '') as string;
+    const phone = executionContext.getNodeParameter('phone', itemIndex, '') as string;
 
     const customFields = constructCustomFieldFromResourceMapper(customFieldMapper);
 
-    const payload = {
+    const payload: CreateContactPayload = {
       ...(firstName && { firstName }),
       ...(lastName && { lastName }),
       ...(language && { language }),
@@ -101,6 +103,8 @@ const actionHandlers = {
       ...(countryCode && { countryCode }),
       ...(customFields.length && { custom_fields: customFields }),
     }
+    if (email.length) payload.email = email
+    if (phone.length) payload.phone = phone
 
     return callDeveloperApi<DeleteManyTagsResponse>(executionContext, {
       method: 'PUT',
@@ -116,10 +120,12 @@ const actionHandlers = {
     const profilePic = executionContext.getNodeParameter('profilePic', itemIndex, '') as string;
     const countryCode = executionContext.getNodeParameter('countryCode', itemIndex, '') as string;
     const customFieldMapper = executionContext.getNodeParameter('customFields', itemIndex, []) as CustomFieldMapperReturnValue;
+    const email = executionContext.getNodeParameter('email', itemIndex, '') as string;
+    const phone = executionContext.getNodeParameter('phone', itemIndex, '') as string;
 
     const customFields = constructCustomFieldFromResourceMapper(customFieldMapper);
 
-    const payload = {
+    const payload: CreateContactPayload = {
       ...(firstName && { firstName }),
       ...(lastName && { lastName }),
       ...(language && { language }),
@@ -127,6 +133,8 @@ const actionHandlers = {
       ...(countryCode && { countryCode }),
       ...(customFields.length && { custom_fields: customFields }),
     }
+    if (email.length) payload.email = email
+    if (phone.length) payload.phone = phone
 
     return callDeveloperApi<DeleteManyTagsResponse>(executionContext, {
       method: 'POST',
