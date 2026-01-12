@@ -260,6 +260,19 @@ const createLinkButtonComponent = (
   };
 };
 
+const createQuickReplyButtonComponent = (buttonComponent: any) => {
+  const button = buttonComponent?.buttons?.[0]
+  if (!button) return null;
+
+  return {
+    type: 'buttons',
+    buttons: [{
+      type: button.type,
+      text: button.text || 'Choose an option',
+    }]
+  }
+}
+
 const createProductButtonComponent = (
   originalComponents: Array<WhatsappTemplateComponentField>,
   rawComponents: Array<Record<string, any>>,
@@ -282,6 +295,10 @@ const createProductButtonComponent = (
 
   if (buttonType === 'url') {
     return createLinkButtonComponent(buttonComponent, rawComponents);
+  }
+
+  if (buttonType === 'quick_reply') {
+    return createQuickReplyButtonComponent(buttonComponent);
   }
 
   return null;
