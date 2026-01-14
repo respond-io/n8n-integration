@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.2](https://github.com/respond-io/n8n-integration/compare/v1.3.1...v1.3.2) (2026-01-14)
+
+
+### Bug Fixes
+
+* update GitHub Actions to use Node.js 24 and latest action versions ([6de7d94](https://github.com/respond-io/n8n-integration/commit/6de7d9424e3d6f788f33f8c7ae72a57199570abb))
+* update GitHub Actions to use Node.js 24 and latest action versions ([d93535e](https://github.com/respond-io/n8n-integration/commit/d93535eb54448eab2e10ea4a806ff0abfe668f6a))
+
 ## [1.3.1](https://github.com/respond-io/n8n-integration/compare/v1.3.0...v1.3.1) (2026-01-14)
 
 
