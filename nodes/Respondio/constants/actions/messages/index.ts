@@ -261,15 +261,15 @@ const createLinkButtonComponent = (
 };
 
 const createQuickReplyButtonComponent = (buttonComponent: any) => {
-  const button = buttonComponent?.buttons?.[0]
-  if (!button) return null;
+  const buttons = buttonComponent?.buttons;
+  if (!buttons?.length) return null;
 
   return {
     type: 'buttons',
-    buttons: [{
+    buttons: buttons.map((button: Record<string, any>) => ({
       type: button.type,
       text: button.text || 'Choose an option',
-    }]
+    }))
   }
 }
 
