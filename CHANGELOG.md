@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/respond-io/n8n-integration/compare/v1.2.4...v1.3.0) (2026-01-14)
+
+
+### Features
+
+* empty commit trigger action ([91a1cf1](https://github.com/respond-io/n8n-integration/commit/91a1cf1d6549f8ee1acb7f84d7b84f4bef6fe3ab))
+
 ## [1.2.4](https://github.com/respond-io/n8n-integration/compare/v1.2.3...v1.2.4) (2026-01-14)
 
 
