@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.5](https://github.com/respond-io/n8n-integration/compare/v1.3.4...v1.3.5) (2026-01-14)
+
+
+### Bug Fixes
+
+* update npm publish command to include provenance flag and remove unnecessary token handling ([1e8b001](https://github.com/respond-io/n8n-integration/commit/1e8b001d831736ba3886717ca3b5c0eded95ec67))
+* update npm publish command to include provenance flag and remove… ([6d412dc](https://github.com/respond-io/n8n-integration/commit/6d412dc460e8d798ccd22928725c94927357ea42))
+
 ## [1.3.4](https://github.com/respond-io/n8n-integration/compare/v1.3.3...v1.3.4) (2026-01-14)
 
 
