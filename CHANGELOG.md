@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.6](https://github.com/respond-io/n8n-integration/compare/v1.3.5...v1.3.6) (2026-01-14)
+
+
+### Bug Fixes
+
+* update npm publish command to remove provenance flag and adjust … ([84bcada](https://github.com/respond-io/n8n-integration/commit/84bcada48f320e4220fe05acc5bca036fd8d52aa))
+* update npm publish command to remove provenance flag and adjust permissions in workflows ([f124618](https://github.com/respond-io/n8n-integration/commit/f124618eaae6ca232a945de63bd4ae9049e4c213))
+
 ## [1.3.5](https://github.com/respond-io/n8n-integration/compare/v1.3.4...v1.3.5) (2026-01-14)
 
 
