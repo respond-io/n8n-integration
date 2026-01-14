@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.30.6](https://github.com/respond-io/n8n-integration/compare/v0.30.5...v0.30.6) (2026-01-14)
+
+
+### Bug Fixes
+
+* add createQuickReplyButtonComponent to handle quick_reply ([cbdc9f4](https://github.com/respond-io/n8n-integration/commit/cbdc9f4dca2941656b6714012b38b9299ff1f40f))
+* handle list of buttons for quick_reply whatsapp_template ([0b08c13](https://github.com/respond-io/n8n-integration/commit/0b08c13fb4ef6da4d93a6dd29280a0aed4186269))
+* handle list of buttons for quick_reply whatsapp_template ([dadc075](https://github.com/respond-io/n8n-integration/commit/dadc075f31f2715272eb08cd853e9c4f6ed600ed))
+
 ## [0.30.5](https://github.com/respond-io/n8n-integration/compare/v0.30.4...v0.30.5) (2025-11-25)
 
 
