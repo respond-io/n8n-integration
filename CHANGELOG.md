@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.3](https://github.com/respond-io/n8n-integration/compare/v1.3.2...v1.3.3) (2026-01-14)
+
+
+### Bug Fixes
+
+* update npm publish command to ensure no token is used ([8e7e99d](https://github.com/respond-io/n8n-integration/commit/8e7e99dfa5abc2b2f14c903979a4027c9170888d))
+* update npm publish command to ensure no token is used and set proper configurations ([7ad6b40](https://github.com/respond-io/n8n-integration/commit/7ad6b401749b71de82487715e76e856dad9bdbaf))
+
 ## [1.3.2](https://github.com/respond-io/n8n-integration/compare/v1.3.1...v1.3.2) (2026-01-14)
 
 
