@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.4](https://github.com/respond-io/n8n-integration/compare/v1.3.3...v1.3.4) (2026-01-14)
+
+
+### Bug Fixes
+
+* update publish_release job permissions and remove unnecessary ([5ad9b70](https://github.com/respond-io/n8n-integration/commit/5ad9b70dac2d71ee38531664958627c2f8b7a391))
+* update publish_release job permissions and remove unnecessary npm commands ([a912c77](https://github.com/respond-io/n8n-integration/commit/a912c77bd0c5a35a10167391bc3386897a122af2))
+
 ## [1.3.3](https://github.com/respond-io/n8n-integration/compare/v1.3.2...v1.3.3) (2026-01-14)
 
 
