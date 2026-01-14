@@ -7,11 +7,11 @@ on:
 name: Release Live
 
 permissions:
+  id-token: write
   contents: write
   pull-requests: write
   packages: write
   issues: write
-  id-token: write
 
 jobs:
   audit:
@@ -74,6 +74,18 @@ jobs:
         with:
           node-version: 24
           registry-url: 'https://registry.npmjs.org'
+          always-auth: true
+          scope: '@respond-io'
+      - run: node -v && npm -v
+      - run: npm i -g npm@^11.5.1
+      - run: node -v && npm -v
+      - name: Ensure no npm token is used (OIDC only)
+        run: |
+          rm -f ~/.npmrc .npmrc || true
+          npm config delete //registry.npmjs.org/:_authToken || true
+        env:
+          NODE_AUTH_TOKEN: ""
+          NPM_TOKEN: ""
       - run: npm ci --ignore-scripts
       - run: npm run release
 
