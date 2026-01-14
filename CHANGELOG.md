@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.1](https://github.com/respond-io/n8n-integration/compare/v1.3.0...v1.3.1) (2026-01-14)
+
+
+### Bug Fixes
+
+* Change n8n release from id token to trusted publisher ([ae1972d](https://github.com/respond-io/n8n-integration/commit/ae1972d3b735a63e137cf080a38fc8786e55b8b2))
+* Change n8n release from id token to trusted publisher ([fb49bbe](https://github.com/respond-io/n8n-integration/commit/fb49bbefcb84f249fe4ced4d86243c7e4304d6a5))
+
 ## [1.3.0](https://github.com/respond-io/n8n-integration/compare/v1.2.4...v1.3.0) (2026-01-14)
 
 
