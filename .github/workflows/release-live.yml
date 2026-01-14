@@ -77,17 +77,10 @@ jobs:
         with:
           node-version: 24
           registry-url: 'https://registry.npmjs.org'
-          always-auth: true
-          scope: '@respond-io'
-      - name: Ensure no npm token is used (OIDC only)
-        run: |
-          rm -f ~/.npmrc .npmrc || true
-          npm config delete //registry.npmjs.org/:_authToken || true
-        env:
-          NODE_AUTH_TOKEN: ""
-          NPM_TOKEN: ""
       - run: npm ci --ignore-scripts
       - run: npm run release
+        env:
+          NPM_CONFIG_PROVENANCE: true
 
   notify_slack:
     needs: [audit, tests, create_release, publish_release]
