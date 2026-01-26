@@ -74,6 +74,12 @@ const TRIGGER_SETTINGS = {
     description: 'Trigger on contact lifecycle being updated',
     action: 'On Contact Lifecycle updated'
   },
+  CALL_ENDED: {
+    name: 'Call Ended',
+    value: 'callEnded',
+    description: 'Trigger on call ended',
+    action: 'On Call ended'
+  }
 } as const satisfies Record<string, INodePropertyOptions>;
 
 export type TriggerSettingKey = keyof typeof TRIGGER_SETTINGS;
