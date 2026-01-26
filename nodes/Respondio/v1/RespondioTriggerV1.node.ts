@@ -86,6 +86,7 @@ export class RespondioTriggerV1 implements INodeType {
             TRIGGER_SETTINGS.CONTACT_UPDATED,
             TRIGGER_SETTINGS.CONTACT_TAG_UPDATED,
             TRIGGER_SETTINGS.CONTACT_LIFECYCLE_UPDATED,
+            TRIGGER_SETTINGS.CALL_ENDED
           ],
           default: RespondioTriggerV1.triggerDefaultValue,
           required: true
