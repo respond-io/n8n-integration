@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.31.0](https://github.com/respond-io/n8n-integration/compare/v0.30.6...v0.31.0) (2026-01-26)
+
+
+### Features
+
+* add new CALL_ENDED in TRIGGER_SETTINGS ([62801fa](https://github.com/respond-io/n8n-integration/commit/62801fa5a007fe9483b5b84729ff07319491d835))
+* add proper default eventSources based on eventType ([6fcd3e2](https://github.com/respond-io/n8n-integration/commit/6fcd3e2af5081d9478990813b897cac2170a417c))
+* empty commit trigger action ([91a1cf1](https://github.com/respond-io/n8n-integration/commit/91a1cf1d6549f8ee1acb7f84d7b84f4bef6fe3ab))
+* remove NodeOperationError and add new CALL_ENDED trigger ([d30bd54](https://github.com/respond-io/n8n-integration/commit/d30bd547d8910a2a417c90d55cba3b4862cc24ae))
+* remove NodeOperationError and add new CALL_ENDED trigger ([fe00895](https://github.com/respond-io/n8n-integration/commit/fe00895ecf3ac1de54af6923b820a06750d54c46))
+
+
+### Bug Fixes
+
+* Change n8n release from id token to trusted publisher ([ae1972d](https://github.com/respond-io/n8n-integration/commit/ae1972d3b735a63e137cf080a38fc8786e55b8b2))
+* Change n8n release from id token to trusted publisher ([fb49bbe](https://github.com/respond-io/n8n-integration/commit/fb49bbefcb84f249fe4ced4d86243c7e4304d6a5))
+* update GitHub Actions to use Node.js 24 and latest action versions ([6de7d94](https://github.com/respond-io/n8n-integration/commit/6de7d9424e3d6f788f33f8c7ae72a57199570abb))
+* update GitHub Actions to use Node.js 24 and latest action versions ([d93535e](https://github.com/respond-io/n8n-integration/commit/d93535eb54448eab2e10ea4a806ff0abfe668f6a))
+* update npm publish command to ensure no token is used ([8e7e99d](https://github.com/respond-io/n8n-integration/commit/8e7e99dfa5abc2b2f14c903979a4027c9170888d))
+* update npm publish command to ensure no token is used and set proper configurations ([7ad6b40](https://github.com/respond-io/n8n-integration/commit/7ad6b401749b71de82487715e76e856dad9bdbaf))
+* update npm publish command to include provenance flag and remove unnecessary token handling ([1e8b001](https://github.com/respond-io/n8n-integration/commit/1e8b001d831736ba3886717ca3b5c0eded95ec67))
+* update npm publish command to include provenance flag and remove… ([6d412dc](https://github.com/respond-io/n8n-integration/commit/6d412dc460e8d798ccd22928725c94927357ea42))
+* update npm publish command to remove provenance flag and adjust … ([84bcada](https://github.com/respond-io/n8n-integration/commit/84bcada48f320e4220fe05acc5bca036fd8d52aa))
+* update npm publish command to remove provenance flag and adjust permissions in workflows ([f124618](https://github.com/respond-io/n8n-integration/commit/f124618eaae6ca232a945de63bd4ae9049e4c213))
+* update publish_release job permissions and remove unnecessary ([5ad9b70](https://github.com/respond-io/n8n-integration/commit/5ad9b70dac2d71ee38531664958627c2f8b7a391))
+* update publish_release job permissions and remove unnecessary npm commands ([a912c77](https://github.com/respond-io/n8n-integration/commit/a912c77bd0c5a35a10167391bc3386897a122af2))
+
 ## [0.30.6](https://github.com/respond-io/n8n-integration/compare/v0.30.5...v0.30.6) (2026-01-14)
 
 
