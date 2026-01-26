@@ -203,8 +203,20 @@ export class RespondioTriggerV1 implements INodeType {
           if (!webhookUrl) throw new NodeOperationError(this.getNode(), 'Webhook URL is not defined. Please set the webhook URL in the node settings.');
 
           // set default event sources if none selected for NEW_OUTGOING_MESSAGE event types
-          if (eventType === TRIGGER_SETTINGS.NEW_OUTGOING_MESSAGE.value && (!eventSources || !eventSources.length)) {
-            eventSources = TRIGGER_SETTINGS_EVENT_SOURCES.NEW_OUTGOING_MESSAGE.map(({ value }) => value);
+          const eventTypesWithDefaultSources: Array<string> = [
+            TRIGGER_SETTINGS.NEW_OUTGOING_MESSAGE.value,
+            TRIGGER_SETTINGS.CONVERSATION_OPENED.value,
+            TRIGGER_SETTINGS.CONVERSATION_CLOSED.value,
+          ]
+          if (eventTypesWithDefaultSources.includes(eventType) && (!eventSources || !eventSources.length)) {
+            const eventTypeSettingMap = {
+              [TRIGGER_SETTINGS.CONVERSATION_CLOSED.value]: TRIGGER_SETTINGS_EVENT_SOURCES.CONVERSATION_CLOSED,
+              [TRIGGER_SETTINGS.CONVERSATION_OPENED.value]: TRIGGER_SETTINGS_EVENT_SOURCES.CONVERSATION_OPENED,
+              [TRIGGER_SETTINGS.NEW_OUTGOING_MESSAGE.value]: TRIGGER_SETTINGS_EVENT_SOURCES.NEW_OUTGOING_MESSAGE,
+            }
+
+            const selectedSetting = eventTypeSettingMap[eventType as keyof typeof eventTypeSettingMap];
+            eventSources = selectedSetting.map(({ value }) => value);
           }
 
           // set default message types if none selected for NEW_OUTGOING_MESSAGE & NEW_INCOMING_MESSAGE event types
