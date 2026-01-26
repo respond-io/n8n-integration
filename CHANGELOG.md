@@ -1,5 +1,68 @@
 # Changelog
 
+## [1.3.6](https://github.com/respond-io/n8n-integration/compare/v1.3.5...v1.3.6) (2026-01-14)
+
+
+### Bug Fixes
+
+* update npm publish command to remove provenance flag and adjust … ([84bcada](https://github.com/respond-io/n8n-integration/commit/84bcada48f320e4220fe05acc5bca036fd8d52aa))
+* update npm publish command to remove provenance flag and adjust permissions in workflows ([f124618](https://github.com/respond-io/n8n-integration/commit/f124618eaae6ca232a945de63bd4ae9049e4c213))
+
+## [1.3.5](https://github.com/respond-io/n8n-integration/compare/v1.3.4...v1.3.5) (2026-01-14)
+
+
+### Bug Fixes
+
+* update npm publish command to include provenance flag and remove unnecessary token handling ([1e8b001](https://github.com/respond-io/n8n-integration/commit/1e8b001d831736ba3886717ca3b5c0eded95ec67))
+* update npm publish command to include provenance flag and remove… ([6d412dc](https://github.com/respond-io/n8n-integration/commit/6d412dc460e8d798ccd22928725c94927357ea42))
+
+## [1.3.4](https://github.com/respond-io/n8n-integration/compare/v1.3.3...v1.3.4) (2026-01-14)
+
+
+### Bug Fixes
+
+* update publish_release job permissions and remove unnecessary ([5ad9b70](https://github.com/respond-io/n8n-integration/commit/5ad9b70dac2d71ee38531664958627c2f8b7a391))
+* update publish_release job permissions and remove unnecessary npm commands ([a912c77](https://github.com/respond-io/n8n-integration/commit/a912c77bd0c5a35a10167391bc3386897a122af2))
+
+## [1.3.3](https://github.com/respond-io/n8n-integration/compare/v1.3.2...v1.3.3) (2026-01-14)
+
+
+### Bug Fixes
+
+* update npm publish command to ensure no token is used ([8e7e99d](https://github.com/respond-io/n8n-integration/commit/8e7e99dfa5abc2b2f14c903979a4027c9170888d))
+* update npm publish command to ensure no token is used and set proper configurations ([7ad6b40](https://github.com/respond-io/n8n-integration/commit/7ad6b401749b71de82487715e76e856dad9bdbaf))
+
+## [1.3.2](https://github.com/respond-io/n8n-integration/compare/v1.3.1...v1.3.2) (2026-01-14)
+
+
+### Bug Fixes
+
+* update GitHub Actions to use Node.js 24 and latest action versions ([6de7d94](https://github.com/respond-io/n8n-integration/commit/6de7d9424e3d6f788f33f8c7ae72a57199570abb))
+* update GitHub Actions to use Node.js 24 and latest action versions ([d93535e](https://github.com/respond-io/n8n-integration/commit/d93535eb54448eab2e10ea4a806ff0abfe668f6a))
+
+## [1.3.1](https://github.com/respond-io/n8n-integration/compare/v1.3.0...v1.3.1) (2026-01-14)
+
+
+### Bug Fixes
+
+* Change n8n release from id token to trusted publisher ([ae1972d](https://github.com/respond-io/n8n-integration/commit/ae1972d3b735a63e137cf080a38fc8786e55b8b2))
+* Change n8n release from id token to trusted publisher ([fb49bbe](https://github.com/respond-io/n8n-integration/commit/fb49bbefcb84f249fe4ced4d86243c7e4304d6a5))
+
+## [1.3.0](https://github.com/respond-io/n8n-integration/compare/v1.2.4...v1.3.0) (2026-01-14)
+
+
+### Features
+
+* empty commit trigger action ([91a1cf1](https://github.com/respond-io/n8n-integration/commit/91a1cf1d6549f8ee1acb7f84d7b84f4bef6fe3ab))
+
+## [1.2.4](https://github.com/respond-io/n8n-integration/compare/v1.2.3...v1.2.4) (2026-01-14)
+
+
+### Bug Fixes
+
+* add createQuickReplyButtonComponent to handle quick_reply ([cbdc9f4](https://github.com/respond-io/n8n-integration/commit/cbdc9f4dca2941656b6714012b38b9299ff1f40f))
+* handle list of buttons for quick_reply whatsapp_template ([dadc075](https://github.com/respond-io/n8n-integration/commit/dadc075f31f2715272eb08cd853e9c4f6ed600ed))
+
 ## [1.2.3](https://github.com/respond-io/n8n-integration/compare/v1.2.2...v1.2.3) (2025-11-26)
 
 
