@@ -93,6 +93,7 @@ const TRIGGER_SETTINGS_EVENT_SOURCES = {
     { name: 'Bot', value: 'bot' },
     { name: 'Make', value: 'make' },
     { name: 'n8n', value: 'n8n' },
+    { name: 'AI Agent', value: 'ai_agent' },
   ],
   CONVERSATION_OPENED: [
     { name: 'User', value: 'user' },
@@ -112,6 +113,7 @@ const TRIGGER_SETTINGS_EVENT_SOURCES = {
     { name: 'Echo', value: 'echo' },
     { name: 'Make', value: 'make' },
     { name: 'n8n', value: 'n8n' },
+    { name: 'AI Agent', value: 'ai_agent' },
   ]
 };
 
