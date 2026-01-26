@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.32.0](https://github.com/respond-io/n8n-integration/compare/v0.31.0...v0.32.0) (2026-01-26)
+
+
+### Features
+
+* add AI Agent to event sources for: ([b1d0d72](https://github.com/respond-io/n8n-integration/commit/b1d0d72b2ba7b7d64334fdf35289073f429e4a81))
+
 ## [0.31.0](https://github.com/respond-io/n8n-integration/compare/v0.30.6...v0.31.0) (2026-01-26)
 
 
