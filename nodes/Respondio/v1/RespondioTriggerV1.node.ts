@@ -271,7 +271,6 @@ export class RespondioTriggerV1 implements INodeType {
             this.logger.info(`Delete response: ${JSON.stringify(response)}`);
           } catch (error) {
             this.logger.info(`Error: ${JSON.stringify(error)}`);
-            throw new NodeOperationError(this.getNode(), `Failed to delete webhook subscription: ${error.message}`);
           }
 
           return true;
