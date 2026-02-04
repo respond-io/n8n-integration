@@ -120,7 +120,7 @@ const actionHandlers = {
       })
     }
 
-    if (messageType === SendMessageTypes.MESSENGER_TEMPLATE) {
+    if (messageType === SendMessageTypes.FACEBOOK_TEMPLATE) {
       const templateId = executionContext.getNodeParameter('templateId', itemIndex, '') as number;
       const templateComponentsFields = executionContext.getNodeParameter('messengerTemplateComponentFields', itemIndex, {}) as CustomFieldMapperReturnValue;
 

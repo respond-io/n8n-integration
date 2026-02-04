@@ -7,7 +7,7 @@ import custom_payload from './custom_payload';
 import quick_reply from './quick_reply';
 import whatsapp_template from './whatsapp_template';
 import text_message from './text_message';
-import messenger_template from './messenger_template';
+import facebook_template from './facebook_template';
 import ACTION_NAMES from "../action_names";
 import {
   CustomFieldMapperReturnValue,
@@ -515,7 +515,7 @@ interface WhatsappTemplateInputData {
 }
 
 interface MessengerTemplateInputData {
-  messageType: SendMessageTypes.MESSENGER_TEMPLATE;
+  messageType: SendMessageTypes.FACEBOOK_TEMPLATE;
   [key: string]: any;
   templateComponentsFields: CustomFieldMapperReturnValue;
   templateDetails: FetchWhatsappTemplateResponse['data'];
@@ -594,7 +594,7 @@ export const sendMessagePayloadFormatter = (input: SendMessagePayloadFormatterIn
     };
   }
 
-  const templateMessageTypes = [SendMessageTypes.MESSENGER_TEMPLATE, SendMessageTypes.WHATSAPP_TEMPLATE];
+  const templateMessageTypes = [SendMessageTypes.FACEBOOK_TEMPLATE, SendMessageTypes.WHATSAPP_TEMPLATE];
   if (templateMessageTypes.includes(messageType)) {
     const {
       templateComponentsFields,
@@ -683,7 +683,7 @@ export default {
           { name: 'Quick Reply', value: 'quick_reply' },
           { name: 'Custom Payload', value: 'custom_payload' },
           { name: 'WhatsApp Template', value: 'whatsapp_template' },
-          { name: 'Messenger Template', value: 'messenger_template' },
+          { name: 'Facebook Template', value: 'facebook_template' },
           { name: 'Email', value: 'email' },
         ],
         required: true,
@@ -721,7 +721,7 @@ export default {
       ...quick_reply.generateFields(),
       ...whatsapp_template.generateFields(),
       ...text_message.generateFields(),
-      ...messenger_template.generateFields(),
+      ...facebook_template.generateFields(),
     ] as unknown as INodeProperties[]
   },
 };

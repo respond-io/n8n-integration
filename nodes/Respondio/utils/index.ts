@@ -449,7 +449,6 @@ export const getMessengerTemplateFunction = async (context: ILoadOptionsFunction
     }),
     { limit: 20, includeRaw: true }
   )
-  context.logger.info(`Fetched ${allMessengerTemplates.length} messenger templates for channel ID: ${channelId}, with the values: ${JSON.stringify(allMessengerTemplates)}`);
 
   const globalData = context.getWorkflowStaticData('global')
   if (!allMessengerTemplates || allMessengerTemplates.length === 0) {
