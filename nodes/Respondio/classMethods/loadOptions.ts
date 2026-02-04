@@ -1,5 +1,5 @@
 import { ILoadOptionsFunctions, INodePropertyOptions } from "n8n-workflow";
-import { callDeveloperApi, capitalizeFirstLetter, constructIdentifier, fetchPaginatedOptions, getWhatsappTemplatesFunction } from "../utils";
+import { callDeveloperApi, capitalizeFirstLetter, constructIdentifier, fetchPaginatedOptions, getMessengerTemplateFunction, getWhatsappTemplatesFunction } from "../utils";
 import {
   Channel,
   ClosingNote,
@@ -82,6 +82,10 @@ export async function getWhatsappTemplates(this: ILoadOptionsFunctions): Promise
   return getWhatsappTemplatesFunction(this);
 }
 
+export async function getMessengerTemplates(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+  return getMessengerTemplateFunction(this);
+}
+
 export async function getWhatsappTemplateLanguageCodes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
   const templateId = this.getNodeParameter('templateId', 0) as string;
 
@@ -95,7 +99,60 @@ export async function getWhatsappTemplateLanguageCodes(this: ILoadOptionsFunctio
   return [{ name: template.data.languageCode, value: template.data.languageCode }];
 }
 
+export async function getMessengerTemplateLanguageCodes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+  const templateId = this.getNodeParameter('templateId', 0) as string;
+
+  if (!templateId) throw new Error('Template Id not provided');
+
+  const template = await callDeveloperApi<FetchWhatsappTemplateResponse>(this, {
+    method: 'GET',
+    path: `/space/mtm/${templateId}`,
+  })
+
+  return [{ name: template.data.languageCode, value: template.data.languageCode }];
+}
+
 export async function getTemplatePreviewOptions(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+  const templateId = this.getNodeParameter('templateId', 0) as number;
+
+  if (!templateId) return [];
+
+  const response = await callDeveloperApi<FetchWhatsappTemplateResponse>(this, {
+    method: 'GET',
+    path: `/space/mtm/${templateId}`,
+  });
+
+  if (!response?.data?.id) return [];
+
+  const { data: template } = response;
+  const options: INodePropertyOptions[] = [];
+  const templateComponents = (typeof template?.components === 'string' ?
+    JSON.parse(template.components) :
+    template?.components) || [];
+
+  for (const comp of templateComponents) {
+    if (typeof comp === 'object' && comp.text && ['header', 'body', 'footer'].includes(comp.type)) {
+      options.push({
+        name: `${capitalizeFirstLetter(comp.type)}: ${comp.text}`,
+        value: comp.type,
+      });
+    }
+  }
+
+  if (template.catalogProducts && template.catalogProducts.length > 0) {
+    template.catalogProducts.forEach((product) => {
+      options.push({
+        name: `Product: ${product.name} (${product.currency}${product.price} - ${product.availability})`,
+        value: product.id,
+        description: `Description: ${product.description}`
+      })
+    })
+  }
+
+  return options;
+}
+
+export async function getMessengerTemplatePreviewOptions(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
   const templateId = this.getNodeParameter('templateId', 0) as number;
 
   if (!templateId) return [];

@@ -160,8 +160,8 @@ const ACTION_SETTINGS = {
   >
 >;
 
-const DEVELOPER_API_BASE_URL = 'https://api.respond.io';
-const INTEGRATION_API_BASE_URL = 'https://app.respond.io';
+const DEVELOPER_API_BASE_URL = 'https://api-staging.respond.io';
+const INTEGRATION_API_BASE_URL = 'https://staging.respond.io';
 
 export const INPUT_IDENTIFIER = '$input$';
 export const HIDDEN_INPUT_IDENTIFIER = '$hidden$';

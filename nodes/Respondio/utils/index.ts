@@ -433,6 +433,38 @@ export const getWhatsappTemplatesFunction = async (context: ILoadOptionsFunction
   return allWhatsappTemplates;
 }
 
+export const getMessengerTemplateFunction = async (context: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> => {
+  const channelId = context.getNodeParameter('channelId', 0) as string;
+  const {
+    transformed: allMessengerTemplates,
+    raw: rawMessengerTemplates,
+  } = await fetchPaginatedOptions<WhatsAppTemplate, INodePropertyOptions>(
+    context,
+    'respondIoApi',
+    `/space/channel/${channelId}/template`,
+    (item) => ({
+      name: `${item.name} (${item.languageCode})`,
+      value: item.id,
+      description: `Namespace: ${item.namespace}, Category: ${item.category}, Status: ${item.status}`,
+    }),
+    { limit: 20, includeRaw: true }
+  )
+
+  const globalData = context.getWorkflowStaticData('global')
+  if (!allMessengerTemplates || allMessengerTemplates.length === 0) {
+    globalData.messengerTemplates = undefined;
+    return [{
+      name: '⚠️ No Messenger templates found for this channel',
+      value: '__EMPTY__',
+      description: 'Please check if the channelId is correct or if templates exist.',
+    }]
+  }
+
+  // store the raw templates in global static data for subsequent usage
+  globalData.messengerTemplates = JSON.stringify(rawMessengerTemplates);
+  return allMessengerTemplates;
+}
+
 export function capitalizeFirstLetter(string: string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
