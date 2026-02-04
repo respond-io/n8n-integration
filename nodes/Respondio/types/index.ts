@@ -235,7 +235,7 @@ export enum SendMessageTypes {
   QUICK_REPLY = 'quick_reply',
   EMAIL = 'email',
   WHATSAPP_TEMPLATE = 'whatsapp_template',
-  MESSENGER_TEMPLATE = 'messenger_template',
+  FACEBOOK_TEMPLATE = 'facebook_template',
 }
 
 export type FetchWhatsappTemplateResponse = {

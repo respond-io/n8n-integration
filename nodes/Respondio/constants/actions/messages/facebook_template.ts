@@ -3,11 +3,11 @@ import { INodeProperties } from "n8n-workflow";
 export default {
   generateFields: (): INodeProperties[] => [
     {
-      displayName: 'Messenger Template Name',
+      displayName: 'Facebook Template Name',
       required: true,
       name: 'templateId',
       type: 'options',
-      description: 'The name of the approved Messenger template.',
+      description: 'The name of the approved Facebook template.',
       default: '',
       typeOptions: {
         loadOptionsMethod: 'getMessengerTemplates',
@@ -15,24 +15,24 @@ export default {
       },
       displayOptions: {
         show: {
-          messageType: ['messenger_template']
+          messageType: ['facebook_template']
         }
       }
     },
     {
-      displayName: 'Messenger Template Language Code',
+      displayName: 'Facebook Template Language Code',
       name: 'templateLanguageCode',
       type: 'options',
       required: true,
       default: '',
-      description: 'The language code of the approved Messenger template.',
+      description: 'The language code of the approved Facebook template.',
       typeOptions: {
         loadOptionsMethod: 'getMessengerTemplateLanguageCodes',
         loadOptionsDependsOn: ['templateId']
       },
       displayOptions: {
         show: {
-          messageType: ['messenger_template'],
+          messageType: ['facebook_template'],
           templateId: [{ _cnd: { exists: true } }]
         }
       },
@@ -46,7 +46,7 @@ export default {
       description: 'This is informational only. The template\'s header and body preview will be available at the bottom of the section after selecting the template.',
       displayOptions: {
         show: {
-          messageType: ['messenger_template'],
+          messageType: ['facebook_template'],
           templateId: [{ _cnd: { exists: true } }]
         }
       },
@@ -60,13 +60,13 @@ export default {
       description: 'This is informational only.',
       displayOptions: {
         show: {
-          messageType: ['messenger_template'],
+          messageType: ['facebook_template'],
           templateId: [{ _cnd: { exists: true } }]
         }
       },
     },
     {
-      displayName: 'Messenger Template Component Fields',
+      displayName: 'Facebook Template Component Fields',
       name: 'messengerTemplateComponentFields',
       type: 'resourceMapper',
       default: {
@@ -87,7 +87,7 @@ export default {
       },
       displayOptions: {
         show: {
-          messageType: ['messenger_template'],
+          messageType: ['facebook_template'],
           templateId: [{ _cnd: { exists: true } }],
         }
       }
@@ -100,7 +100,7 @@ export default {
       default: [],
       displayOptions: {
         show: {
-          messageType: ['messenger_template'],
+          messageType: ['facebook_template'],
           templateId: [{ _cnd: { exists: true } }],
         }
       },
