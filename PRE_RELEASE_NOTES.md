@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.33.0](https://github.com/respond-io/n8n-integration/compare/v0.32.0...v0.33.0) (2026-02-04)
+
+
+### Features
+
+* rename to facebook_template ([0fe366f](https://github.com/respond-io/n8n-integration/commit/0fe366f9cb7f74d7906b3e14536f3f4dca7227a7))
+* rename to facebook_template ([b406458](https://github.com/respond-io/n8n-integration/commit/b406458c9322fe8d742c460f063100d26ff37073))
+
 ## [0.32.0](https://github.com/respond-io/n8n-integration/compare/v0.31.0...v0.32.0) (2026-02-04)
 
 
