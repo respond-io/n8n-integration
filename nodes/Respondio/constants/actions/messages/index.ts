@@ -514,13 +514,21 @@ interface WhatsappTemplateInputData {
   templateDetails: FetchWhatsappTemplateResponse['data'];
 }
 
+interface MessengerTemplateInputData {
+  messageType: SendMessageTypes.MESSENGER_TEMPLATE;
+  [key: string]: any;
+  templateComponentsFields: CustomFieldMapperReturnValue;
+  templateDetails: FetchWhatsappTemplateResponse['data'];
+}
+
 export type SendMessagePayloadFormatterInput =
   | (TextInputData & SharedInputFields)
   | (AttachmentInputData & SharedInputFields)
   | (CustomPayloadInputData & SharedInputFields)
   | (QuickReplyInputData & SharedInputFields)
   | (EmailInputData & SharedInputFields)
-  | (WhatsappTemplateInputData & SharedInputFields);
+  | (WhatsappTemplateInputData & SharedInputFields)
+  | (MessengerTemplateInputData & SharedInputFields);
 
 export const sendMessagePayloadFormatter = (input: SendMessagePayloadFormatterInput) => {
   const requestBody: BaseRequestBody = {};
@@ -586,7 +594,8 @@ export const sendMessagePayloadFormatter = (input: SendMessagePayloadFormatterIn
     };
   }
 
-  if (messageType === SendMessageTypes.WHATSAPP_TEMPLATE) {
+  const templateMessageTypes = [SendMessageTypes.MESSENGER_TEMPLATE, SendMessageTypes.WHATSAPP_TEMPLATE];
+  if (templateMessageTypes.includes(messageType)) {
     const {
       templateComponentsFields,
       templateDetails,
