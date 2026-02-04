@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.32.0](https://github.com/respond-io/n8n-integration/compare/v0.31.0...v0.32.0) (2026-02-04)
+
+
+### Features
+
+* add AI Agent to event sources for: ([b1d0d72](https://github.com/respond-io/n8n-integration/commit/b1d0d72b2ba7b7d64334fdf35289073f429e4a81))
+* handle send message with messenger templates ([5c208a6](https://github.com/respond-io/n8n-integration/commit/5c208a6a81d951e760efcaa85733f96e23d287ae))
+* update node to include messenger template for send message ([568dfef](https://github.com/respond-io/n8n-integration/commit/568dfefcb11661dece6dcd127d8c7352cb3ee45b))
+* update node to include messenger template for send message ([3bf284f](https://github.com/respond-io/n8n-integration/commit/3bf284fb3a63030f0c93760281f36b6c6883a1ba))
+
 ## [0.31.0](https://github.com/respond-io/n8n-integration/compare/v0.30.6...v0.31.0) (2026-01-26)
 
 
