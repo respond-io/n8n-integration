@@ -7,6 +7,7 @@ import custom_payload from './custom_payload';
 import quick_reply from './quick_reply';
 import whatsapp_template from './whatsapp_template';
 import text_message from './text_message';
+import facebook_template from './facebook_template';
 import ACTION_NAMES from "../action_names";
 import {
   CustomFieldMapperReturnValue,
@@ -513,13 +514,21 @@ interface WhatsappTemplateInputData {
   templateDetails: FetchWhatsappTemplateResponse['data'];
 }
 
+interface MessengerTemplateInputData {
+  messageType: SendMessageTypes.FACEBOOK_TEMPLATE;
+  [key: string]: any;
+  templateComponentsFields: CustomFieldMapperReturnValue;
+  templateDetails: FetchWhatsappTemplateResponse['data'];
+}
+
 export type SendMessagePayloadFormatterInput =
   | (TextInputData & SharedInputFields)
   | (AttachmentInputData & SharedInputFields)
   | (CustomPayloadInputData & SharedInputFields)
   | (QuickReplyInputData & SharedInputFields)
   | (EmailInputData & SharedInputFields)
-  | (WhatsappTemplateInputData & SharedInputFields);
+  | (WhatsappTemplateInputData & SharedInputFields)
+  | (MessengerTemplateInputData & SharedInputFields);
 
 export const sendMessagePayloadFormatter = (input: SendMessagePayloadFormatterInput) => {
   const requestBody: BaseRequestBody = {};
@@ -585,7 +594,8 @@ export const sendMessagePayloadFormatter = (input: SendMessagePayloadFormatterIn
     };
   }
 
-  if (messageType === SendMessageTypes.WHATSAPP_TEMPLATE) {
+  const templateMessageTypes = [SendMessageTypes.FACEBOOK_TEMPLATE, SendMessageTypes.WHATSAPP_TEMPLATE];
+  if (templateMessageTypes.includes(messageType)) {
     const {
       templateComponentsFields,
       templateDetails,
@@ -673,6 +683,7 @@ export default {
           { name: 'Quick Reply', value: 'quick_reply' },
           { name: 'Custom Payload', value: 'custom_payload' },
           { name: 'WhatsApp Template', value: 'whatsapp_template' },
+          { name: 'Facebook Template', value: 'facebook_template' },
           { name: 'Email', value: 'email' },
         ],
         required: true,
@@ -710,6 +721,7 @@ export default {
       ...quick_reply.generateFields(),
       ...whatsapp_template.generateFields(),
       ...text_message.generateFields(),
+      ...facebook_template.generateFields(),
     ] as unknown as INodeProperties[]
   },
 };

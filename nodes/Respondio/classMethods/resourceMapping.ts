@@ -210,3 +210,47 @@ export async function getWhatsappTemplateComponentFields(this: ILoadOptionsFunct
 
   return { fields }
 }
+
+export async function getMessengerTemplateComponentFields(this: ILoadOptionsFunctions): Promise<ResourceMapperFields> {
+  const templateId = this.getNodeParameter('templateId', 0) as number;
+
+  const response = await callDeveloperApi<FetchWhatsappTemplateResponse>(this, {
+    method: 'GET',
+    path: `/space/mtm/${templateId}`,
+  })
+
+  if (!response?.data?.id) return { fields: [] };
+
+  const { data: template } = response;
+
+  const { fields } = createTemplateParameters(template)
+
+  const hasCatalogProducts = template?.catalogProducts?.length > 0;
+
+  if (hasCatalogProducts) {
+    for (const [index, product] of template.catalogProducts.entries()) {
+      fields.push({
+        id: `${HIDDEN_INPUT_IDENTIFIER}_catalog_products_${index}`,
+        type: 'boolean',
+        displayName: `Include Product (${product.name} - ${product.currency}${product.price})`,
+        display: true,
+        required: false,
+        defaultMatch: false,
+      })
+
+      fields.push({
+        id: `${HIDDEN_INPUT_IDENTIFIER}_catalog_products_${index}_details`,
+        type: 'options',
+        displayName: `Hidden Product Details (${product.name})`,
+        display: false,
+        required: false,
+        defaultMatch: false,
+        options: [
+          { name: 'Value', value: JSON.stringify(product) }
+        ]
+      })
+    }
+  }
+
+  return { fields }
+}

@@ -120,6 +120,28 @@ const actionHandlers = {
       })
     }
 
+    if (messageType === SendMessageTypes.FACEBOOK_TEMPLATE) {
+      const templateId = executionContext.getNodeParameter('templateId', itemIndex, '') as number;
+      const templateComponentsFields = executionContext.getNodeParameter('messengerTemplateComponentFields', itemIndex, {}) as CustomFieldMapperReturnValue;
+
+      const templateDetails = await callDeveloperApi<FetchWhatsappTemplateResponse>(executionContext, {
+        method: 'GET',
+        path: `/space/mtm/${templateId}`,
+      })
+
+      payload = sendMessagePayloadFormatter({
+        messageType,
+        channelId,
+        channelType,
+        templateComponentsFields,
+        templateDetails: templateDetails.data,
+      })
+    }
+
+    if (!payload || Object.keys(payload).length === 0) {
+      throw new Error(`No payload is constructed for sending message with type of ${messageType}`);
+    }
+
     const response = await callDeveloperApi<SendMessageResponse>(executionContext, {
       method: 'POST',
       path: sendMessagePath,
