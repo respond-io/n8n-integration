@@ -74,6 +74,12 @@ const TRIGGER_SETTINGS = {
     description: 'Trigger on contact lifecycle being updated',
     action: 'On Contact Lifecycle updated'
   },
+  CALL_ENDED: {
+    name: 'Call Ended',
+    value: 'callEnded',
+    description: 'Trigger on call ended',
+    action: 'On Call ended'
+  }
 } as const satisfies Record<string, INodePropertyOptions>;
 
 export type TriggerSettingKey = keyof typeof TRIGGER_SETTINGS;
@@ -87,6 +93,7 @@ const TRIGGER_SETTINGS_EVENT_SOURCES = {
     { name: 'Bot', value: 'bot' },
     { name: 'Make', value: 'make' },
     { name: 'n8n', value: 'n8n' },
+    { name: 'AI Agent', value: 'ai_agent' },
   ],
   CONVERSATION_OPENED: [
     { name: 'User', value: 'user' },
@@ -106,6 +113,7 @@ const TRIGGER_SETTINGS_EVENT_SOURCES = {
     { name: 'Echo', value: 'echo' },
     { name: 'Make', value: 'make' },
     { name: 'n8n', value: 'n8n' },
+    { name: 'AI Agent', value: 'ai_agent' },
   ]
 };
 
