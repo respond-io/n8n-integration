@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.0](https://github.com/respond-io/n8n-integration/compare/v1.4.0...v1.5.0) (2026-02-11)
+
+
+### Features
+
+* revert DEVELOPER_API_BASE_URL and INTEGRATION_API_BASE_URL ([a38b6cf](https://github.com/respond-io/n8n-integration/commit/a38b6cf165caca3c100ffed497ab8186779d0201))
+* revert DEVELOPER_API_BASE_URL and INTEGRATION_API_BASE_URL ([c825278](https://github.com/respond-io/n8n-integration/commit/c82527854b647bba1df5a9e32430b453291cf7bc))
+
 ## [1.4.0](https://github.com/respond-io/n8n-integration/compare/v1.3.6...v1.4.0) (2026-02-10)
 
 
