@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.34.0](https://github.com/respond-io/n8n-integration/compare/v0.33.0...v0.34.0) (2026-04-06)
+
+
+### Features
+
+* empty commit trigger action ([ea84afe](https://github.com/respond-io/n8n-integration/commit/ea84afe6663fe6ff29d4caa40a9e5448496779de))
+* empty commit trigger action ([487d780](https://github.com/respond-io/n8n-integration/commit/487d780868afdaa000dcfebfe20fbf44f9ab002d))
+* empty commit trigger action ([e3f1ae1](https://github.com/respond-io/n8n-integration/commit/e3f1ae15e6874ab5a7cfee449b958c3c10d3d019))
+* Merge branch 'flight/workflows-call-ended-trigger' into chore/resolve-conflict-flight-workflow-call-ended-trigger ([78ab975](https://github.com/respond-io/n8n-integration/commit/78ab9754e26e1de264ddbae145cc1961a22657fb))
+* revert DEVELOPER_API_BASE_URL and INTEGRATION_API_BASE_URL ([a38b6cf](https://github.com/respond-io/n8n-integration/commit/a38b6cf165caca3c100ffed497ab8186779d0201))
+* revert DEVELOPER_API_BASE_URL and INTEGRATION_API_BASE_URL ([c825278](https://github.com/respond-io/n8n-integration/commit/c82527854b647bba1df5a9e32430b453291cf7bc))
+
+
+### Bug Fixes
+
+* added support for new message type in incoming message trigger ([83b88d0](https://github.com/respond-io/n8n-integration/commit/83b88d0cb4f888235bf16134457e92125b8e7831))
+
 ## [0.33.0](https://github.com/respond-io/n8n-integration/compare/v0.32.0...v0.33.0) (2026-02-04)
 
 
