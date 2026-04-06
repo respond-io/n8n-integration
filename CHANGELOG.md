@@ -1,5 +1,33 @@
 # Changelog
 
+## [1.6.0](https://github.com/respond-io/n8n-integration/compare/v1.5.0...v1.6.0) (2026-02-19)
+
+
+### Features
+
+* empty commit trigger action ([ea84afe](https://github.com/respond-io/n8n-integration/commit/ea84afe6663fe6ff29d4caa40a9e5448496779de))
+* empty commit trigger action ([487d780](https://github.com/respond-io/n8n-integration/commit/487d780868afdaa000dcfebfe20fbf44f9ab002d))
+* empty commit trigger action ([e3f1ae1](https://github.com/respond-io/n8n-integration/commit/e3f1ae15e6874ab5a7cfee449b958c3c10d3d019))
+
+## [1.5.0](https://github.com/respond-io/n8n-integration/compare/v1.4.0...v1.5.0) (2026-02-11)
+
+
+### Features
+
+* revert DEVELOPER_API_BASE_URL and INTEGRATION_API_BASE_URL ([a38b6cf](https://github.com/respond-io/n8n-integration/commit/a38b6cf165caca3c100ffed497ab8186779d0201))
+* revert DEVELOPER_API_BASE_URL and INTEGRATION_API_BASE_URL ([c825278](https://github.com/respond-io/n8n-integration/commit/c82527854b647bba1df5a9e32430b453291cf7bc))
+
+## [1.4.0](https://github.com/respond-io/n8n-integration/compare/v1.3.6...v1.4.0) (2026-02-10)
+
+
+### Features
+
+* handle send message with messenger templates ([5c208a6](https://github.com/respond-io/n8n-integration/commit/5c208a6a81d951e760efcaa85733f96e23d287ae))
+* rename to facebook_template ([0fe366f](https://github.com/respond-io/n8n-integration/commit/0fe366f9cb7f74d7906b3e14536f3f4dca7227a7))
+* rename to facebook_template ([b406458](https://github.com/respond-io/n8n-integration/commit/b406458c9322fe8d742c460f063100d26ff37073))
+* update node to include messenger template for send message ([568dfef](https://github.com/respond-io/n8n-integration/commit/568dfefcb11661dece6dcd127d8c7352cb3ee45b))
+* update node to include messenger template for send message ([3bf284f](https://github.com/respond-io/n8n-integration/commit/3bf284fb3a63030f0c93760281f36b6c6883a1ba))
+
 ## [1.3.6](https://github.com/respond-io/n8n-integration/compare/v1.3.5...v1.3.6) (2026-01-14)
 
 
