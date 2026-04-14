@@ -33,7 +33,8 @@ const incomingMessageTypeOptions = [
   { name: 'Email', value: 'email' },
   { name: 'Un Supported', value: 'unsupported' },
   { name: 'Product Message', value: 'whatsapp_interactive' },
-  { name: 'Tiktok Post', value: 'post' }
+  { name: 'Tiktok Post', value: 'post' },
+  { name: 'Product Order', value: 'whatsapp_order' },
 ]
 
 export class RespondioTriggerV1 implements INodeType {
