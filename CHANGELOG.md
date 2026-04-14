@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.6.1](https://github.com/respond-io/n8n-integration/compare/v1.6.0...v1.6.1) (2026-04-14)
+
+
+### Bug Fixes
+
+* added support for new message type in incoming message trigger ([29eb6bd](https://github.com/respond-io/n8n-integration/commit/29eb6bd2b2d3d225be4b7f1ca450e2a415e843ca))
+* added support for new message type in incoming message trigger ([83b88d0](https://github.com/respond-io/n8n-integration/commit/83b88d0cb4f888235bf16134457e92125b8e7831))
+
 ## [1.6.0](https://github.com/respond-io/n8n-integration/compare/v1.5.0...v1.6.0) (2026-02-19)
 
 
