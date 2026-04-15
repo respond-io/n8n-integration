@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.6.2](https://github.com/respond-io/n8n-integration/compare/v1.6.1...v1.6.2) (2026-04-15)
+
+
+### Bug Fixes
+
+* trigger github action ([a8a72f5](https://github.com/respond-io/n8n-integration/commit/a8a72f521edbe6a8749f92d5658ac5b08e89bd3d))
+* trigger github action ([f077426](https://github.com/respond-io/n8n-integration/commit/f07742667fac94ce7bcced05d0f4a442214139a6))
+
 ## [1.6.1](https://github.com/respond-io/n8n-integration/compare/v1.6.0...v1.6.1) (2026-04-14)
 
 
