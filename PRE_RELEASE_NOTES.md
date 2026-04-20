@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.36.0](https://github.com/respond-io/n8n-integration/compare/v0.35.0...v0.36.0) (2026-04-20)
+
+
+### Features
+
+* add logic for failure branch ([9e97f54](https://github.com/respond-io/n8n-integration/commit/9e97f54c5f87c4ed2cd184f8788361f8a4fd19ee))
+
 ## [0.35.0](https://github.com/respond-io/n8n-integration/compare/v0.34.0...v0.35.0) (2026-04-15)
 
 
