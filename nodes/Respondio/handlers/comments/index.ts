@@ -1,4 +1,4 @@
-import { IExecuteFunctions, INodeExecutionData, NodeExecutionWithMetadata, NodeOperationError } from "n8n-workflow";
+import { IExecuteFunctions, INodeExecutionData, JsonObject, NodeApiError, NodeExecutionWithMetadata, NodeOperationError } from "n8n-workflow";
 import { ACTION_NAMES } from "../../constants/actions/action_names";
 import { callDeveloperApi, constructIdentifier } from "../../utils";
 import { CreateCommentResponse } from "../../types";
@@ -27,13 +27,25 @@ const execute = async (
       results.push({ json: {}, error, pairedItem: { item: i } });
     }
 
-    const response = await callDeveloperApi<CreateCommentResponse>(executionContext, {
-      method: 'POST',
-      path: `/contact/${identifier}/comment`,
-      body: { text: commentContent },
-    })
+    try {
+      const response = await callDeveloperApi<CreateCommentResponse>(executionContext, {
+        method: 'POST',
+        path: `/contact/${identifier}/comment`,
+        body: { text: commentContent },
+      })
 
-    results.push({ json: response, pairedItem: { item: i } });
+      results.push({ json: response, pairedItem: { item: i } });
+    } catch (error) {
+      const apiError = new NodeApiError(
+        executionContext.getNode(),
+        error as JsonObject,
+        {
+          message: `Comments Action Error: ${error?.response?.data?.message || error?.message || 'An error occurred while executing the comments action.'}`,
+          description: `An error occurred while executing the comments action. Please check the details for more information.`,
+        }
+      );
+      results.push({ json: {}, pairedItem: { item: 0 }, error: apiError });
+    }
   }
 
   return [results];

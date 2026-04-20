@@ -1,4 +1,4 @@
-import { IExecuteFunctions, INodeExecutionData, NodeExecutionWithMetadata } from "n8n-workflow";
+import { IExecuteFunctions, INodeExecutionData, JsonObject, NodeApiError, NodeExecutionWithMetadata } from "n8n-workflow";
 import { ACTION_NAMES } from "../../constants/actions/action_names";
 import { callDeveloperApi, constructIdentifier } from "../../utils";
 import { CreateContactResponse } from "../../types";
@@ -43,9 +43,21 @@ const execute = async (
   for (let i = 0; i < items.length; i++) {
     const identifier = constructIdentifier(executionContext, i);
 
-    const data = await handler(executionContext, i, identifier);
+    try {
+      const data = await handler(executionContext, i, identifier);
 
-    results.push({ json: data, pairedItem: { item: i } });
+      results.push({ json: data, pairedItem: { item: i } });
+    } catch (error) {
+      const apiError = new NodeApiError(
+        executionContext.getNode(),
+        error as JsonObject,
+        {
+          message: `Lifecycles Action Error: ${error?.response?.data?.message || error?.message || 'An error occurred while executing the lifecycles action.'}`,
+          description: `An error occurred while executing the lifecycles action. Please check the details for more information.`,
+        }
+      );
+      results.push({ json: {}, pairedItem: { item: 0 }, error: apiError });
+    }
   }
 
   return [results];
