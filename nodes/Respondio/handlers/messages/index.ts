@@ -1,4 +1,4 @@
-import { IExecuteFunctions, INodeExecutionData, NodeExecutionWithMetadata } from "n8n-workflow";
+import { IExecuteFunctions, INodeExecutionData, JsonObject, NodeApiError, NodeExecutionWithMetadata } from "n8n-workflow";
 
 import { ACTION_NAMES } from "../../constants/actions/action_names";
 import { callDeveloperApi, constructIdentifier, IContactIdentifiers } from "../../utils";
@@ -178,17 +178,29 @@ const execute = async (
       const contactId = identifier.split(':')[1];
       if (!contactId) throw new Error('Contact ID is required for this action');
     }
-    const data = await handler(executionContext, i, identifier);
+    try {
+      const data = await handler(executionContext, i, identifier);
 
-    if (Array.isArray(data)) {
-      results.push(
-        ...data.map(d => ({
-          json: d,
-          pairedItem: { item: i },
-        }))
+      if (Array.isArray(data)) {
+        results.push(
+          ...data.map(d => ({
+            json: d,
+            pairedItem: { item: i },
+          }))
+        );
+      } else {
+        results.push({ json: data, pairedItem: { item: i } });
+      }
+    } catch (error) {
+      const apiError = new NodeApiError(
+        executionContext.getNode(),
+        error as JsonObject,
+        {
+          message: `Messages Action Error: ${error?.response?.data?.message || error?.message || 'An error occurred while executing the messages action.'}`,
+          description: `An error occurred while executing the messages action. Please check the details for more information.`,
+        }
       );
-    } else {
-      results.push({ json: data, pairedItem: { item: i } });
+      results.push({ json: {}, pairedItem: { item: 0 }, error: apiError });
     }
   }
 
