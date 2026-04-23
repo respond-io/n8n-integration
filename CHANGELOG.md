@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.7.0](https://github.com/respond-io/n8n-integration/compare/v1.6.2...v1.7.0) (2026-04-23)
+
+
+### Features
+
+* migrate npm publish to OIDC authentication ([6afb664](https://github.com/respond-io/n8n-integration/commit/6afb664134c253f47566baeff66e497a41d280f8))
+* migrate npm publish to OIDC authentication ([a1f5cdf](https://github.com/respond-io/n8n-integration/commit/a1f5cdf53c55ad11ab02542d0ae840eafb9626ef))
+
 ## [1.6.2](https://github.com/respond-io/n8n-integration/compare/v1.6.1...v1.6.2) (2026-04-15)
 
 
