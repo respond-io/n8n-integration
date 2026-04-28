@@ -23,6 +23,7 @@ const outgoingMessageTypeOptions = [
   { name: 'Card', value: 'card' },
   { name: 'Rating', value: 'rating' },
   { name: 'Product Message', value: 'whatsapp_interactive' },
+  { name: 'Facebook Template', value: 'facebook_template' },
 ]
 
 const incomingMessageTypeOptions = [
