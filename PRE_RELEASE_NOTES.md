@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.37.0](https://github.com/respond-io/n8n-integration/compare/v0.36.0...v0.37.0) (2026-04-28)
+
+
+### Features
+
+* add facebook_template into outgoingMessageTypeOptions ([c1399e6](https://github.com/respond-io/n8n-integration/commit/c1399e67f605e176fd11d9b3cecb21eeaf043356))
+* add facebook_template into outgoingMessageTypeOptions ([ee1bc6f](https://github.com/respond-io/n8n-integration/commit/ee1bc6fd890c9c7fffd0c73a8ee068ebcd45cdd8))
+* migrate npm publish to OIDC authentication ([6afb664](https://github.com/respond-io/n8n-integration/commit/6afb664134c253f47566baeff66e497a41d280f8))
+* migrate npm publish to OIDC authentication ([a1f5cdf](https://github.com/respond-io/n8n-integration/commit/a1f5cdf53c55ad11ab02542d0ae840eafb9626ef))
+
+
+### Bug Fixes
+
+* trigger github action ([f435898](https://github.com/respond-io/n8n-integration/commit/f435898f83b0a12539008788e1a886482effd866))
+
 ## [0.36.0](https://github.com/respond-io/n8n-integration/compare/v0.35.0...v0.36.0) (2026-04-20)
 
 
