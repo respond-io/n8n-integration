@@ -68,10 +68,14 @@ const actionHandlers = {
   [ACTION_NAMES.GET_MANY_CONTACTS]: async (executionContext: IExecuteFunctions, itemIndex: number) => {
     const search = executionContext.getNodeParameter('search', itemIndex, '') as string;
     const limit = executionContext.getNodeParameter('limit', itemIndex, 10) as number;
+    const cursorId = executionContext.getNodeParameter('cursorId', itemIndex, '') as string;
+
+    let path = `/contact/list?limit=${limit}`;
+    if (cursorId?.length) path += `&cursorId=${cursorId}`;
 
     const response = await callDeveloperApi<GetManyContactsResponse>(executionContext, {
       method: 'POST',
-      path: `/contact/list?limit=${limit}`,
+      path,
       body: {
         search,
         timezone: 'utc',
