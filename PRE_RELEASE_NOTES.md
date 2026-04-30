@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.38.0](https://github.com/respond-io/n8n-integration/compare/v0.37.0...v0.38.0) (2026-04-30)
+
+
+### Features
+
+* add security scan workflow ([153cd95](https://github.com/respond-io/n8n-integration/commit/153cd958d5907f0a5e1cbb2926db043bfe28d935))
+* add security scan workflow ([5b13409](https://github.com/respond-io/n8n-integration/commit/5b13409dd04cb8b5c0b6e30a00c3f97fc1120fad))
+
 ## [0.37.0](https://github.com/respond-io/n8n-integration/compare/v0.36.0...v0.37.0) (2026-04-28)
 
 
