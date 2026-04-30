@@ -94,7 +94,7 @@ export default {
         name: 'search',
         type: 'string',
         required: false,
-        description: 'Search term for filtering Contacts',
+        description: 'Search term for filtering Contacts (first_name, last_name, full_name, email, phone)',
         default: ''
       },
       {
