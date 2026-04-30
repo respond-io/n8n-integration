@@ -94,7 +94,7 @@ export default {
         name: 'search',
         type: 'string',
         required: false,
-        description: 'Search term for filtering Contacts',
+        description: 'Search term for filtering Contacts (first_name, last_name, full_name, email, phone)',
         default: ''
       },
       {
@@ -104,6 +104,14 @@ export default {
         required: false,
         description: 'Maximum number of Contacts to return',
         default: 10
+      },
+      {
+        displayName: 'CursorId',
+        name: 'cursorId',
+        type: 'string',
+        required: false,
+        description: 'Cursor for pagination. It is the id of the last item from the previous page. If not provided, it will return the first page.',
+        default: ''
       }
     ] as unknown as INodeProperties[]
   },
