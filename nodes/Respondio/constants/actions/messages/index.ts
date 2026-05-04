@@ -641,7 +641,6 @@ export const sendMessagePayloadFormatter = (input: SendMessagePayloadFormatterIn
       messageType,
       templateComponentsFields,
       templateDetails,
-      isWhatsapp: messageType === SendMessageTypes.WHATSAPP_TEMPLATE
     })
   }
 
