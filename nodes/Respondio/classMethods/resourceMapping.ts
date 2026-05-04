@@ -82,10 +82,7 @@ const createEmptyResourceMapper = (text: string = '', itemType: string = '') => 
   return parameters;
 }
 
-const createTemplateParameters = (
-  template: FetchWhatsappTemplateResponse['data'],
-  options: { useImageHeaderExamples?: boolean } = {},
-): ResourceMapperFields => {
+const createTemplateParameters = (template: FetchWhatsappTemplateResponse['data']): ResourceMapperFields => {
   const fields: ResourceMapperField[] = [];
 
   const templateComponents = typeof template?.components === 'string' ?
@@ -106,59 +103,14 @@ const createTemplateParameters = (
           }
 
           if (['image', 'document', 'video'].includes(item.format)) {
-            const image = item.examples && item.examples.find((example: any) => example.type === 'image')
-            const textExample = item.examples && item.examples.find((example: any) => example.type === 'text')
-            const hasParameterizedText = !!item.text && /\{\{\d+\}\}/.test(item.text);
-
-            if (
-              options.useImageHeaderExamples &&
-              item.format === 'image' &&
-              image?.image?.link
-            ) {
-              fields.push({
-                id: `${HIDDEN_INPUT_IDENTIFIER}_header_image_details`,
-                type: 'options',
-                displayName: 'Hidden Header Image',
-                display: false,
-                required: false,
-                defaultMatch: false,
-                options: [{ name: 'Value', value: image.image.link }],
-              });
-
-              if (textExample?.text) {
-                fields.push({
-                  id: `${HIDDEN_INPUT_IDENTIFIER}_header_text_details`,
-                  type: 'options',
-                  displayName: 'Hidden Header Text',
-                  display: false,
-                  required: false,
-                  defaultMatch: false,
-                  options: [{ name: 'Value', value: textExample.text }],
-                });
-              }
-
-              if (hasParameterizedText) {
-                fields.push({
-                  id: `${INPUT_IDENTIFIER}_header_image`,
-                  displayName: 'Header Image Link',
-                  required: false,
-                  display: true,
-                  type: 'string',
-                  defaultMatch: false,
-                });
-              }
-            } else if (image) {
-              fields.push(...createEmptyResourceMapper(item.text, 'header'))
-            } else {
-              fields.push({
-                id: `${INPUT_IDENTIFIER}_${item.format}`,
-                displayName: `Header ${item.format} link`,
-                required: true,
-                display: true,
-                type: 'string',
-                defaultMatch: false,
-              });
-            }
+            fields.push({
+              id: `${INPUT_IDENTIFIER}_${item.format}`,
+              displayName: `Header ${item.format} link`,
+              required: true,
+              display: true,
+              type: 'string',
+              defaultMatch: false,
+            });
           }
 
           if (item.format === 'location') {
@@ -271,7 +223,8 @@ export async function getMessengerTemplateComponentFields(this: ILoadOptionsFunc
 
   const { data: template } = response;
 
-  const { fields } = createTemplateParameters(template, { useImageHeaderExamples: true })
+  const { fields } = createTemplateParameters(template)
+
   const hasCatalogProducts = template?.catalogProducts?.length > 0;
 
   if (hasCatalogProducts) {
