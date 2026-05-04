@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.39.0](https://github.com/respond-io/n8n-integration/compare/v0.38.0...v0.39.0) (2026-05-04)
+
+
+### Features
+
+* handle facebook template header image ([697a4cf](https://github.com/respond-io/n8n-integration/commit/697a4cf9cba4a6a2942d7b01ce8bcf2c05bbcbbb))
+* handle facebook template header image ([92517a3](https://github.com/respond-io/n8n-integration/commit/92517a3de2f6b85c530e81040377ee7a4acf42a8))
+* remove isWhatsapp ([2efadc5](https://github.com/respond-io/n8n-integration/commit/2efadc540ffdb7283a0052dac02707ee1e1890b3))
+
 ## [0.38.0](https://github.com/respond-io/n8n-integration/compare/v0.37.0...v0.38.0) (2026-04-30)
 
 
