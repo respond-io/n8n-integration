@@ -138,14 +138,7 @@ const createTemplateParameters = (
               }
 
               if (hasParameterizedText) {
-                fields.push({
-                  id: `${INPUT_IDENTIFIER}_header_image`,
-                  displayName: 'Header Image Link',
-                  required: false,
-                  display: true,
-                  type: 'string',
-                  defaultMatch: false,
-                });
+                fields.push(...createEmptyResourceMapper(item.text, 'header'));
               }
             } else if (image) {
               fields.push(...createEmptyResourceMapper(item.text, 'header'))

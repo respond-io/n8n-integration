@@ -130,14 +130,10 @@ const createTextComponents = (
         // Create a parameter for each placeholder
         parameters = uniqueIndices.map(idx => {
           const key = `${INPUT_IDENTIFIER}_${component.type}_${idx}`;
-          let replacementValue = inputMap[key] ?? '';
-
-          if (!replacementValue && component.type === 'header') {
-            replacementValue = getHiddenValue(
-              rawComponents,
-              `${HIDDEN_INPUT_IDENTIFIER}_header_text_details`,
-            ) ?? '';
-          }
+          const replacementValue = inputMap[key] || getHiddenValue(
+            rawComponents,
+            `${HIDDEN_INPUT_IDENTIFIER}_header_text_details`,
+          ) || '';
 
           return {
             type: "text",
@@ -148,16 +144,16 @@ const createTextComponents = (
     }
 
     if (component.type === 'header' && component.format === 'image' && parameterIncluded) {
-      const userImageLink = inputMap[`${INPUT_IDENTIFIER}_header_image`] || getHiddenValue(
+      const imageLink = getHiddenValue(
         rawComponents,
         `${HIDDEN_INPUT_IDENTIFIER}_header_image_details`,
       );
-      if (userImageLink) {
+      if (imageLink) {
         parameters.unshift({
           type: 'image',
           image: {
-            link: userImageLink,
-            filename: getFilenameFromUrl(userImageLink, 'image'),
+            link: imageLink,
+            filename: getFilenameFromUrl(imageLink, 'image'),
             caption: '',
           },
         });
