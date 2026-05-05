@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.41.0](https://github.com/respond-io/n8n-integration/compare/v0.40.0...v0.41.0) (2026-05-05)
+
+
+### Features
+
+* handle static header link image ([96ffa5d](https://github.com/respond-io/n8n-integration/commit/96ffa5d071214d8a08623678648e5d9416ca0379))
+* handle static header link image ([0f468d6](https://github.com/respond-io/n8n-integration/commit/0f468d62c5226839ee256df2f75a9561f775a85f))
+
 ## [0.40.0](https://github.com/respond-io/n8n-integration/compare/v0.39.0...v0.40.0) (2026-05-05)
 
 
