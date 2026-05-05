@@ -112,7 +112,6 @@ const actionHandlers = {
       })
 
       payload = sendMessagePayloadFormatter({
-        executionContext,
         messageType,
         channelId,
         channelType,
