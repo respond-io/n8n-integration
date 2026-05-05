@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.40.0](https://github.com/respond-io/n8n-integration/compare/v0.39.0...v0.40.0) (2026-05-05)
+
+
+### Features
+
+* add back facebook_template to outgoingMessageTypeOptions ([94eca29](https://github.com/respond-io/n8n-integration/commit/94eca299924451da23d62e8f8981a3ea48fe8cbe))
+* handle image link header ([51f15e8](https://github.com/respond-io/n8n-integration/commit/51f15e81c67f7071dedcde15cd62dedd12c4af2c))
+* handle image link header ([eb3d01e](https://github.com/respond-io/n8n-integration/commit/eb3d01e576a856a9e1691cb16bd3d113cafd47b5))
+
 ## [0.39.0](https://github.com/respond-io/n8n-integration/compare/v0.38.0...v0.39.0) (2026-05-04)
 
 
