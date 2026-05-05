@@ -108,6 +108,7 @@ const createTextComponents = (
   nonButtonComponents: Array<WhatsappTemplateComponentField>,
   inputMap: Record<string, string>,
   rawComponents: Array<Record<string, any>>,
+  isFacebook: boolean,
 ) => {
   const components: any[] = [];
   for (const component of nonButtonComponents) {
@@ -130,10 +131,10 @@ const createTextComponents = (
         // Create a parameter for each placeholder
         parameters = uniqueIndices.map(idx => {
           const key = `${INPUT_IDENTIFIER}_${component.type}_${idx}`;
-          const replacementValue = inputMap[key] || getHiddenValue(
-            rawComponents,
-            `${HIDDEN_INPUT_IDENTIFIER}_header_text_details`,
-          ) || '';
+          const headerTextFallback = isFacebook && component.type === 'header'
+            ? getHiddenValue(rawComponents, `${HIDDEN_INPUT_IDENTIFIER}_header_text_details`)
+            : undefined;
+          const replacementValue = inputMap[key] || headerTextFallback || '';
 
           return {
             type: "text",
@@ -143,11 +144,14 @@ const createTextComponents = (
       }
     }
 
-    if (component.type === 'header' && component.format === 'image' && parameterIncluded) {
-      const imageLink = getHiddenValue(
+    if (isFacebook && component.type === 'header' && component.format === 'image') {
+      const userImageLink = inputMap[`${INPUT_IDENTIFIER}_header_image`];
+      const exampleImageLink = getHiddenValue(
         rawComponents,
         `${HIDDEN_INPUT_IDENTIFIER}_header_image_details`,
       );
+      const imageLink = userImageLink || exampleImageLink;
+
       if (imageLink) {
         parameters.unshift({
           type: 'image',
@@ -464,7 +468,8 @@ const getTemplateMessage = (input: GetWhatsappTemplateMessageInput) => {
   const nonButtonComponents: Array<WhatsappTemplateComponentField> = originalComponents.filter((item) => item.type !== 'buttons');
 
   const inputMap = createInputMap(rawComponents);
-  const resultingComponents = createTextComponents(nonButtonComponents, inputMap, rawComponents);
+  const isFacebook = messageType === SendMessageTypes.FACEBOOK_TEMPLATE;
+  const resultingComponents = createTextComponents(nonButtonComponents, inputMap, rawComponents, isFacebook);
 
   const hasProductsOrButton = templateDetails.catalogProducts.length > 0 || buttonComponent !== undefined;
   if (hasProductsOrButton) {

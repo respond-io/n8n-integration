@@ -106,24 +106,24 @@ const createTemplateParameters = (
           }
 
           if (['image', 'document', 'video'].includes(item.format)) {
-            const image = item.examples && item.examples.find((example: any) => example.type === 'image')
+            const imageFromExamples = item.examples && item.examples.find((example: any) => example.type === 'image')
+            const exampleImageLink = imageFromExamples?.image?.link
+              || (Array.isArray(item.example?.header_handle) ? item.example.header_handle[0] : undefined);
             const textExample = item.examples && item.examples.find((example: any) => example.type === 'text')
             const hasParameterizedText = !!item.text && /\{\{\d+\}\}/.test(item.text);
 
-            if (
-              options.useImageHeaderExamples &&
-              item.format === 'image' &&
-              image?.image?.link
-            ) {
-              fields.push({
-                id: `${HIDDEN_INPUT_IDENTIFIER}_header_image_details`,
-                type: 'options',
-                displayName: 'Hidden Header Image',
-                display: false,
-                required: false,
-                defaultMatch: false,
-                options: [{ name: 'Value', value: image.image.link }],
-              });
+            if (options.useImageHeaderExamples && item.format === 'image') {
+              if (exampleImageLink) {
+                fields.push({
+                  id: `${HIDDEN_INPUT_IDENTIFIER}_header_image_details`,
+                  type: 'options',
+                  displayName: 'Hidden Header Image',
+                  display: false,
+                  required: false,
+                  defaultMatch: false,
+                  options: [{ name: 'Value', value: exampleImageLink }],
+                });
+              }
 
               if (textExample?.text) {
                 fields.push({
@@ -140,7 +140,7 @@ const createTemplateParameters = (
               if (hasParameterizedText) {
                 fields.push(...createEmptyResourceMapper(item.text, 'header'));
               }
-            } else if (image) {
+            } else if (imageFromExamples) {
               fields.push(...createEmptyResourceMapper(item.text, 'header'))
             } else {
               fields.push({
