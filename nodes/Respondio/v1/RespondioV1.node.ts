@@ -5,7 +5,7 @@ import {
   type INodeType,
   INodeTypeBaseDescription,
   type INodeTypeDescription,
-  NodeConnectionType,
+  NodeConnectionTypes,
   NodeExecutionWithMetadata,
 } from 'n8n-workflow';
 
@@ -101,8 +101,8 @@ export class RespondioV1 implements INodeType {
       defaults: {
         name: 'Respond.io Actions',
       },
-      inputs: [NodeConnectionType.Main],
-      outputs: [NodeConnectionType.Main],
+      inputs: [NodeConnectionTypes.Main],
+      outputs: [NodeConnectionTypes.Main],
       credentials: [
         {
           name: 'respondIoApi',
