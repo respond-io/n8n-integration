@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.10.0](https://github.com/respond-io/n8n-integration/compare/v1.9.0...v1.10.0) (2026-05-06)
+
+
+### Features
+
+* update RespondioV1.node.ts to use NodeConnectionTypes ([c912a75](https://github.com/respond-io/n8n-integration/commit/c912a751e65333ee75519c34273fc90299fbc6ca))
+* update RespondioV1.node.ts to use NodeConnectionTypes ([5390967](https://github.com/respond-io/n8n-integration/commit/5390967e0c37eb9efcb67abc44e091f21ac917f8))
+
 ## [1.9.0](https://github.com/respond-io/n8n-integration/compare/v1.8.0...v1.9.0) (2026-05-06)
 
 
