@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.8.0](https://github.com/respond-io/n8n-integration/compare/v1.7.0...v1.8.0) (2026-05-06)
+
+
+### Features
+
+* add back facebook_template to outgoingMessageTypeOptions ([94eca29](https://github.com/respond-io/n8n-integration/commit/94eca299924451da23d62e8f8981a3ea48fe8cbe))
+* add facebook_template into outgoingMessageTypeOptions ([53e449f](https://github.com/respond-io/n8n-integration/commit/53e449f9fabf5a416e76729b072c6b88318e9c1d))
+* add facebook_template into outgoingMessageTypeOptions ([c1399e6](https://github.com/respond-io/n8n-integration/commit/c1399e67f605e176fd11d9b3cecb21eeaf043356))
+* add facebook_template into outgoingMessageTypeOptions ([ee1bc6f](https://github.com/respond-io/n8n-integration/commit/ee1bc6fd890c9c7fffd0c73a8ee068ebcd45cdd8))
+* add security scan workflow ([659fee2](https://github.com/respond-io/n8n-integration/commit/659fee2078a7d9098009b70abab379549ddb1f32))
+* add security scan workflow ([5b13409](https://github.com/respond-io/n8n-integration/commit/5b13409dd04cb8b5c0b6e30a00c3f97fc1120fad))
+* handle facebook template header image ([92517a3](https://github.com/respond-io/n8n-integration/commit/92517a3de2f6b85c530e81040377ee7a4acf42a8))
+* handle image link header ([eb3d01e](https://github.com/respond-io/n8n-integration/commit/eb3d01e576a856a9e1691cb16bd3d113cafd47b5))
+* handle static header link image ([0f468d6](https://github.com/respond-io/n8n-integration/commit/0f468d62c5226839ee256df2f75a9561f775a85f))
+* remove isWhatsapp ([2efadc5](https://github.com/respond-io/n8n-integration/commit/2efadc540ffdb7283a0052dac02707ee1e1890b3))
+* run npm audit fix ([e0cba62](https://github.com/respond-io/n8n-integration/commit/e0cba62fd40c47e6778dd50db8d3ffb974896ae3))
+
 ## [1.7.0](https://github.com/respond-io/n8n-integration/compare/v1.6.2...v1.7.0) (2026-04-23)
 
 
