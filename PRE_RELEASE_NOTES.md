@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.42.0](https://github.com/respond-io/n8n-integration/compare/v0.41.0...v0.42.0) (2026-05-06)
+
+
+### Features
+
+* update search description for GET_MANY_CONTACTS ([7936053](https://github.com/respond-io/n8n-integration/commit/793605355377e7a41920c9dd80560d781f9be5a4))
+* update search description for GET_MANY_CONTACTS ([3a6fe69](https://github.com/respond-io/n8n-integration/commit/3a6fe6931dcb8664e0859732e73dfbce2935b732))
+
 ## [0.41.0](https://github.com/respond-io/n8n-integration/compare/v0.40.0...v0.41.0) (2026-05-05)
 
 
