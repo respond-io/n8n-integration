@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.43.0](https://github.com/respond-io/n8n-integration/compare/v0.42.0...v0.43.0) (2026-05-06)
+
+
+### Features
+
+* fix import of type name ([35f5279](https://github.com/respond-io/n8n-integration/commit/35f5279d63315bcb605796283946f2238af9f8f8))
+
 ## [0.42.0](https://github.com/respond-io/n8n-integration/compare/v0.41.0...v0.42.0) (2026-05-06)
 
 
