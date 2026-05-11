@@ -379,6 +379,89 @@ export async function callDeveloperApi<T>(
   return response as T
 }
 
+export async function withRetryBackoff<T>(
+  fn: () => Promise<T>,
+  options: { maxRetries: number; sleepFn?: (ms: number) => Promise<void> }
+): Promise<T> {
+  const sleepFn = options.sleepFn ?? sleep;
+  for (let attempt = 0; attempt <= options.maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      const statusCode = (error as any)?.response?.status || (error as any)?.statusCode;
+      if (statusCode === 429 && attempt < options.maxRetries) {
+        const delay = Math.pow(2, attempt) * 1000;
+        await sleepFn(delay);
+        continue;
+      }
+      throw error;
+    }
+  }
+  throw new Error('Unreachable');
+}
+
+export async function paginateCallDeveloperApi<
+  TResponse extends { items: unknown[]; pagination?: { next?: string } },
+  TResult = TResponse['items'][number],
+>(
+  executionContext: IExecuteFunctions | ILoadOptionsFunctions,
+  params: {
+    method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+    path: string;
+    body?: any;
+  },
+  mapItem?: (item: TResponse['items'][number]) => TResult,
+  options?: {
+    limit?: number;
+    maxResults?: number;
+    delayMs?: number;
+    maxRetries?: number;
+    cursorId?: string;
+    sleepFn?: (ms: number) => Promise<void>;
+  }
+): Promise<{ transformed: TResult[]; raw: TResponse['items'][number][] }> {
+  const limit = options?.limit ?? 100;
+  const maxResults = Math.min(options?.maxResults ?? 5000, 5000);
+  const delayMs = options?.delayMs ?? 500;
+  const maxRetries = options?.maxRetries ?? 3;
+  const sleepFn = options?.sleepFn ?? sleep;
+
+  const transformed: TResult[] = [];
+  const raw: TResponse['items'][number][] = [];
+
+  let cursor: string | null = options?.cursorId ?? null;
+
+  do {
+    let pathWithParams = params.path;
+    const separator = pathWithParams.includes('?') ? '&' : '?';
+    pathWithParams += `${separator}limit=${limit}`;
+    if (cursor) pathWithParams += `&cursorId=${cursor}`;
+
+    const response = await withRetryBackoff(
+      () => callDeveloperApi<TResponse>(executionContext, {
+        method: params.method,
+        path: pathWithParams,
+        body: params.body,
+      }),
+      { maxRetries, sleepFn }
+    );
+
+    const items = response.items as TResponse['items'][number][];
+    const remaining = maxResults - raw.length;
+    const itemsToAdd = remaining >= items.length ? items : items.slice(0, remaining);
+
+    if (mapItem) transformed.push(...itemsToAdd.map(mapItem));
+    raw.push(...itemsToAdd);
+
+    if (raw.length >= maxResults || !response.pagination?.next) break;
+
+    cursor = new URL(response.pagination.next).searchParams.get('cursorId');
+    await sleepFn(delayMs);
+  } while (true);
+
+  return { transformed, raw };
+}
+
 export const constructCustomFieldFromResourceMapper = (
   customFieldMapper: CustomFieldMapperReturnValue,
 ): Array<{ name: string; value: string | number | boolean | Date }> => {
