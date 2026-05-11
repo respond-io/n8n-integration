@@ -102,7 +102,7 @@ export default {
         name: 'limit',
         type: 'number',
         required: false,
-        description: 'Maximum number of contacts to return, if the limit is set above 100 the results might take a longer time to be returned. Maximum returned results is 5000 no matter what',
+        description: 'Number of Contacts to return. Enter a value from 1 to 5000. Limits over 100 take longer to return',
         default: 10,
       },
       {
