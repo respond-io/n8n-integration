@@ -106,11 +106,11 @@ export default {
         default: 10,
       },
       {
-        displayName: 'CursorId',
+        displayName: 'Cursor ID',
         name: 'cursorId',
         type: 'string',
         required: false,
-        description: 'Cursor for pagination. It is the id of the last item from the previous page. If not provided, it will return the first page.',
+        description: 'Retrieves the next batch of Contacts. Enter the ID of the last Contact from your previous result, or leave empty to start from the beginning',
         default: ''
       }
     ] as unknown as INodeProperties[]
