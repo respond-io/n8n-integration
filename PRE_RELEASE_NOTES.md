@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.45.0](https://github.com/respond-io/n8n-integration/compare/v0.44.0...v0.45.0) (2026-05-11)
+
+
+### Features
+
+* add internal looping with backoff retry on GET MANY CONTACTS ([79fa895](https://github.com/respond-io/n8n-integration/commit/79fa895c1fabf86e2dc150f9ad859da2ff615805))
+
 ## [0.44.0](https://github.com/respond-io/n8n-integration/compare/v0.43.0...v0.44.0) (2026-05-06)
 
 
