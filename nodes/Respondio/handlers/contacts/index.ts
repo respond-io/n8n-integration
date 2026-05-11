@@ -1,6 +1,12 @@
 import { IExecuteFunctions, INodeExecutionData, INodePropertyOptions, JsonObject, NodeApiError, NodeExecutionWithMetadata } from "n8n-workflow";
 import { ACTION_NAMES } from "../../constants/actions/action_names";
-import { callDeveloperApi, constructCustomFieldFromResourceMapper, constructIdentifier, fetchPaginatedOptions } from "../../utils";
+import {
+  callDeveloperApi,
+  constructCustomFieldFromResourceMapper,
+  constructIdentifier,
+  fetchPaginatedOptions,
+  paginateCallDeveloperApi,
+} from "../../utils";
 import {
   CreateContactPayload,
   CreateContactResponse,
@@ -70,20 +76,18 @@ const actionHandlers = {
     const limit = executionContext.getNodeParameter('limit', itemIndex, 10) as number;
     const cursorId = executionContext.getNodeParameter('cursorId', itemIndex, '') as string;
 
-    let path = `/contact/list?limit=${limit}`;
-    if (cursorId?.length) path += `&cursorId=${cursorId}`;
+    const { raw } = await paginateCallDeveloperApi<GetManyContactsResponse>(
+      executionContext,
+      {
+        method: 'POST',
+        path: '/contact/list',
+        body: { search, timezone: 'utc', filter: { $or: [] } },
+      },
+      undefined,
+      { limit: Math.min(limit, 100), maxResults: limit, cursorId: cursorId || undefined }
+    );
 
-    const response = await callDeveloperApi<GetManyContactsResponse>(executionContext, {
-      method: 'POST',
-      path,
-      body: {
-        search,
-        timezone: 'utc',
-        filter: { $or: [] }
-      }
-    })
-
-    return response.items;
+    return raw;
   },
   [ACTION_NAMES.UPDATE_CONTACT]: async (executionContext: IExecuteFunctions, itemIndex: number) => {
     const identifier = constructIdentifier(executionContext, itemIndex);
