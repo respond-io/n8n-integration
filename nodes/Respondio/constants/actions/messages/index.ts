@@ -15,7 +15,17 @@ import {
   SendMessageTypes,
   WhatsappTemplateComponentField,
 } from "../../../types";
-import { INPUT_IDENTIFIER } from "../..";
+import { HIDDEN_INPUT_IDENTIFIER, INPUT_IDENTIFIER } from "../..";
+
+const getHiddenValue = (
+  rawComponents: Array<Record<string, any>>,
+  fieldId: string,
+): string | undefined => {
+  const hidden = rawComponents.find((obj) => Object.keys(obj)[0] === fieldId);
+  if (!hidden) return undefined;
+  const field = Object.values(hidden)[0] as { options?: Array<{ value: string }> };
+  return field?.options?.[0]?.value;
+};
 
 type GetWhatsappTemplateMessageInput = {
   messageType: SendMessageTypes;
@@ -97,6 +107,8 @@ const createInputMap = (rawComponents: Array<Record<string, any>>) => {
 const createTextComponents = (
   nonButtonComponents: Array<WhatsappTemplateComponentField>,
   inputMap: Record<string, string>,
+  rawComponents: Array<Record<string, any>>,
+  isFacebook: boolean,
 ) => {
   const components: any[] = [];
   for (const component of nonButtonComponents) {
@@ -119,11 +131,35 @@ const createTextComponents = (
         // Create a parameter for each placeholder
         parameters = uniqueIndices.map(idx => {
           const key = `${INPUT_IDENTIFIER}_${component.type}_${idx}`;
-          const replacementValue = inputMap[key] ?? '';
+          const headerTextFallback = isFacebook && component.type === 'header'
+            ? getHiddenValue(rawComponents, `${HIDDEN_INPUT_IDENTIFIER}_header_text_details`)
+            : undefined;
+          const replacementValue = inputMap[key] || headerTextFallback || '';
+
           return {
             type: "text",
             text: replacementValue
           };
+        });
+      }
+    }
+
+    if (isFacebook && component.type === 'header' && component.format === 'image') {
+      const userImageLink = inputMap[`${INPUT_IDENTIFIER}_header_image`];
+      const exampleImageLink = getHiddenValue(
+        rawComponents,
+        `${HIDDEN_INPUT_IDENTIFIER}_header_image_details`,
+      );
+      const imageLink = userImageLink || exampleImageLink;
+
+      if (imageLink) {
+        parameters.unshift({
+          type: 'image',
+          image: {
+            link: imageLink,
+            filename: getFilenameFromUrl(imageLink, 'image'),
+            caption: '',
+          },
         });
       }
     }
@@ -401,7 +437,7 @@ const createMediaComponents = (
   return result;
 }
 
-const getWhatsappTemplateMessage = (input: GetWhatsappTemplateMessageInput) => {
+const getTemplateMessage = (input: GetWhatsappTemplateMessageInput) => {
   const {
     messageType,
     templateComponentsFields,
@@ -432,7 +468,8 @@ const getWhatsappTemplateMessage = (input: GetWhatsappTemplateMessageInput) => {
   const nonButtonComponents: Array<WhatsappTemplateComponentField> = originalComponents.filter((item) => item.type !== 'buttons');
 
   const inputMap = createInputMap(rawComponents);
-  const resultingComponents = createTextComponents(nonButtonComponents, inputMap);
+  const isFacebook = messageType === SendMessageTypes.FACEBOOK_TEMPLATE;
+  const resultingComponents = createTextComponents(nonButtonComponents, inputMap, rawComponents, isFacebook);
 
   const hasProductsOrButton = templateDetails.catalogProducts.length > 0 || buttonComponent !== undefined;
   if (hasProductsOrButton) {
@@ -601,7 +638,7 @@ export const sendMessagePayloadFormatter = (input: SendMessagePayloadFormatterIn
       templateDetails,
     } = rest as WhatsappTemplateInputData;
 
-    requestBody.message = getWhatsappTemplateMessage({
+    requestBody.message = getTemplateMessage({
       messageType,
       templateComponentsFields,
       templateDetails,

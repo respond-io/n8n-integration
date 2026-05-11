@@ -4,10 +4,10 @@ import {
   IWebhookFunctions,
   IHookFunctions,
   IWebhookResponseData,
-  NodeConnectionType,
   NodeOperationError,
   IWorkflowMetadata,
   INodeTypeBaseDescription,
+  NodeConnectionTypes,
 } from 'n8n-workflow';
 import { INTEGRATION_API_BASE_URL, TRIGGER_SETTINGS, TRIGGER_SETTINGS_EVENT_SOURCES } from '../constants';
 import { loadOptions } from '../classMethods';
@@ -23,6 +23,7 @@ const outgoingMessageTypeOptions = [
   { name: 'Card', value: 'card' },
   { name: 'Rating', value: 'rating' },
   { name: 'Product Message', value: 'whatsapp_interactive' },
+  { name: 'Facebook Template', value: 'facebook_template' },
 ]
 
 const incomingMessageTypeOptions = [
@@ -56,7 +57,7 @@ export class RespondioTriggerV1 implements INodeType {
         name: 'Respond.io Trigger',
       },
       inputs: [],
-      outputs: [NodeConnectionType.Main],
+      outputs: [NodeConnectionTypes.Main],
       credentials: [
         {
           name: 'respondIoApi',
