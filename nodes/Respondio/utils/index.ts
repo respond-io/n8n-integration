@@ -381,7 +381,7 @@ export async function callDeveloperApi<T>(
 
 export async function withRetryBackoff<T>(
   fn: () => Promise<T>,
-  options: { maxRetries: number; sleepFn?: (ms: number) => Promise<void> }
+  options: { maxRetries: number; sleepFn?: (ms: number) => Promise<void> },
 ): Promise<T> {
   const sleepFn = options.sleepFn ?? sleep;
   for (let attempt = 0; attempt <= options.maxRetries; attempt++) {
@@ -390,7 +390,7 @@ export async function withRetryBackoff<T>(
     } catch (error) {
       const statusCode = (error as any)?.response?.status || (error as any)?.statusCode;
       if (statusCode === 429 && attempt < options.maxRetries) {
-        const delay = Math.pow(2, attempt) * 1000;
+        const delay = Math.min(Math.pow(2, attempt) * 500, 5000);
         await sleepFn(delay);
         continue;
       }
@@ -414,7 +414,6 @@ export async function paginateCallDeveloperApi<
   options?: {
     limit?: number;
     maxResults?: number;
-    delayMs?: number;
     maxRetries?: number;
     cursorId?: string;
     sleepFn?: (ms: number) => Promise<void>;
@@ -422,7 +421,6 @@ export async function paginateCallDeveloperApi<
 ): Promise<{ transformed: TResult[]; raw: TResponse['items'][number][] }> {
   const limit = options?.limit ?? 100;
   const maxResults = Math.min(options?.maxResults ?? 5000, 5000);
-  const delayMs = options?.delayMs ?? 500;
   const maxRetries = options?.maxRetries ?? 3;
   const sleepFn = options?.sleepFn ?? sleep;
 
@@ -443,7 +441,7 @@ export async function paginateCallDeveloperApi<
         path: pathWithParams,
         body: params.body,
       }),
-      { maxRetries, sleepFn }
+      { maxRetries, sleepFn },
     );
 
     const items = response.items as TResponse['items'][number][];
@@ -456,7 +454,6 @@ export async function paginateCallDeveloperApi<
     if (raw.length >= maxResults || !response.pagination?.next) break;
 
     cursor = new URL(response.pagination.next).searchParams.get('cursorId');
-    await sleepFn(delayMs);
   } while (true);
 
   return { transformed, raw };

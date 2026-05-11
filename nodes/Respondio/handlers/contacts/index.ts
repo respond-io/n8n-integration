@@ -84,7 +84,12 @@ const actionHandlers = {
         body: { search, timezone: 'utc', filter: { $or: [] } },
       },
       undefined,
-      { limit: Math.min(limit, 100), maxResults: limit, cursorId: cursorId || undefined }
+      {
+        limit: Math.min(limit, 100),
+        maxResults: limit,
+        cursorId: cursorId || undefined,
+        maxRetries: 5
+      }
     );
 
     return raw;
