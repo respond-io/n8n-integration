@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.46.0](https://github.com/respond-io/n8n-integration/compare/v0.45.0...v0.46.0) (2026-05-12)
+
+
+### Features
+
+* update description for cursor id ([1a13cb0](https://github.com/respond-io/n8n-integration/commit/1a13cb04ee5bcc3446e550f0ee600ce04b929227))
+* update limit description ([227ffe5](https://github.com/respond-io/n8n-integration/commit/227ffe57633b3e0f9b1990d2de6c4470b6feaf1d))
+* update limit description ([f9ce1e3](https://github.com/respond-io/n8n-integration/commit/f9ce1e3907a852d2f642dbf87f53e3b8298b5fc2))
+
 ## [0.45.0](https://github.com/respond-io/n8n-integration/compare/v0.44.0...v0.45.0) (2026-05-11)
 
 
