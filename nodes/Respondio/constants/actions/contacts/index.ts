@@ -102,15 +102,15 @@ export default {
         name: 'limit',
         type: 'number',
         required: false,
-        description: 'Maximum number of contacts to return, if the limit is set above 100 the results might take a longer time to be returned. Maximum returned results is 5000 no matter what',
+        description: 'Number of Contacts to return. Enter a value from 1 to 5000. Limits over 100 take longer to return',
         default: 10,
       },
       {
-        displayName: 'CursorId',
+        displayName: 'Cursor ID',
         name: 'cursorId',
         type: 'string',
         required: false,
-        description: 'Cursor for pagination. It is the id of the last item from the previous page. If not provided, it will return the first page.',
+        description: 'Retrieves the next batch of Contacts. Enter the ID of the last Contact from your previous result, or leave empty to start from the beginning',
         default: ''
       }
     ] as unknown as INodeProperties[]
