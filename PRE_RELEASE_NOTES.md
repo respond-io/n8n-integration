@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.47.0](https://github.com/respond-io/n8n-integration/compare/v0.46.0...v0.47.0) (2026-05-28)
+
+
+### Features
+
+* added new source for conversation opened trigger ([a0c0219](https://github.com/respond-io/n8n-integration/commit/a0c02194ae5952df447d89bd5544736381bbc325))
+* added new source for conversation opened trigger ([0e15df1](https://github.com/respond-io/n8n-integration/commit/0e15df14197973c548a85b1e317e3ba490cee209))
+
 ## [0.46.0](https://github.com/respond-io/n8n-integration/compare/v0.45.0...v0.46.0) (2026-05-12)
 
 
