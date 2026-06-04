@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.11.0](https://github.com/respond-io/n8n-integration/compare/v1.10.0...v1.11.0) (2026-06-04)
+
+
+### Features
+
+* add internal looping with backoff retry on GET MANY CONTACTS ([79fa895](https://github.com/respond-io/n8n-integration/commit/79fa895c1fabf86e2dc150f9ad859da2ff615805))
+* remove artificial sleep and increase maxRetry to 5 ([820bbb9](https://github.com/respond-io/n8n-integration/commit/820bbb90cbf827f11048b34a15323605fb2586e1))
+* update description for cursor id ([1a13cb0](https://github.com/respond-io/n8n-integration/commit/1a13cb04ee5bcc3446e550f0ee600ce04b929227))
+* update limit description ([227ffe5](https://github.com/respond-io/n8n-integration/commit/227ffe57633b3e0f9b1990d2de6c4470b6feaf1d))
+* update limit description ([f9ce1e3](https://github.com/respond-io/n8n-integration/commit/f9ce1e3907a852d2f642dbf87f53e3b8298b5fc2))
+
 ## [1.10.0](https://github.com/respond-io/n8n-integration/compare/v1.9.0...v1.10.0) (2026-05-06)
 
 
