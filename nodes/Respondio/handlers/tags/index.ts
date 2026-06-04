@@ -1,4 +1,4 @@
-import { IExecuteFunctions, INodeExecutionData, NodeExecutionWithMetadata } from "n8n-workflow";
+import { IExecuteFunctions, INodeExecutionData, JsonObject, NodeApiError, NodeExecutionWithMetadata } from "n8n-workflow";
 import { ACTION_NAMES } from "../../constants/actions/action_names";
 import { callDeveloperApi } from "../../utils";
 import {
@@ -78,9 +78,21 @@ const execute = async (
 
   if (!handler) return [[{ json: { message: 'Action not handled' }, pairedItem: { item: 0 } }]]
 
-  const data = await handler(executionContext);
+  try {
+    const data = await handler(executionContext);
 
-  results.push({ json: data, pairedItem: { item: 0 } });
+    results.push({ json: data, pairedItem: { item: 0 } });
+  } catch (error) {
+    const apiError = new NodeApiError(
+      executionContext.getNode(),
+      error as JsonObject,
+      {
+        message: `Tags Action Error: ${error?.response?.data?.message || error?.message || 'An error occurred while executing the tags action.'}`,
+        description: `An error occurred while executing the tags action. Please check the details for more information.`,
+      }
+    );
+    results.push({ json: {}, pairedItem: { item: 0 }, error: apiError });
+  }
 
   return [results];
 }

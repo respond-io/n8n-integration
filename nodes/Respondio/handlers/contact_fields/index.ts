@@ -1,4 +1,4 @@
-import { IExecuteFunctions, INodeExecutionData, INodePropertyOptions, NodeExecutionWithMetadata } from "n8n-workflow";
+import { IExecuteFunctions, INodeExecutionData, INodePropertyOptions, JsonObject, NodeApiError, NodeExecutionWithMetadata } from "n8n-workflow";
 import { ACTION_NAMES } from "../../constants/actions/action_names";
 import { callDeveloperApi, fetchPaginatedOptions } from "../../utils";
 import { CustomField } from "../../types";
@@ -78,17 +78,28 @@ const execute = async (
   ].includes(action);
   for (let i = 0; i < items.length; i++) {
     if (isSingularAction && i > 0) continue;
-    const data = await handler(executionContext, i);
-
-    if (Array.isArray(data)) {
-      results.push(
-        ...data.map(d => ({
-          json: d,
-          pairedItem: { item: i },
-        }))
+    try {
+      const data = await handler(executionContext, i);
+      if (Array.isArray(data)) {
+        results.push(
+          ...data.map(d => ({
+            json: d,
+            pairedItem: { item: i },
+          }))
+        );
+      } else {
+        results.push({ json: data, pairedItem: { item: i }, index: i });
+      }
+    } catch (error) {
+      const apiError = new NodeApiError(
+        executionContext.getNode(),
+        error as JsonObject,
+        {
+          message: `Contact Fields Action Error: ${error?.response?.data?.message || error?.message || 'An error occurred while executing the contact fields action.'}`,
+          description: `An error occurred while executing the contact fields action. Please check the details for more information.`,
+        }
       );
-    } else {
-      results.push({ json: data, pairedItem: { item: i } });
+      results.push({ json: {}, pairedItem: { item: i }, error: apiError });
     }
   }
 

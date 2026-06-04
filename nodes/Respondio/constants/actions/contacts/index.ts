@@ -94,7 +94,7 @@ export default {
         name: 'search',
         type: 'string',
         required: false,
-        description: 'Search term for filtering Contacts',
+        description: 'Search by first name, last name, full name, email, or phone number. Partial match supported.',
         default: ''
       },
       {
@@ -102,8 +102,16 @@ export default {
         name: 'limit',
         type: 'number',
         required: false,
-        description: 'Maximum number of Contacts to return',
-        default: 10
+        description: 'Number of Contacts to return. Enter a value from 1 to 5000. Limits over 100 take longer to return',
+        default: 10,
+      },
+      {
+        displayName: 'Cursor ID',
+        name: 'cursorId',
+        type: 'string',
+        required: false,
+        description: 'Retrieves the next batch of Contacts. Enter the ID of the last Contact from your previous result, or leave empty to start from the beginning',
+        default: ''
       }
     ] as unknown as INodeProperties[]
   },
