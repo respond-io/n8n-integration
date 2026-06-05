@@ -254,11 +254,13 @@ export type SendMessageResponse = {
 }
 
 export type WhatsappTemplateComponentField = {
-  type: 'text' | 'header' | 'buttons' | 'image' | 'video' | 'document' | 'audio';
-  format?: 'text' | 'date' | 'time' | 'video' | 'image' | 'document';
+  type: 'text' | 'header' | 'body' | 'footer' | 'buttons' | 'carousel' | 'image' | 'video' | 'document' | 'audio';
+  format?: 'text' | 'date' | 'time' | 'video' | 'image' | 'document' | string;
   text?: string;
   example: Record<string, any> | string;
+  examples?: any[];
   buttons?: any[] | null;
+  cards?: Array<{ components: WhatsappTemplateComponentField[] }>;
 }
 
 export type CreateContactPayload = {
