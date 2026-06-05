@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.48.0](https://github.com/respond-io/n8n-integration/compare/v0.47.0...v0.48.0) (2026-06-05)
+
+
+### Features
+
+* updated loan option to include carousel ([dd948e8](https://github.com/respond-io/n8n-integration/commit/dd948e8e38f196dac452924535da8f004da55fa9))
+* updated logic to include carousel components ([1354b44](https://github.com/respond-io/n8n-integration/commit/1354b447d0f501a7cc48cb523f3877f68560eb78))
+* updated mapping to include carousel and refactor logic ([9004b22](https://github.com/respond-io/n8n-integration/commit/9004b225d1b6c76485fc4b10fdb537c5e6afc34b))
+* updated types ([8619083](https://github.com/respond-io/n8n-integration/commit/861908311e0e7ee02e6dfb471d218ac0ee0d97d9))
+
 ## [0.47.0](https://github.com/respond-io/n8n-integration/compare/v0.46.0...v0.47.0) (2026-05-28)
 
 
