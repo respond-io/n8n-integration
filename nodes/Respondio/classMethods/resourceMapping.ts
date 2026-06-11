@@ -82,6 +82,104 @@ const createEmptyResourceMapper = (text: string = '', itemType: string = '') => 
   return parameters;
 }
 
+const processComponentFields = (
+  item: Record<string, any>,
+  options: { useImageHeaderExamples?: boolean },
+  fieldPrefix?: string,
+): ResourceMapperField[] => {
+  const fields: ResourceMapperField[] = [];
+  const prefix = fieldPrefix ? `${fieldPrefix}_` : '';
+
+  switch (item.type) {
+    case 'body':
+      fields.push(...createEmptyResourceMapper(item.text, `${prefix}body`));
+      break;
+
+    case 'header':
+      if (item.format === 'text') {
+        fields.push(...createEmptyResourceMapper(item.text, `${prefix}header`));
+      }
+
+      if (['image', 'document', 'video'].includes(item.format?.toLowerCase())) {
+        const normalizedFormat = item.format.toLowerCase();
+        const imageFromExamples = item.examples && item.examples.find((example: any) => example.type === 'image')
+        const exampleImageLink = imageFromExamples?.image?.link
+          || (Array.isArray(item.example?.header_handle) ? item.example.header_handle[0] : undefined);
+        const textExample = item.examples && item.examples.find((example: any) => example.type === 'text')
+        const hasParameterizedText = !!item.text && /\{\{\d+\}\}/.test(item.text);
+
+        if (options.useImageHeaderExamples && normalizedFormat === 'image') {
+          if (exampleImageLink) {
+            fields.push({
+              id: `${HIDDEN_INPUT_IDENTIFIER}_${prefix}header_image_details`,
+              type: 'options',
+              displayName: 'Hidden Header Image',
+              display: false,
+              required: false,
+              defaultMatch: false,
+              options: [{ name: 'Value', value: exampleImageLink }],
+            });
+          }
+
+          if (textExample?.text) {
+            fields.push({
+              id: `${HIDDEN_INPUT_IDENTIFIER}_${prefix}header_text_details`,
+              type: 'options',
+              displayName: 'Hidden Header Text',
+              display: false,
+              required: false,
+              defaultMatch: false,
+              options: [{ name: 'Value', value: textExample.text }],
+            });
+          }
+
+          if (hasParameterizedText) {
+            fields.push(...createEmptyResourceMapper(item.text, `${prefix}header`));
+          }
+        } else if (imageFromExamples) {
+          fields.push(...createEmptyResourceMapper(item.text, `${prefix}header`))
+        } else {
+          fields.push({
+            id: `${INPUT_IDENTIFIER}_${prefix}${normalizedFormat}`,
+            displayName: `${prefix ? `Card ${prefix.replace('carousel_card_', '').replace('_', '')} ` : ''}Header ${normalizedFormat} link`,
+            required: true,
+            display: true,
+            type: 'string',
+            defaultMatch: false,
+          });
+        }
+      }
+
+      if (item.format === 'location') {
+        ['latitude', 'longitude', 'name', 'address'].forEach((field) => {
+          fields.push({
+            id: `${INPUT_IDENTIFIER}_${prefix}location_${field}`,
+            displayName: `Location (${field})`,
+            required: true,
+            display: true,
+            type: 'string',
+            defaultMatch: false,
+          })
+        })
+      }
+      break;
+
+    case 'buttons':
+      for (const button of item.buttons ?? []) {
+        if (button.type === 'url') {
+          fields.push(...createEmptyResourceMapper(button.url, `${prefix}buttons`));
+        }
+      }
+      break;
+
+    case 'footer':
+      fields.push(...createEmptyResourceMapper(item.text, `${prefix}footer`));
+      break;
+  }
+
+  return fields;
+};
+
 const createTemplateParameters = (
   template: FetchWhatsappTemplateResponse['data'],
   options: { useImageHeaderExamples?: boolean } = {},
@@ -95,112 +193,19 @@ const createTemplateParameters = (
 
   for (const item of components) {
     if (typeof item === 'object') {
-      switch (item.type) {
-        case 'body':
-          fields.push(...createEmptyResourceMapper(item.text, 'body'));
-          break;
-
-        case 'header':
-          if (item.format === 'text') {
-            fields.push(...createEmptyResourceMapper(item.text, 'header'));
+      if (item.type === 'carousel' && Array.isArray(item.cards)) {
+        for (let cardIndex = 0; cardIndex < item.cards.length; cardIndex++) {
+          const card = item.cards[cardIndex];
+          for (const cardComponent of card.components || []) {
+            fields.push(...processComponentFields(
+              cardComponent,
+              options,
+              `carousel_card_${cardIndex}`,
+            ));
           }
-
-          if (['image', 'document', 'video'].includes(item.format)) {
-            const imageFromExamples = item.examples && item.examples.find((example: any) => example.type === 'image')
-            const exampleImageLink = imageFromExamples?.image?.link
-              || (Array.isArray(item.example?.header_handle) ? item.example.header_handle[0] : undefined);
-            const textExample = item.examples && item.examples.find((example: any) => example.type === 'text')
-            const hasParameterizedText = !!item.text && /\{\{\d+\}\}/.test(item.text);
-
-            if (options.useImageHeaderExamples && item.format === 'image') {
-              if (exampleImageLink) {
-                fields.push({
-                  id: `${HIDDEN_INPUT_IDENTIFIER}_header_image_details`,
-                  type: 'options',
-                  displayName: 'Hidden Header Image',
-                  display: false,
-                  required: false,
-                  defaultMatch: false,
-                  options: [{ name: 'Value', value: exampleImageLink }],
-                });
-              }
-
-              if (textExample?.text) {
-                fields.push({
-                  id: `${HIDDEN_INPUT_IDENTIFIER}_header_text_details`,
-                  type: 'options',
-                  displayName: 'Hidden Header Text',
-                  display: false,
-                  required: false,
-                  defaultMatch: false,
-                  options: [{ name: 'Value', value: textExample.text }],
-                });
-              }
-
-              if (hasParameterizedText) {
-                fields.push(...createEmptyResourceMapper(item.text, 'header'));
-              }
-            } else if (imageFromExamples) {
-              fields.push(...createEmptyResourceMapper(item.text, 'header'))
-            } else {
-              fields.push({
-                id: `${INPUT_IDENTIFIER}_${item.format}`,
-                displayName: `Header ${item.format} link`,
-                required: true,
-                display: true,
-                type: 'string',
-                defaultMatch: false,
-              });
-            }
-          }
-
-          if (item.format === 'location') {
-            ['latitude', 'longitude', 'name', 'address'].forEach((field) => {
-              fields.push({
-                id: `${INPUT_IDENTIFIER}_location_${field}`,
-                displayName: `Location (${field})`,
-                required: true,
-                display: true,
-                type: 'string',
-                defaultMatch: false,
-              })
-            })
-          }
-          break;
-
-        case 'buttons':
-          for (const button of item.buttons ?? []) {
-            if (button.type === 'url') {
-              fields.push(...createEmptyResourceMapper(button.url, 'buttons'));
-            }
-
-            // mpm and catalog types can be handled later in the `catalogProducts` in `getWhatsappTemplateComponentFields`
-            // if (button.type === 'mpm') {
-            //   fields.push({
-            //     id: `${INPUT_IDENTIFIER}_catalog_products`,
-            //     displayName: 'Catalog Products',
-            //     required: true,
-            //     display: true,
-            //     type: 'string',
-            //     defaultMatch: false,
-            //   });
-            // }
-            // if (button.type === 'catalog') {
-            //   fields.push({
-            //     id: `${HIDDEN_INPUT_IDENTIFIER}_catalog_products`,
-            //     displayName: button.text,
-            //     required: true,
-            //     display: true,
-            //     type: 'string',
-            //     defaultMatch: false,
-            //   });
-            // }
-          }
-          break;
-
-        case 'footer':
-          fields.push(...createEmptyResourceMapper(item.text, 'footer'));
-          break;
+        }
+      } else {
+        fields.push(...processComponentFields(item, options));
       }
     }
   }
