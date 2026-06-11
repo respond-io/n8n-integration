@@ -104,6 +104,7 @@ const TRIGGER_SETTINGS_EVENT_SOURCES = {
     { name: 'Zapier', value: 'zapier' },
     { name: 'Make', value: 'make' },
     { name: 'Click-to-Chat-Ads', value: 'ctc_ads' },
+    { name: 'Growth Widget', value: 'growth_widget' },
   ],
   NEW_OUTGOING_MESSAGE: [
     { name: 'User', value: 'user' },
