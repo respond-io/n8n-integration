@@ -297,7 +297,7 @@ const createLinkButtonComponent = (
   };
 };
 
-const createQuickReplyButtonComponent = (buttonComponent: any) => {
+const createStaticButtonComponent = (buttonComponent: any) => {
   const buttons = buttonComponent?.buttons;
   if (!buttons?.length) return null;
 
@@ -335,7 +335,11 @@ const createProductButtonComponent = (
   }
 
   if (buttonType === 'quick_reply') {
-    return createQuickReplyButtonComponent(buttonComponent);
+    return createStaticButtonComponent(buttonComponent);
+  }
+
+  if (buttonType === 'request_contact_info') {
+    return createStaticButtonComponent(buttonComponent);
   }
 
   return null;
