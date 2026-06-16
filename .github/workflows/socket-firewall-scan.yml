@@ -1,0 +1,17 @@
+name: Socket Firewall Scan
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - dev
+      - master
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  socket_firewall_scan:
+    uses: respond-io/shared-github-actions/.github/workflows/socket-firewall-scan.yml@v1.2.0
+    secrets: inherit
