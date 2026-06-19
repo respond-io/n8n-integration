@@ -1,4 +1,4 @@
-name: Security Checks
+name: Security Scans
 
 on:
   pull_request:
@@ -9,11 +9,18 @@ concurrency:
   group: polinrider-scan-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
 jobs:
   polinrider-scan:
     name: PolinRider Supply-Chain Scan
     uses: respond-io/shared-github-actions/.github/workflows/polinrider-scan.yml@v1.2.0
-    permissions:
-      contents: read
-      pull-requests: write
-      issues: write
+
+  socket-firewall-scan:
+    name: Socket Firewall Scan
+    if: github.event_name == 'pull_request'
+    uses: respond-io/shared-github-actions/.github/workflows/socket-firewall-scan.yml@v1.2.0
+    secrets: inherit
