@@ -109,8 +109,10 @@ const createTextComponents = (
   inputMap: Record<string, string>,
   rawComponents: Array<Record<string, any>>,
   isFacebook: boolean,
+  fieldPrefix?: string,
 ) => {
   const components: any[] = [];
+  const prefix = fieldPrefix ? `${fieldPrefix}_` : '';
   for (const component of nonButtonComponents) {
     if (!component.text) continue;
 
@@ -130,9 +132,9 @@ const createTextComponents = (
 
         // Create a parameter for each placeholder
         parameters = uniqueIndices.map(idx => {
-          const key = `${INPUT_IDENTIFIER}_${component.type}_${idx}`;
+          const key = `${INPUT_IDENTIFIER}_${prefix}${component.type}_${idx}`;
           const headerTextFallback = isFacebook && component.type === 'header'
-            ? getHiddenValue(rawComponents, `${HIDDEN_INPUT_IDENTIFIER}_header_text_details`)
+            ? getHiddenValue(rawComponents, `${HIDDEN_INPUT_IDENTIFIER}_${prefix}header_text_details`)
             : undefined;
           const replacementValue = inputMap[key] || headerTextFallback || '';
 
@@ -145,10 +147,10 @@ const createTextComponents = (
     }
 
     if (isFacebook && component.type === 'header' && component.format === 'image') {
-      const userImageLink = inputMap[`${INPUT_IDENTIFIER}_header_image`];
+      const userImageLink = inputMap[`${INPUT_IDENTIFIER}_${prefix}header_image`];
       const exampleImageLink = getHiddenValue(
         rawComponents,
-        `${HIDDEN_INPUT_IDENTIFIER}_header_image_details`,
+        `${HIDDEN_INPUT_IDENTIFIER}_${prefix}header_image_details`,
       );
       const imageLink = userImageLink || exampleImageLink;
 
@@ -375,10 +377,12 @@ const getFilenameFromUrl = (url: string, format: string): string => {
 const createMediaComponents = (
   originalComponents: Array<WhatsappTemplateComponentField>,
   rawComponents: Array<Record<string, any>>,
+  fieldPrefix?: string,
 ) => {
   const mediaFormats = ['image', 'document', 'video'];
   const mediaComponents = originalComponents.filter((item) => item.format && mediaFormats.includes(item.format))
   const result = []
+  const prefix = fieldPrefix ? `${fieldPrefix}_` : '';
 
   // Create a map from rawComponents for easier lookup
   const inputMap: Record<string, string> = {};
@@ -389,7 +393,7 @@ const createMediaComponents = (
   for (const component of mediaComponents) {
     if (!component.format) continue;
 
-    const inputKey = `$input$_${component.format}`;
+    const inputKey = `$input$_${prefix}${component.format}`;
     const mediaUrl = inputMap[inputKey];
 
     let parameters: any[] = [];
@@ -457,7 +461,7 @@ const buildComponentPayload = (
 
   const nonButtonComponents = components.filter((item) => item.type !== 'buttons' && item.type !== 'carousel');
   const inputMap = createInputMap(filteredRawComponents);
-  const result = createTextComponents(nonButtonComponents, inputMap, filteredRawComponents, options.isFacebook);
+  const result = createTextComponents(nonButtonComponents, inputMap, filteredRawComponents, options.isFacebook, options.fieldPrefix);
 
   const buttonComponent = components.find((item) =>
     item.type === 'buttons' && item.buttons?.length
@@ -471,7 +475,7 @@ const buildComponentPayload = (
     }
   }
 
-  const mediaComponents = createMediaComponents(components, filteredRawComponents);
+  const mediaComponents = createMediaComponents(components, filteredRawComponents, options.fieldPrefix);
   result.push(...mediaComponents);
 
   return result;
