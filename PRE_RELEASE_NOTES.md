@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.49.1](https://github.com/respond-io/n8n-integration/compare/v0.49.0...v0.49.1) (2026-06-29)
+
+
+### Bug Fixes
+
+* handled carousel header properly ([a6625b0](https://github.com/respond-io/n8n-integration/commit/a6625b05fa50a06c5689b42a8ec8c0286ce204ee))
+
 ## [0.49.0](https://github.com/respond-io/n8n-integration/compare/v0.48.0...v0.49.0) (2026-06-16)
 
 
