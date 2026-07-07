@@ -57,11 +57,19 @@ export async function getCustomFields(this: ILoadOptionsFunctions): Promise<Reso
   }
 }
 
+const formatFieldDisplayName = (itemType: string): string => {
+  const carouselMatch = itemType.match(/^carousel_card_(\d+)_(.+)$/);
+  if (carouselMatch) {
+    return `Card ${carouselMatch[1]} ${capitalizeFirstLetter(carouselMatch[2])}`;
+  }
+  return capitalizeFirstLetter(itemType);
+};
+
 const emptyParameter = (itemType: string, parameter = 1): ResourceMapperField => ({
   id: `${INPUT_IDENTIFIER}_${itemType}_${parameter}`,
   display: true,
   required: true,
-  displayName: `${capitalizeFirstLetter(itemType)} Param {{${parameter}}}`,
+  displayName: `${formatFieldDisplayName(itemType)} Param {{${parameter}}}`,
   type: 'string',
   defaultMatch: false
 });
