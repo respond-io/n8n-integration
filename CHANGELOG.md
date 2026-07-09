@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.2](https://github.com/respond-io/n8n-integration/compare/v1.12.1...v1.12.2) (2026-07-09)
+
+
+### Bug Fixes
+
+* resolved label ([9d631a0](https://github.com/respond-io/n8n-integration/commit/9d631a0c976ccbb6cdd9afcad4a54aaa57a5cb29))
+
 ## [1.12.1](https://github.com/respond-io/n8n-integration/compare/v1.12.0...v1.12.1) (2026-07-06)
 
 
