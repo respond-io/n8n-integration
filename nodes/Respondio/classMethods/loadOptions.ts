@@ -137,6 +137,22 @@ export async function getTemplatePreviewOptions(this: ILoadOptionsFunctions): Pr
         value: comp.type,
       });
     }
+
+    if (typeof comp === 'object' && comp.type === 'carousel' && Array.isArray(comp.cards)) {
+      options.push({
+        name: `Carousel: ${comp.cards.length} card(s)`,
+        value: 'carousel',
+      });
+      comp.cards.forEach((card: any, idx: number) => {
+        const bodyComp = (card.components || []).find((c: any) => c.type === 'body');
+        if (bodyComp?.text) {
+          options.push({
+            name: `  Card ${idx + 1}: ${bodyComp.text}`,
+            value: `carousel_card_${idx}`,
+          });
+        }
+      });
+    }
   }
 
   if (template.catalogProducts && template.catalogProducts.length > 0) {
@@ -175,6 +191,22 @@ export async function getMessengerTemplatePreviewOptions(this: ILoadOptionsFunct
       options.push({
         name: `${capitalizeFirstLetter(comp.type)}: ${comp.text}`,
         value: comp.type,
+      });
+    }
+
+    if (typeof comp === 'object' && comp.type === 'carousel' && Array.isArray(comp.cards)) {
+      options.push({
+        name: `Carousel: ${comp.cards.length} card(s)`,
+        value: 'carousel',
+      });
+      comp.cards.forEach((card: any, idx: number) => {
+        const bodyComp = (card.components || []).find((c: any) => c.type === 'body');
+        if (bodyComp?.text) {
+          options.push({
+            name: `  Card ${idx + 1}: ${bodyComp.text}`,
+            value: `carousel_card_${idx}`,
+          });
+        }
       });
     }
   }

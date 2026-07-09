@@ -109,8 +109,10 @@ const createTextComponents = (
   inputMap: Record<string, string>,
   rawComponents: Array<Record<string, any>>,
   isFacebook: boolean,
+  fieldPrefix?: string,
 ) => {
   const components: any[] = [];
+  const prefix = fieldPrefix ? `${fieldPrefix}_` : '';
   for (const component of nonButtonComponents) {
     if (!component.text) continue;
 
@@ -130,9 +132,9 @@ const createTextComponents = (
 
         // Create a parameter for each placeholder
         parameters = uniqueIndices.map(idx => {
-          const key = `${INPUT_IDENTIFIER}_${component.type}_${idx}`;
+          const key = `${INPUT_IDENTIFIER}_${prefix}${component.type}_${idx}`;
           const headerTextFallback = isFacebook && component.type === 'header'
-            ? getHiddenValue(rawComponents, `${HIDDEN_INPUT_IDENTIFIER}_header_text_details`)
+            ? getHiddenValue(rawComponents, `${HIDDEN_INPUT_IDENTIFIER}_${prefix}header_text_details`)
             : undefined;
           const replacementValue = inputMap[key] || headerTextFallback || '';
 
@@ -145,10 +147,10 @@ const createTextComponents = (
     }
 
     if (isFacebook && component.type === 'header' && component.format === 'image') {
-      const userImageLink = inputMap[`${INPUT_IDENTIFIER}_header_image`];
+      const userImageLink = inputMap[`${INPUT_IDENTIFIER}_${prefix}header_image`];
       const exampleImageLink = getHiddenValue(
         rawComponents,
-        `${HIDDEN_INPUT_IDENTIFIER}_header_image_details`,
+        `${HIDDEN_INPUT_IDENTIFIER}_${prefix}header_image_details`,
       );
       const imageLink = userImageLink || exampleImageLink;
 
@@ -375,10 +377,12 @@ const getFilenameFromUrl = (url: string, format: string): string => {
 const createMediaComponents = (
   originalComponents: Array<WhatsappTemplateComponentField>,
   rawComponents: Array<Record<string, any>>,
+  fieldPrefix?: string,
 ) => {
   const mediaFormats = ['image', 'document', 'video'];
   const mediaComponents = originalComponents.filter((item) => item.format && mediaFormats.includes(item.format))
   const result = []
+  const prefix = fieldPrefix ? `${fieldPrefix}_` : '';
 
   // Create a map from rawComponents for easier lookup
   const inputMap: Record<string, string> = {};
@@ -389,7 +393,7 @@ const createMediaComponents = (
   for (const component of mediaComponents) {
     if (!component.format) continue;
 
-    const inputKey = `$input$_${component.format}`;
+    const inputKey = `$input$_${prefix}${component.format}`;
     const mediaUrl = inputMap[inputKey];
 
     let parameters: any[] = [];
@@ -441,6 +445,42 @@ const createMediaComponents = (
   return result;
 }
 
+const buildComponentPayload = (
+  components: Array<WhatsappTemplateComponentField>,
+  rawComponents: Array<Record<string, any>>,
+  options: { isFacebook: boolean; fieldPrefix?: string; catalogProducts?: Record<string, any>[] },
+): any[] => {
+  const prefix = options.fieldPrefix ? `${options.fieldPrefix}_` : '';
+
+  const filteredRawComponents = prefix
+    ? rawComponents.filter((obj) => {
+        const key = Object.keys(obj)[0];
+        return key.includes(prefix) || key.includes(HIDDEN_INPUT_IDENTIFIER);
+      })
+    : rawComponents;
+
+  const nonButtonComponents = components.filter((item) => item.type !== 'buttons' && item.type !== 'carousel');
+  const inputMap = createInputMap(filteredRawComponents);
+  const result = createTextComponents(nonButtonComponents, inputMap, filteredRawComponents, options.isFacebook, options.fieldPrefix);
+
+  const buttonComponent = components.find((item) =>
+    item.type === 'buttons' && item.buttons?.length
+  ) as { type: 'buttons', buttons: any[] } | undefined;
+
+  const hasProductsOrButton = (options.catalogProducts?.length ?? 0) > 0 || buttonComponent !== undefined;
+  if (hasProductsOrButton) {
+    const productButtonComponent = createProductButtonComponent(components, filteredRawComponents);
+    if (productButtonComponent) {
+      result.push(productButtonComponent);
+    }
+  }
+
+  const mediaComponents = createMediaComponents(components, filteredRawComponents, options.fieldPrefix);
+  result.push(...mediaComponents);
+
+  return result;
+};
+
 const getTemplateMessage = (input: GetWhatsappTemplateMessageInput) => {
   const {
     messageType,
@@ -469,23 +509,25 @@ const getTemplateMessage = (input: GetWhatsappTemplateMessageInput) => {
     buttonType,
   );
 
-  const nonButtonComponents: Array<WhatsappTemplateComponentField> = originalComponents.filter((item) => item.type !== 'buttons');
-
-  const inputMap = createInputMap(rawComponents);
   const isFacebook = messageType === SendMessageTypes.FACEBOOK_TEMPLATE;
-  const resultingComponents = createTextComponents(nonButtonComponents, inputMap, rawComponents, isFacebook);
 
-  const hasProductsOrButton = templateDetails.catalogProducts.length > 0 || buttonComponent !== undefined;
-  if (hasProductsOrButton) {
-    const productButtonComponent = createProductButtonComponent(originalComponents, rawComponents);
-    if (productButtonComponent) {
-      resultingComponents.push(productButtonComponent);
-    }
+  const topLevelComponents = originalComponents.filter((item) => item.type !== 'carousel');
+  const resultingComponents = buildComponentPayload(topLevelComponents, rawComponents, {
+    isFacebook,
+    catalogProducts: templateDetails.catalogProducts,
+  });
+
+  const carouselComponent = originalComponents.find((item) => item.type === 'carousel');
+  if (carouselComponent?.cards && carouselComponent.cards.length > 0) {
+    const cardsPayload = carouselComponent.cards.map((card, idx) => ({
+      components: buildComponentPayload(
+        card.components as Array<WhatsappTemplateComponentField>,
+        rawComponents,
+        { isFacebook, fieldPrefix: `carousel_card_${idx}` },
+      ),
+    }));
+    resultingComponents.push({ type: 'carousel', cards: cardsPayload });
   }
-
-  const mediaComponents = createMediaComponents(originalComponents, rawComponents);
-
-  resultingComponents.push(...mediaComponents)
 
   const payload = {
     type: messageType,
