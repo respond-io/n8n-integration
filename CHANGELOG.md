@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.12.2](https://github.com/respond-io/n8n-integration/compare/v1.12.1...v1.12.2) (2026-07-09)
+
+
+### Bug Fixes
+
+* resolved label ([9d631a0](https://github.com/respond-io/n8n-integration/commit/9d631a0c976ccbb6cdd9afcad4a54aaa57a5cb29))
+
+## [1.12.1](https://github.com/respond-io/n8n-integration/compare/v1.12.0...v1.12.1) (2026-07-06)
+
+
+### Bug Fixes
+
+* support new button type ([be57079](https://github.com/respond-io/n8n-integration/commit/be57079b6870e120b1004d65dcb5cf6adbf301c4))
+* support new button type ([d082b75](https://github.com/respond-io/n8n-integration/commit/d082b756ec78e7c7e9d46856bc5c00adda2fcb32))
+
 ## [1.12.0](https://github.com/respond-io/n8n-integration/compare/v1.11.0...v1.12.0) (2026-06-11)
 
 
