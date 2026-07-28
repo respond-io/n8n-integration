@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.51.0](https://github.com/respond-io/n8n-integration/compare/v0.50.0...v0.51.0) (2026-07-28)
+
+
+### Features
+
+* added support for new message type ([21449e8](https://github.com/respond-io/n8n-integration/commit/21449e8ee00e8b7810f82a68e26e0c1301720d4a))
+* Merge branch 'flight/integration-calendly' into chore/resolve-dev-conflict-jul-28 ([bcbadaf](https://github.com/respond-io/n8n-integration/commit/bcbadaf244fc32407aee30f289095fa727f35240))
+
 ## [0.50.0](https://github.com/respond-io/n8n-integration/compare/v0.49.2...v0.50.0) (2026-07-20)
 
 
