@@ -37,6 +37,7 @@ const incomingMessageTypeOptions = [
   { name: 'Tiktok Post', value: 'post' },
   { name: 'Product Order', value: 'whatsapp_order' },
   { name: 'Story Mention', value: 'story_mention' },
+  { name: 'Contact', value: 'contact' }
 ]
 
 export class RespondioTriggerV1 implements INodeType {
