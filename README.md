@@ -88,7 +88,7 @@ The Respond.io Trigger node can listen for the following events:
 - **New Outgoing Message** - Triggered when a new outgoing message is sent
 - **New Comment** - Triggered when a new comment is added to a conversation
 - **Conversation Opened** - Triggered when a conversation is opened
-- **Conversation Closed** - Triggered when a conversation is closed
+- **Conversation Closed** - Triggered when a conversation is closed. When the workspace's Sentiment Score setting is enabled, the payload's `conversation` object additionally carries `sentiment` (`positive` | `neutral` | `negative` | `unavailable`) and `sentimentReason` (one-sentence explanation; empty string when unavailable)
 - **New Contact** - Triggered when a new contact is created
 - **Contact Updated** - Triggered when a contact is updated
 - **Contact Assignee Updated** - Triggered when a contact's assignee is changed
