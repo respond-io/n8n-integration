@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.14.0](https://github.com/respond-io/n8n-integration/compare/v1.13.0...v1.14.0) (2026-08-04)
+
+
+### Features
+
+* added support for new message type ([3ad296a](https://github.com/respond-io/n8n-integration/commit/3ad296a1cab6676c813057dbe0ea928b430feb98))
+* Merge branch 'master' into flight/integration-calendly ([2ba3353](https://github.com/respond-io/n8n-integration/commit/2ba3353f7af89782162144a2a4548958e5bb1611))
+
+## [1.13.0](https://github.com/respond-io/n8n-integration/compare/v1.12.2...v1.13.0) (2026-07-29)
+
+
+### Features
+
+* added support for new message type in incoming message trigger ([34156a9](https://github.com/respond-io/n8n-integration/commit/34156a9c75aa79705e2cfbfe7943c4082446bc1f))
+* added support for new message type in incoming message trigger ([aab8d2e](https://github.com/respond-io/n8n-integration/commit/aab8d2efd8235f70b8a416aa50dbbdc94bf2e82f))
+
 ## [1.12.2](https://github.com/respond-io/n8n-integration/compare/v1.12.1...v1.12.2) (2026-07-09)
 
 

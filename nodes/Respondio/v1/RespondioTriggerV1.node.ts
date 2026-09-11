@@ -9,7 +9,11 @@ import {
   INodeTypeBaseDescription,
   NodeConnectionTypes,
 } from 'n8n-workflow';
-import { INTEGRATION_API_BASE_URL, TRIGGER_SETTINGS, TRIGGER_SETTINGS_EVENT_SOURCES } from '../constants';
+import {
+  INTEGRATION_API_BASE_URL,
+  TRIGGER_SETTINGS,
+  TRIGGER_SETTINGS_EVENT_SOURCES,
+} from '../constants';
 import { loadOptions } from '../classMethods';
 
 const outgoingMessageTypeOptions = [
@@ -24,7 +28,7 @@ const outgoingMessageTypeOptions = [
   { name: 'Rating', value: 'rating' },
   { name: 'Product Message', value: 'whatsapp_interactive' },
   { name: 'Facebook Template', value: 'facebook_template' },
-]
+];
 
 const incomingMessageTypeOptions = [
   { name: 'Text', value: 'text' },
@@ -38,13 +42,13 @@ const incomingMessageTypeOptions = [
   { name: 'Product Order', value: 'whatsapp_order' },
   { name: 'Story Mention', value: 'story_mention' },
   { name: 'Contact', value: 'contact' },
-]
+];
 
 export class RespondioTriggerV1 implements INodeType {
   description: INodeTypeDescription;
-  webhookMethods: INodeType['webhookMethods']
-  static triggerEventTypeName = 'triggerEventType'
-  static eventSourceTypeName = 'eventSource'
+  webhookMethods: INodeType['webhookMethods'];
+  static triggerEventTypeName = 'triggerEventType';
+  static eventSourceTypeName = 'eventSource';
   static triggerDefaultValue = TRIGGER_SETTINGS.NEW_INCOMING_MESSAGE.value;
   static messageTypeName = 'messageType';
 
@@ -90,10 +94,10 @@ export class RespondioTriggerV1 implements INodeType {
             TRIGGER_SETTINGS.CONTACT_UPDATED,
             TRIGGER_SETTINGS.CONTACT_TAG_UPDATED,
             TRIGGER_SETTINGS.CONTACT_LIFECYCLE_UPDATED,
-            TRIGGER_SETTINGS.CALL_ENDED
+            TRIGGER_SETTINGS.CALL_ENDED,
           ],
           default: RespondioTriggerV1.triggerDefaultValue,
-          required: true
+          required: true,
         },
         {
           displayName: 'Event Source',
@@ -107,13 +111,13 @@ export class RespondioTriggerV1 implements INodeType {
                 TRIGGER_SETTINGS.CONVERSATION_OPENED.value,
                 TRIGGER_SETTINGS.NEW_OUTGOING_MESSAGE.value,
               ],
-            }
+            },
           },
           typeOptions: {
             loadOptionsMethod: 'getEventSources',
             loadOptionsDependsOn: [RespondioTriggerV1.triggerEventTypeName],
           },
-          default: ''
+          default: '',
         },
         {
           displayName: 'Message Type',
@@ -125,10 +129,10 @@ export class RespondioTriggerV1 implements INodeType {
             show: {
               [RespondioTriggerV1.triggerEventTypeName]: [
                 TRIGGER_SETTINGS.NEW_INCOMING_MESSAGE.value,
-              ]
-            }
+              ],
+            },
           },
-          required: false
+          required: false,
         },
         {
           displayName: 'Message Type',
@@ -141,8 +145,8 @@ export class RespondioTriggerV1 implements INodeType {
             show: {
               [RespondioTriggerV1.triggerEventTypeName]: [
                 TRIGGER_SETTINGS.NEW_OUTGOING_MESSAGE.value,
-              ]
-            }
+              ],
+            },
           },
         },
         {
@@ -158,10 +162,8 @@ export class RespondioTriggerV1 implements INodeType {
           ],
           displayOptions: {
             show: {
-              [RespondioTriggerV1.triggerEventTypeName]: [
-                TRIGGER_SETTINGS.CONTACT_UPDATED.value,
-              ]
-            }
+              [RespondioTriggerV1.triggerEventTypeName]: [TRIGGER_SETTINGS.CONTACT_UPDATED.value],
+            },
           },
         },
         {
@@ -177,8 +179,8 @@ export class RespondioTriggerV1 implements INodeType {
           displayOptions: {
             show: {
               [RespondioTriggerV1.triggerEventTypeName]: [TRIGGER_SETTINGS.CONTACT_UPDATED.value],
-              [RespondioTriggerV1.contactFieldTypeName]: [{ _cnd: { exists: true } }]
-            }
+              [RespondioTriggerV1.contactFieldTypeName]: [{ _cnd: { exists: true } }],
+            },
           },
         },
       ],
@@ -195,47 +197,79 @@ export class RespondioTriggerV1 implements INodeType {
           const eventType = this.getNodeParameter(
             RespondioTriggerV1.triggerEventTypeName,
             RespondioTriggerV1.triggerDefaultValue,
-          ) as typeof TRIGGER_SETTINGS[keyof typeof TRIGGER_SETTINGS]['value'];
-          let eventSources = this.getNodeParameter(RespondioTriggerV1.eventSourceTypeName, []) as string[];
-          let messageType = this.getNodeParameter(RespondioTriggerV1.messageTypeName, []) as string[];
-          const contactFieldType = this.getNodeParameter(RespondioTriggerV1.contactFieldTypeName, '') as 'standard_field' | 'custom_field' | '';
-          const fields = contactFieldType?.length ? this.getNodeParameter(RespondioTriggerV1.contactFieldsName, []) as string[] : [];
+          ) as (typeof TRIGGER_SETTINGS)[keyof typeof TRIGGER_SETTINGS]['value'];
+          let eventSources = this.getNodeParameter(
+            RespondioTriggerV1.eventSourceTypeName,
+            [],
+          ) as string[];
+          let messageType = this.getNodeParameter(
+            RespondioTriggerV1.messageTypeName,
+            [],
+          ) as string[];
+          const contactFieldType = this.getNodeParameter(
+            RespondioTriggerV1.contactFieldTypeName,
+            '',
+          ) as 'standard_field' | 'custom_field' | '';
+          const fields = contactFieldType?.length
+            ? (this.getNodeParameter(RespondioTriggerV1.contactFieldsName, []) as string[])
+            : [];
 
           const platformUrl = INTEGRATION_API_BASE_URL;
-          const bundle: { source?: string[]; workflowDetails?: IWorkflowMetadata, messageType?: string[]; fields?: string[]; contactFieldType?: 'standard_field' | 'custom_field' } = {}
+          const bundle: {
+            source?: string[];
+            workflowDetails?: IWorkflowMetadata;
+            messageType?: string[];
+            fields?: string[];
+            contactFieldType?: 'standard_field' | 'custom_field';
+          } = {};
 
-          if (!webhookUrl) throw new NodeOperationError(this.getNode(), 'Webhook URL is not defined. Please set the webhook URL in the node settings.');
+          if (!webhookUrl)
+            throw new NodeOperationError(
+              this.getNode(),
+              'Webhook URL is not defined. Please set the webhook URL in the node settings.',
+            );
 
           // set default event sources if none selected for NEW_OUTGOING_MESSAGE event types
           const eventTypesWithDefaultSources: Array<string> = [
             TRIGGER_SETTINGS.NEW_OUTGOING_MESSAGE.value,
             TRIGGER_SETTINGS.CONVERSATION_OPENED.value,
             TRIGGER_SETTINGS.CONVERSATION_CLOSED.value,
-          ]
-          if (eventTypesWithDefaultSources.includes(eventType) && (!eventSources || !eventSources.length)) {
+          ];
+          if (
+            eventTypesWithDefaultSources.includes(eventType) &&
+            (!eventSources || !eventSources.length)
+          ) {
             const eventTypeSettingMap = {
-              [TRIGGER_SETTINGS.CONVERSATION_CLOSED.value]: TRIGGER_SETTINGS_EVENT_SOURCES.CONVERSATION_CLOSED,
-              [TRIGGER_SETTINGS.CONVERSATION_OPENED.value]: TRIGGER_SETTINGS_EVENT_SOURCES.CONVERSATION_OPENED,
-              [TRIGGER_SETTINGS.NEW_OUTGOING_MESSAGE.value]: TRIGGER_SETTINGS_EVENT_SOURCES.NEW_OUTGOING_MESSAGE,
-            }
+              [TRIGGER_SETTINGS.CONVERSATION_CLOSED.value]:
+                TRIGGER_SETTINGS_EVENT_SOURCES.CONVERSATION_CLOSED,
+              [TRIGGER_SETTINGS.CONVERSATION_OPENED.value]:
+                TRIGGER_SETTINGS_EVENT_SOURCES.CONVERSATION_OPENED,
+              [TRIGGER_SETTINGS.NEW_OUTGOING_MESSAGE.value]:
+                TRIGGER_SETTINGS_EVENT_SOURCES.NEW_OUTGOING_MESSAGE,
+            };
 
-            const selectedSetting = eventTypeSettingMap[eventType as keyof typeof eventTypeSettingMap];
+            const selectedSetting =
+              eventTypeSettingMap[eventType as keyof typeof eventTypeSettingMap];
             eventSources = selectedSetting.map(({ value }) => value);
           }
 
           // set default message types if none selected for NEW_OUTGOING_MESSAGE & NEW_INCOMING_MESSAGE event types
           const messageHookEvents = [
             TRIGGER_SETTINGS.NEW_INCOMING_MESSAGE.value,
-            TRIGGER_SETTINGS.NEW_OUTGOING_MESSAGE.value
+            TRIGGER_SETTINGS.NEW_OUTGOING_MESSAGE.value,
           ] as const;
-          if (messageHookEvents.includes(eventType as typeof messageHookEvents[number]) && (!messageType || !messageType.length)) {
-            messageType = eventType === TRIGGER_SETTINGS.NEW_INCOMING_MESSAGE.value
-              ? incomingMessageTypeOptions.map(({ value }) => value)
-              : outgoingMessageTypeOptions.map(({ value }) => value);
+          if (
+            messageHookEvents.includes(eventType as (typeof messageHookEvents)[number]) &&
+            (!messageType || !messageType.length)
+          ) {
+            messageType =
+              eventType === TRIGGER_SETTINGS.NEW_INCOMING_MESSAGE.value
+                ? incomingMessageTypeOptions.map(({ value }) => value)
+                : outgoingMessageTypeOptions.map(({ value }) => value);
           }
 
-          if (eventSources?.length) bundle.source = eventSources
-          if (workflow) bundle.workflowDetails = workflow
+          if (eventSources?.length) bundle.source = eventSources;
+          if (workflow) bundle.workflowDetails = workflow;
           if (messageType?.length) bundle.messageType = messageType;
 
           if (contactFieldType.length && contactFieldType !== '' && fields.length) {
@@ -261,7 +295,10 @@ export class RespondioTriggerV1 implements INodeType {
             });
           } catch (error) {
             this.logger.info(`Error: ${JSON.stringify(error)}`);
-            throw new NodeOperationError(this.getNode(), `Failed to create webhook subscription: ${error.message}`);
+            throw new NodeOperationError(
+              this.getNode(),
+              `Failed to create webhook subscription: ${error.message}`,
+            );
           }
 
           return true;
@@ -273,7 +310,7 @@ export class RespondioTriggerV1 implements INodeType {
           const webhookId = currentNode.webhookId;
           const webhookUrl = this.getNodeWebhookUrl('default');
 
-          if (!webhookId) return true
+          if (!webhookId) return true;
 
           const platformUrl = INTEGRATION_API_BASE_URL;
           try {
@@ -309,7 +346,7 @@ export class RespondioTriggerV1 implements INodeType {
               headers: {
                 Authorization: `Bearer ${credentials.apiKey}`,
               },
-              json: true
+              json: true,
             });
 
             if (response === '<h3 align=\"center\">404 not Found!</h3>') {
