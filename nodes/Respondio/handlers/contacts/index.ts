@@ -73,6 +73,11 @@ const actionHandlers = {
   },
   [ACTION_NAMES.GET_MANY_CONTACTS]: async (executionContext: IExecuteFunctions, itemIndex: number) => {
     const search = executionContext.getNodeParameter('search', itemIndex, '') as string;
+    // The API rejects 1-2 character searches (they match almost every contact); fail early with a clear message.
+    const trimmedSearch = String(search ?? '').trim();
+    if (trimmedSearch && trimmedSearch.length < 3) {
+      throw new Error('Search must be empty or at least 3 characters long.');
+    }
     const limit = executionContext.getNodeParameter('limit', itemIndex, 10) as number;
     const cursorId = executionContext.getNodeParameter('cursorId', itemIndex, '') as string;
 
@@ -81,7 +86,7 @@ const actionHandlers = {
       {
         method: 'POST',
         path: '/contact/list',
-        body: { search, timezone: 'utc', filter: { $or: [] } },
+        body: { search: trimmedSearch, timezone: 'utc', filter: { $or: [] } },
       },
       undefined,
       {
