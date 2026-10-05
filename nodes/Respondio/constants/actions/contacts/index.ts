@@ -94,7 +94,7 @@ export default {
         name: 'search',
         type: 'string',
         required: false,
-        description: 'Search by first name, last name, full name, email, or phone number. Partial match supported.',
+        description: 'Search by first name, last name, full name, email, or phone number. Partial match supported. Leave empty to list all Contacts, otherwise enter at least 3 characters.',
         default: ''
       },
       {
