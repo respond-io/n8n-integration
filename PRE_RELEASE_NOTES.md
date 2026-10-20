@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.53.0](https://github.com/respond-io/n8n-integration/compare/v0.52.0...v0.53.0) (2026-10-20)
+
+
+### Features
+
+* added reaction message type to incoming message trigger ([6c15289](https://github.com/respond-io/n8n-integration/commit/6c152899d85f6e3e3d6d5444ff783457312c86f1))
+* added support for reaction message type ([183203f](https://github.com/respond-io/n8n-integration/commit/183203f1d0c0d7373215e2723a8fe3b16fefa24d))
+
 ## [0.52.0](https://github.com/respond-io/n8n-integration/compare/v0.51.0...v0.52.0) (2026-09-11)
 
 
