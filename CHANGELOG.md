@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.14.1](https://github.com/respond-io/n8n-integration/compare/v1.14.0...v1.14.1) (2026-10-07)
+
+
+### Bug Fixes
+
+* ensure proper formatting by adding newline at end of file in con… ([16bf295](https://github.com/respond-io/n8n-integration/commit/16bf295ba2b9b3f140880c28de44624745312034))
+* ensure proper formatting by adding newline at end of file in conversations index ([1a750ad](https://github.com/respond-io/n8n-integration/commit/1a750adcdbc44887c5cc64a8458c0b573f92d9ee))
+
 ## [1.14.0](https://github.com/respond-io/n8n-integration/compare/v1.13.0...v1.14.0) (2026-08-04)
 
 
