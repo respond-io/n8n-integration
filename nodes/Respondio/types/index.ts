@@ -215,6 +215,13 @@ export type GetMessageResponse = {
     subType?: string;
     title?: string;
     replies?: string[];
+    reaction?: {
+      mId: string;
+      action: 'react' | 'unreact';
+      emoji: string | null;
+      name: string | null;
+      sender?: { source: string };
+    };
   },
   status: Array<GetMessageResponseStatusItem>;
 }
