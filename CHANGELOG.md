@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.15.0](https://github.com/respond-io/n8n-integration/compare/v1.14.1...v1.15.0) (2026-11-11)
+
+
+### Features
+
+* added support for reaction message type ([fa7266c](https://github.com/respond-io/n8n-integration/commit/fa7266ca4d0cb693250fb62475fffebb5ea307a0))
+* added support for reaction message type ([183203f](https://github.com/respond-io/n8n-integration/commit/183203f1d0c0d7373215e2723a8fe3b16fefa24d))
+
 ## [1.14.1](https://github.com/respond-io/n8n-integration/compare/v1.14.0...v1.14.1) (2026-10-07)
 
 
