@@ -41,6 +41,13 @@ const incomingMessageTypeOptions = [
   { name: 'Reaction', value: 'reaction' }
 ]
 
+const callSentimentOptions = [
+  { name: 'Positive', value: 'positive' },
+  { name: 'Neutral', value: 'neutral' },
+  { name: 'Negative', value: 'negative' },
+  { name: 'Unavailable', value: 'unavailable' },
+]
+
 export class RespondioTriggerV1 implements INodeType {
   description: INodeTypeDescription;
   webhookMethods: INodeType['webhookMethods']
@@ -48,6 +55,7 @@ export class RespondioTriggerV1 implements INodeType {
   static eventSourceTypeName = 'eventSource'
   static triggerDefaultValue = TRIGGER_SETTINGS.NEW_INCOMING_MESSAGE.value;
   static messageTypeName = 'messageType';
+  static callSentimentName = 'callSentiment';
 
   static contactFieldTypeName = 'contactFieldType';
   static contactFieldsName = 'contactFields';
@@ -145,6 +153,22 @@ export class RespondioTriggerV1 implements INodeType {
               ]
             }
           },
+        },
+        {
+          displayName: 'Sentiment',
+          name: RespondioTriggerV1.callSentimentName,
+          default: [],
+          type: 'multiOptions',
+          options: callSentimentOptions,
+          description: 'Only trigger for calls scored with one of these sentiments. Leave empty to trigger on every ended call, including calls that were not scored.',
+          displayOptions: {
+            show: {
+              [RespondioTriggerV1.triggerEventTypeName]: [
+                TRIGGER_SETTINGS.CALL_ENDED.value,
+              ]
+            }
+          },
+          required: false
         },
         {
           displayName: 'Contact Field Type',
@@ -332,6 +356,12 @@ export class RespondioTriggerV1 implements INodeType {
   async webhook(this: IWebhookFunctions): Promise<IWebhookResponseData> {
     const req = this.getRequestObject();
     const body = req.body;
+
+    // Call Ended sentiment filter. Unscored calls carry no `sentiment` key, so they never match a selection.
+    if (this.getNodeParameter(RespondioTriggerV1.triggerEventTypeName) === TRIGGER_SETTINGS.CALL_ENDED.value) {
+      const sentiments = this.getNodeParameter(RespondioTriggerV1.callSentimentName, []) as string[];
+      if (sentiments.length && !sentiments.includes(body?.call?.sentiment)) return {};
+    }
 
     return {
       workflowData: [[{ json: body }]],
