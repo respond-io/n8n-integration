@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.54.0](https://github.com/respond-io/n8n-integration/compare/v0.53.0...v0.54.0) (2026-11-19)
+
+
+### Features
+
+* add sentiment filter to the Call Ended trigger ([a530e04](https://github.com/respond-io/n8n-integration/commit/a530e04fbc70c895c514426b7312fa58e5e783bc))
+* added support for reaction message type ([fa7266c](https://github.com/respond-io/n8n-integration/commit/fa7266ca4d0cb693250fb62475fffebb5ea307a0))
+
 ## [0.53.0](https://github.com/respond-io/n8n-integration/compare/v0.52.0...v0.53.0) (2026-10-20)
 
 
