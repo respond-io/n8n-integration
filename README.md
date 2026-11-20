@@ -94,6 +94,7 @@ The Respond.io Trigger node can listen for the following events:
 - **Contact Assignee Updated** - Triggered when a contact's assignee is changed
 - **Contact Tag Updated** - Triggered when a contact's tags are modified
 - **Contact Lifecycle Updated** - Triggered when a contact's lifecycle stage changes
+- **Call Ended** - Triggered when a call ends. For recorded calls with call transcription enabled, the payload's `call` object additionally carries `sentiment` (`positive` | `neutral` | `negative` | `unavailable`) and `sentimentReason` (one-sentence explanation; empty string when unavailable). Both keys are omitted when the call was not scored. Use the optional **Sentiment** filter to trigger only for calls scored with the selected sentiments
 
 ## Credentials
 
